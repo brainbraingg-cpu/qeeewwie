@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTIMATE INSTANT STEAL & ESP EDITION
+-- QEEEWWIE HUB: STABLE EXECUTE FIX
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -35,7 +35,6 @@ ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999999
 
--- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.05, 0, 0.10, 0)
@@ -56,7 +55,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Instant Steal Edition [⚡]"
+SubTitle.Text = "Stable Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -448,4 +447,4 @@ task.spawn(function()
                                 end
 
                                 if shouldGrab then
-            
+                                    prompt.HoldDura
