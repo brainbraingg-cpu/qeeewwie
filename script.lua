@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: PRECISION TP & DIRECT NAME RARITY
+-- QEEEWWIE HUB: FIX ALL RARITY TELEPORT TO SHOP
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -15,7 +15,6 @@ local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
 
--- Daftar Rarity murni berdasarkan nama objek telur di game
 local rarityList = {"ALL", "CHERUB", "LEGENDARY", "EPIC", "RARE", "COMMON"}
 local rarityIndex = 1
 
@@ -41,7 +40,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Precision TP & Name Filter [⚡]"
+SubTitle.Text = "Fix Shop Teleport [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -168,7 +167,7 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Presisi Tinggi & Filter Berdasarkan Nama Objek Telur
+-- Engine Filter yang Aman dari Toko / Shop
 task.spawn(function()
     while true do
         task.wait(1.5)
@@ -181,33 +180,37 @@ task.spawn(function()
             for _, obj in pairs(Workspace:GetDescendants()) do
                 if not autoTeleportEggActive then break end
                 
-                -- Hanya cari objek yang benar-benar bernama "egg" atau "telur"
-                if obj:IsA("BasePart") and (string.lower(obj.Name):find("egg") or string.lower(obj.Name):find("telur")) then
-                    
+                if obj:IsA("BasePart") then
+                    local nameLower = string.lower(obj.Name)
                     local parentModel = obj.Parent
-                    local fullName = string.lower(obj.Name .. " " .. (parentModel and parentModel.Name or ""))
+                    local parentName = parentModel and string.lower(parentModel.Name) or ""
+                    local fullName = nameLower .. " " .. parentName
                     
-                    local isMatch = false
-                    if selectedRarityName == "all" then
-                        isMatch = true
-                    else
-                        isMatch = fullName:find(selectedRarityName)
-                    end
-
-                    if isMatch then
-                        -- Teleport persis di samping objek (tinggi Y disamakan agar tidak tembus ke atap/lantai)
-                        root.CFrame = CFrame.new(obj.Position + Vector3.new(0, 2, 3))
-                        
-                        -- Picu interaksi prompt jika ada
-                        for _, prompt in pairs(parentModel:GetDescendants()) do
-                            if prompt:IsA("ProximityPrompt") then
-                                prompt.HoldDuration = 0
-                                if fireproximityprompt then fireproximityprompt(prompt) end
-                            end
+                    -- Pastikan mendeteksi telur, tapi DI-SKIP jika itu toko/shop
+                    local isEgg = (nameLower:find("egg") or nameLower:find("telur"))
+                    local isShop = (fullName:find("shop") or fullName:find("toko") or fullName:find("store"))
+                    
+                    if isEgg and not isShop then
+                        local isMatch = false
+                        if selectedRarityName == "all" then
+                            isMatch = true
+                        else
+                            isMatch = fullName:find(selectedRarityName)
                         end
-                        
-                        task.wait(2.5) -- Jeda di telur tersebut
-                        break
+
+                        if isMatch then
+                            root.CFrame = CFrame.new(obj.Position + Vector3.new(0, 2, 3))
+                            
+                            for _, prompt in pairs(parentModel:GetDescendants()) do
+                                if prompt:IsA("ProximityPrompt") then
+                                    prompt.HoldDuration = 0
+                                    if fireproximityprompt then fireproximityprompt(prompt) end
+                                end
+                            end
+                            
+                            task.wait(2.5)
+                            break
+                        end
                     end
                 end
             end
