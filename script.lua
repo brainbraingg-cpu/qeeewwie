@@ -1,22 +1,21 @@
 -- =========================================================
--- QEEEWWIE HUB: IMPROVED EDITION (RIDE A PET)
+-- QEEEWWIE HUB: PLAYERGUI FIXED VERSION (RIDE A PET)
 -- =========================================================
-
-local CoreGui = game:GetService("CoreGui")
-if CoreGui:FindFirstChild("QeeewwieHubUI") then
-    CoreGui.QeeewwieHubUI:Destroy()
-end
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("QeeewwieHubUI") then
+    PlayerGui.QeeewwieHubUI:Destroy()
+end
 
 local instantGrabActive = false
 local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
 
--- Daftar raritinya beserta status aktif
 local rarityFilters = {
     {name = "ALL", active = true},
     {name = "Solaris Egg", active = false},
@@ -28,9 +27,10 @@ local rarityFilters = {
 }
 local currentFilterIdx = 1
 
-local ScreenGui = Instance.new("ScreenGui", CoreGui)
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 999999
 
 -- 1. Main Frame (Menu Utama)
 local MainFrame = Instance.new("Frame", ScreenGui)
@@ -51,7 +51,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Improved Stable Edition [⚡]"
+SubTitle.Text = "PlayerGui Fix Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.09, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -177,7 +177,6 @@ SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
--- Event Minimize & Restore
 MinimizeBtn.Activated:Connect(function()
     MainFrame.Visible = false
     FloatingIcon.Position = MainFrame.Position
@@ -267,7 +266,6 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Main Loop Engine (Aman & Optimized)
 task.spawn(function()
     while true do
         task.wait(0.3)
