@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FIX AUTO TP & LOCK POSITION
+-- QEEEWWIE HUB V13: FIXED TP & IMPROVED RARITY FILTER
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -14,8 +14,10 @@ local autoTeleportEggActive = false
 local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
-local selectedRarity = "all"
+local selectedRarityIndex = 1
+local rarityList = {"ALL", "CHERUB", "LEGENDARY", "EPIC", "RARE"}
 
+-- 1. UI Utama
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
@@ -38,7 +40,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Fix Teleport Base [⚡]"
+SubTitle.Text = "Fixed TP & Rarity Improved [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -46,6 +48,7 @@ SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 12
 SubTitle.BackgroundTransparency = 1
 
+-- 2. Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
 TabContainer.Position = UDim2.new(0.05, 0, 0.18, 0)
@@ -91,6 +94,7 @@ TeleportEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TeleportEggBtn.TextSize = 11
 Instance.new("UICorner", TeleportEggBtn).CornerRadius = UDim.new(0, 6)
 
+-- Tombol Rarity Filter Improved
 local RarityBtn = Instance.new("TextButton", PageFarm)
 RarityBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
 RarityBtn.Position = UDim2.new(0, 0, 0.38, 0)
@@ -121,6 +125,7 @@ SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
+-- 3. Logika Navigasi Tab
 TabFarm.Activated:Connect(function()
     PageFarm.Visible = true
     PagePlayer.Visible = false
@@ -139,23 +144,14 @@ TabPlayer.Activated:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
+-- 4. Pengaturan Tombol Rarity Filter (Improved Loop)
 RarityBtn.Activated:Connect(function()
-    if selectedRarity == "all" then
-        selectedRarity = "cherub"
-        RarityBtn.Text = "RARITY: CHERUB / MYTHIC"
-    elseif selectedRarity == "cherub" then
-        selectedRarity = "legendary"
-        RarityBtn.Text = "RARITY: LEGENDARY"
-    elseif selectedRarity == "legendary" then
-        selectedRarity = "epic"
-        RarityBtn.Text = "RARITY: EPIC"
-    elseif selectedRarity == "epic" then
-        selectedRarity = "rare"
-        RarityBtn.Text = "RARITY: RARE"
-    else
-        selectedRarity = "all"
-        RarityBtn.Text = "RARITY FILTER: ALL"
+    selectedRarityIndex = selectedRarityIndex + 1
+    if selectedRarityIndex > #rarityList then
+        selectedRarityIndex = 1
     end
+    local currentRarity = rarityList[selectedRarityIndex]
+    RarityBtn.Text = "RARITY FILTER: " .. currentRarity
 end)
 
 TeleportEggBtn.Activated:Connect(function()
@@ -176,10 +172,10 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Anti-Pull Back ke Base
+-- 5. Engine Utama (Aman dari Nyangkut & Filter Rarity Lebih Pintar)
 task.spawn(function()
     while true do
-        task.wait(0.5)
+        task.wait(1.2)
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
@@ -188,14 +184,23 @@ task.spawn(function()
                 for _, obj in pairs(Workspace:GetDescendants()) do
                     if autoTeleportEggActive and (obj:IsA("Model") or obj:IsA("BasePart")) then
                         local nameLower = string.lower(obj.Name)
+                        -- Deteksi objek yang mengandung kata telur/egg
                         if nameLower:find("egg") or nameLower:find("telur") or nameLower:find("cherub") then
-                            local matchRarity = (selectedRarity == "all") or nameLower:find(selectedRarity)
+                            
+                            local activeRarityName = string.lower(rarityList[selectedRarityIndex])
+                            local matchRarity = false
+                            
+                            if activeRarityName == "all" then
+                                matchRarity = true
+                            else
+                                matchRarity = nameLower:find(activeRarityName) or (obj.Parent and string.lower(obj.Parent.Name):find(activeRarityName))
+                            end
 
                             if matchRarity then
-                                local partPos = obj:IsA("BasePart") and obj.Position or (obj.PrimaryPart and obj.PrimaryPart.Position)
-                                if partPos then
-                                    -- Kunci posisi di atas telur terus menerus agar tidak tertarik ke base
-                                    root.CFrame = CFrame.new(partPos + Vector3.new(0, 3, 0))
+                                local targetPart = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
+                                if targetPart then
+                                    -- Teleport di samping objek (agak digeser sedikit agar tidak nyangkut di dalam/atap model)
+                                    root.CFrame = targetPart.CFrame + Vector3.new(2, 2, 2)
                                     
                                     for _, prompt in pairs(obj:GetDescendants()) do
                                         if prompt:IsA("ProximityPrompt") then
@@ -203,7 +208,7 @@ task.spawn(function()
                                             if fireproximityprompt then fireproximityprompt(prompt) end
                                         end
                                     end
-                                    task.wait(2) -- Diam sebentar di telur tersebut sebelum cari yang lain
+                                    task.wait(2)
                                     break
                                 end
                             end
