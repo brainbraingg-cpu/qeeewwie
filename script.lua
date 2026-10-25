@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: INSTANT GRAB & EGG FILTER
+-- QEEEWWIE HUB: UPDATE NEW RARITY & EGGS (RIDE A PET)
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -15,7 +15,16 @@ local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
 
-local eggNameList = {"ALL", "Cherub", "Legendary", "Epic", "Rare", "Common"}
+-- Daftar Rarity & Egg baru sesuai data game
+local eggNameList = {
+    "ALL", 
+    "Solaris Egg", 
+    "Cherub Egg", 
+    "Seraph Egg", 
+    "Divine", 
+    "Ethereal", 
+    "Blackhole Egg"
+}
 local eggIndex = 1
 
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
@@ -25,7 +34,7 @@ ScreenGui.ResetOnSpawn = false
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
-MainFrame.Size = UDim2.new(0, 250, 0, 340)
+MainFrame.Size = UDim2.new(0, 260, 0, 350)
 MainFrame.Active = true
 MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -40,7 +49,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Instant Grab Edition [⚡]"
+SubTitle.Text = "Divine & Blackhole Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -100,7 +109,7 @@ EggFilterBtn.Size = UDim2.new(1, 0, 0, 32)
 EggFilterBtn.Font = Enum.Font.SourceSansBold
 EggFilterBtn.Text = "EGG: ALL"
 EggFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-EggFilterBtn.TextSize = 11
+EggFilterBtn.TextSize = 10
 Instance.new("UICorner", EggFilterBtn).CornerRadius = UDim.new(0, 6)
 
 local CollectBtn = Instance.new("TextButton", PageFarm)
@@ -167,7 +176,7 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Instant Grab Tanpa Teleport
+-- Engine Instant Grab dengan Filter Rarity Baru
 task.spawn(function()
     while true do
         task.wait(0.5)
@@ -189,7 +198,7 @@ task.spawn(function()
                         local parentName = grandParent and string.lower(grandParent.Name) or ""
                         local fullStr = partName .. " " .. parentName
                         
-                        local isEggPrompt = fullStr:find("egg") or fullStr:find("telur")
+                        local isEggPrompt = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal")
                         local isShop = fullStr:find("shop") or fullStr:find("toko")
                         
                         if isEggPrompt and not isShop then
