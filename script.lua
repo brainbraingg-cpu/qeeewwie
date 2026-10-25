@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FIXED & UNLOCKED GACOR EDITION [🔥]
+-- QEEEWWIE HUB: FIXED RANGE & UI VISIBLE EDITION [🔥]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -17,6 +17,7 @@ local autoCollectActive = false
 local speedBoostActive = false
 local espEggActive = false
 local customWalkSpeed = 65
+local maxInteractDistance = 30 -- Jarak maksimal (studs) biar gak kejauhan!
 
 local rarityFilters = {
     {name = "ALL", active = true},
@@ -29,14 +30,15 @@ local rarityFilters = {
 }
 local currentFilterIdx = 1
 
+-- Diperbaiki agar UI dijamin muncul di atas lapisan game & tidak tertutup
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999999
+ScreenGui.DisplayOrder = 2147483647 -- Prioritas layar tertinggi
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
+MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0) -- Diposisikan pas di tengah atas layar HP
 MainFrame.Size = UDim2.new(0, 260, 0, 420)
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -54,7 +56,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Unlocked Gacor Edition [⚡]"
+SubTitle.Text = "Fixed Range & UI Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -313,12 +315,12 @@ end)
 
 task.spawn(function()
     while true do
-        task.wait(0.2)
+        task.wait(0.15)
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
-        -- 1. ESP EGG
-        if espEggActive then
+        -- 1. ESP EGG (Dibatasi jaraknya biar gak nge-lag)
+        if espEggActive and root then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not espEggActive then break end
@@ -326,7 +328,7 @@ task.spawn(function()
                         local parentPart = prompt.Parent
                         local grandParent = parentPart and parentPart.Parent
                         
-                        if parentPart then
+                        if parentPart and parentPart:IsA("BasePart") and (root.Position - parentPart.Position).Magnitude <= 80 then
                             local partName = string.lower(parentPart.Name)
                             local parentName = grandParent and string.lower(grandParent.Name) or ""
                             local fullStr = partName .. " " .. parentName
@@ -383,8 +385,8 @@ task.spawn(function()
             end)
         end
 
-        -- 2. INSTANT GRAB EGG (Map Umum)
-        if instantGrabActive then
+        -- 2. INSTANT GRAB EGG (Map Umum + Bates Jarak Maksimal)
+        if instantGrabActive and root then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not instantGrabActive then break end
@@ -393,7 +395,7 @@ task.spawn(function()
                         local parentPart = prompt.Parent
                         local grandParent = parentPart and parentPart.Parent
                         
-                        if parentPart then
+                        if parentPart and parentPart:IsA("BasePart") and (root.Position - parentPart.Position).Magnitude <= maxInteractDistance then
                             local partName = string.lower(parentPart.Name)
                             local parentName = grandParent and string.lower(grandParent.Name) or ""
                             local fullStr = partName .. " " .. parentName
@@ -436,18 +438,11 @@ task.spawn(function()
             end)
         end
 
-        -- 3. AUTO INSTANT STEAL (Khusus Ranch / Base Player Lain dengan HoldDuration = 0)
-        if autoInstantStealActive then
+        -- 3. AUTO INSTANT STEAL (Khusus Ranch / Base Player Lain + Batas Jarak)
+        if autoInstantStealActive and root then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not autoInstantStealActive then break end
                     
                     if prompt:IsA("ProximityPrompt") then
-                        local parentPart = prompt.Parent
-                        local grandParent = parentPart and parentPart.Parent
-                        
-                        if parentPart then
-                            local partName = string.lower(parentPart.Name)
-                            local parentName = grandParent and string.lower(grandParent.Name) or ""
-                            local fullStr = partName .. " " .. parentName
-                            local promptText = string.lower(prompt.ActionText .. " " 
+                        local p
