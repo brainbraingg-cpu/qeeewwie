@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB V13: FIXED TP & IMPROVED RARITY FILTER
+-- QEEEWWIE HUB: PRECISION TP & DIRECT NAME RARITY
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -14,10 +14,11 @@ local autoTeleportEggActive = false
 local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
-local selectedRarityIndex = 1
-local rarityList = {"ALL", "CHERUB", "LEGENDARY", "EPIC", "RARE"}
 
--- 1. UI Utama
+-- Daftar Rarity murni berdasarkan nama objek telur di game
+local rarityList = {"ALL", "CHERUB", "LEGENDARY", "EPIC", "RARE", "COMMON"}
+local rarityIndex = 1
+
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
@@ -40,7 +41,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Fixed TP & Rarity Improved [⚡]"
+SubTitle.Text = "Precision TP & Name Filter [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -48,7 +49,6 @@ SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 12
 SubTitle.BackgroundTransparency = 1
 
--- 2. Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
 TabContainer.Position = UDim2.new(0.05, 0, 0.18, 0)
@@ -94,13 +94,12 @@ TeleportEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TeleportEggBtn.TextSize = 11
 Instance.new("UICorner", TeleportEggBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Rarity Filter Improved
 local RarityBtn = Instance.new("TextButton", PageFarm)
 RarityBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
 RarityBtn.Position = UDim2.new(0, 0, 0.38, 0)
 RarityBtn.Size = UDim2.new(1, 0, 0, 32)
 RarityBtn.Font = Enum.Font.SourceSansBold
-RarityBtn.Text = "RARITY FILTER: ALL"
+RarityBtn.Text = "RARITY: ALL"
 RarityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 RarityBtn.TextSize = 11
 Instance.new("UICorner", RarityBtn).CornerRadius = UDim.new(0, 6)
@@ -125,7 +124,6 @@ SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
--- 3. Logika Navigasi Tab
 TabFarm.Activated:Connect(function()
     PageFarm.Visible = true
     PagePlayer.Visible = false
@@ -144,14 +142,12 @@ TabPlayer.Activated:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
--- 4. Pengaturan Tombol Rarity Filter (Improved Loop)
 RarityBtn.Activated:Connect(function()
-    selectedRarityIndex = selectedRarityIndex + 1
-    if selectedRarityIndex > #rarityList then
-        selectedRarityIndex = 1
+    rarityIndex = rarityIndex + 1
+    if rarityIndex > #rarityList then
+        rarityIndex = 1
     end
-    local currentRarity = rarityList[selectedRarityIndex]
-    RarityBtn.Text = "RARITY FILTER: " .. currentRarity
+    RarityBtn.Text = "RARITY: " .. rarityList[rarityIndex]
 end)
 
 TeleportEggBtn.Activated:Connect(function()
@@ -172,74 +168,73 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- 5. Engine Utama (Aman dari Nyangkut & Filter Rarity Lebih Pintar)
+-- Engine Presisi Tinggi & Filter Berdasarkan Nama Objek Telur
 task.spawn(function()
     while true do
-        task.wait(1.2)
+        task.wait(1.5)
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
-        if root then
-            if autoTeleportEggActive then
-                for _, obj in pairs(Workspace:GetDescendants()) do
-                    if autoTeleportEggActive and (obj:IsA("Model") or obj:IsA("BasePart")) then
-                        local nameLower = string.lower(obj.Name)
-                        -- Deteksi objek yang mengandung kata telur/egg
-                        if nameLower:find("egg") or nameLower:find("telur") or nameLower:find("cherub") then
-                            
-                            local activeRarityName = string.lower(rarityList[selectedRarityIndex])
-                            local matchRarity = false
-                            
-                            if activeRarityName == "all" then
-                                matchRarity = true
-                            else
-                                matchRarity = nameLower:find(activeRarityName) or (obj.Parent and string.lower(obj.Parent.Name):find(activeRarityName))
-                            end
+        if root and autoTeleportEggActive then
+            local selectedRarityName = string.lower(rarityList[rarityIndex])
+            
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if not autoTeleportEggActive then break end
+                
+                -- Hanya cari objek yang benar-benar bernama "egg" atau "telur"
+                if obj:IsA("BasePart") and (string.lower(obj.Name):find("egg") or string.lower(obj.Name):find("telur")) then
+                    
+                    local parentModel = obj.Parent
+                    local fullName = string.lower(obj.Name .. " " .. (parentModel and parentModel.Name or ""))
+                    
+                    local isMatch = false
+                    if selectedRarityName == "all" then
+                        isMatch = true
+                    else
+                        isMatch = fullName:find(selectedRarityName)
+                    end
 
-                            if matchRarity then
-                                local targetPart = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
-                                if targetPart then
-                                    -- Teleport di samping objek (agak digeser sedikit agar tidak nyangkut di dalam/atap model)
-                                    root.CFrame = targetPart.CFrame + Vector3.new(2, 2, 2)
-                                    
-                                    for _, prompt in pairs(obj:GetDescendants()) do
-                                        if prompt:IsA("ProximityPrompt") then
-                                            prompt.HoldDuration = 0
-                                            if fireproximityprompt then fireproximityprompt(prompt) end
-                                        end
-                                    end
-                                    task.wait(2)
-                                    break
-                                end
+                    if isMatch then
+                        -- Teleport persis di samping objek (tinggi Y disamakan agar tidak tembus ke atap/lantai)
+                        root.CFrame = CFrame.new(obj.Position + Vector3.new(0, 2, 3))
+                        
+                        -- Picu interaksi prompt jika ada
+                        for _, prompt in pairs(parentModel:GetDescendants()) do
+                            if prompt:IsA("ProximityPrompt") then
+                                prompt.HoldDuration = 0
+                                if fireproximityprompt then fireproximityprompt(prompt) end
+                            end
+                        end
+                        
+                        task.wait(2.5) -- Jeda di telur tersebut
+                        break
+                    end
+                end
+            end
+        end
+
+        if autoCollectActive and root then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if obj:IsA("BasePart") then
+                    local nameLower = string.lower(obj.Name)
+                    if nameLower:find("coin") or nameLower:find("gem") or nameLower:find("cash") or nameLower:find("money") then
+                        if (root.Position - obj.Position).Magnitude <= 100 then
+                            if firetouchinterest then
+                                firetouchinterest(root, obj, 0)
+                                firetouchinterest(root, obj, 1)
                             end
                         end
                     end
                 end
             end
+        end
 
-            if autoCollectActive then
-                for _, obj in pairs(Workspace:GetDescendants()) do
-                    if obj:IsA("BasePart") then
-                        local nameLower = string.lower(obj.Name)
-                        if nameLower:find("coin") or nameLower:find("gem") or nameLower:find("cash") or nameLower:find("money") then
-                            if (root.Position - obj.Position).Magnitude <= 100 then
-                                if firetouchinterest then
-                                    firetouchinterest(root, obj, 0)
-                                    firetouchinterest(root, obj, 1)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-
-            if speedBoostActive then
-                local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if humanoid then humanoid.WalkSpeed = customWalkSpeed end
-            else
-                local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if humanoid and humanoid.WalkSpeed == customWalkSpeed then humanoid.WalkSpeed = 16 end
-            end
+        if speedBoostActive and char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then humanoid.WalkSpeed = customWalkSpeed end
+        elseif char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.WalkSpeed == customWalkSpeed then humanoid.WalkSpeed = 16 end
         end
     end
 end)
