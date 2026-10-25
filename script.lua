@@ -1,5 +1,5 @@
 -- =========================================================
--- AUTO STEAL EGG (TARGETED MODEL/PART SCANNER - AMAN DARI TOKO)
+-- AUTO STEAL EGG (ANTI-LAG & ANTI-TOKO / SMOOTH VERSION)
 -- =========================================================
 
 local Workspace = game:GetService("Workspace")
@@ -8,30 +8,35 @@ local LocalPlayer = Players.LocalPlayer
 
 local AutoSteal = true
 
--- Fungsi untuk mencari dan mengambil telur secara spesifik
 task.spawn(function()
-	print("🔥 Auto Steal Target Mode Aktif!")
+	print("🔥 Auto Steal Anti-Lag Aktif!")
 	
 	while AutoSteal do
-		task.wait(0.1)
+		-- Jeda diperbesar sedikit jadi 0.3 detik agar game tidak berat/patah-patah
+		task.wait(0.3)
 		
-		-- Cari di seluruh isi Workspace
-		for _, obj in pairs(Workspace:GetDescendants()) do
-			-- Filter: Pastikan objek adalah Part atau Model dan namanya mengandung "egg" atau "telur"
-			-- (Kecuali yang ada di dalam folder toko/shop)
-			local nameLower = string.lower(obj.Name)
+		-- Cek hanya objek yang ada di Workspace secara langsung atau dalam folder tertentu (jauh lebih ringan)
+		for _, item in pairs(Workspace:GetChildren()) do
+			local nameLower = string.lower(item.Name)
 			
-			if (nameLower:find("egg") or nameLower:find("telur")) then
-				-- Cek apakah objek ini punya ProximityPrompt di dalamnya
-				local prompt = obj:FindFirstChildOfClass("ProximityPrompt")
-				if not prompt and obj:IsA("BasePart") then
-					prompt = obj.Parent and obj.Parent:FindFirstChildOfClass("ProximityPrompt")
+			-- Jika menemukan model/part telur di map
+			if nameLower:find("egg") or nameLower:find("telur") then
+				local prompt = item:FindFirstChildOfClass("ProximityPrompt")
+				
+				-- Jika prompt tidak ada di luar, cari di dalam anak komponennya (descendants terbatas)
+				if not prompt then
+					for _, child in pairs(item:GetDescendants()) do
+						if child:IsA("ProximityPrompt") then
+							prompt = child
+							break
+						end
+					end
 				end
 				
-				-- Jika ketemu prompt di dalam objek telur tersebut, eksekusi!
+				-- Eksekusi jika prompt ditemukan dan aktif
 				if prompt and prompt.Enabled then
-					-- Pastikan parent-nya bukan bagian dari Shop/Toko
-					local fullName = string.lower(obj:GetFullName())
+					-- Pastikan bukan bagian dari toko
+					local fullName = string.lower(item:GetFullName())
 					if not fullName:find("shop") and not fullName:find("toko") and not fullName:find("gamepass") then
 						prompt.HoldDuration = 0
 						
