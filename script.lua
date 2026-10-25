@@ -1,46 +1,51 @@
-
 -- ==========================================
 -- Steal an Egg - Qeeewwie Hub Script
--- Work for Arceus X & Other Mobile Executors
+-- Support: Arceus X & Mobile Executors
 -- ==========================================
 
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local ToggleStealBtn = Instance.new("TextButton")
-local SpeedBtn = Instance.new("TextButton")
-local EspBtn = Instance.new("TextButton")
-local CloseBtn = Instance.new("TextButton")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 
--- Setup ScreenGui
-ScreenGui.Parent = game:GetService("CoreGui") or game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Hapus GUI lama jika ada
+if CoreGui:FindFirstChild("StealEggAdvancedHub") then
+    CoreGui.StealEggAdvancedHub:Destroy()
+end
+
+-- Setup Main ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StealEggAdvancedHub"
+ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Setup Frame Utama
-MainFrame.Name = "StealEggHub"
+-- Main Frame
+local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
-MainFrame.Size = UDim2.new(0, 240, 0, 260)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MainFrame.Position = UDim2.new(0.25, 0, 0.2, 0)
+MainFrame.Size = UDim2.new(0, 360, 0, 310)
 MainFrame.Active = true
 MainFrame.Draggable = true -- Bisa digeser di layar HP
 
--- Judul
-Title.Name = "Title"
+-- Header / Title Bar
+local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+Title.Size = UDim2.new(1, 0, 0, 40)
 Title.Font = Enum.Font.SourceSansBold
-Title.Text = "STEAL AN EGG HUB"
+Title.Text = "  STEAL AN EGG | ADVANCED HUB"
 Title.TextColor3 = Color3.fromRGB(255, 215, 0)
-Title.TextSize = 18.000
+Title.TextSize = 16.000
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Tombol Close
-CloseBtn.Name = "CloseBtn"
+-- Close Button
+local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = MainFrame
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseBtn.Position = UDim2.new(0.85, -5, 0.02, 0)
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(0.9, -5, 0.1, 0)
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Font = Enum.Font.SourceSansBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -49,111 +54,139 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Variables & Toggles
+-- Container untuk Tombol-tombol Fitur
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Container.Position = UDim2.new(0.03, 0, 0.16, 0)
+Container.Size = UDim2.new(0.94, 0, 0.8, 0)
+Container.CanvasSize = UDim2.new(0, 0, 1.8, 0)
+Container.ScrollBarThickness = 6
+
+-- UI List Layout agar rapi ke bawah
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 8)
+
+-- Fungsi Pembuat Tombol Universal
+local function createButton(name, defaultText, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = Container
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    btn.Size = UDim2.new(0.95, 0, 0, 40)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = defaultText
+    btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+    btn.TextSize = 15.000
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            btn.TextColor3 = Color3.fromRGB(100, 255, 100)
+            btn.Text = name .. ": ON"
+        else
+            btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+            btn.Text = name .. ": OFF"
+        end
+        callback(state)
+    end)
+    return btn
+end
+
+-- ==========================================
+-- VARIABEL FITUR
+-- ==========================================
 local autoSteal = false
-local speedBoost = false
-local espEnabled = false
+local speedVal = 32
+local walkSpeedActive = false
+local infiniteJumpActive = false
+local espActive = false
+local antiAfkActive = true
 
--- 1. Tombol Auto Steal
-ToggleStealBtn.Name = "StealBtn"
-ToggleStealBtn.Parent = MainFrame
-ToggleStealBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-ToggleStealBtn.Position = UDim2.new(0.1, 0, 0.22, 0)
-ToggleStealBtn.Size = UDim2.new(0.8, 0, 0, 40)
-ToggleStealBtn.Font = Enum.Font.SourceSansBold
-ToggleStealBtn.Text = "Auto Steal Egg: OFF"
-ToggleStealBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-ToggleStealBtn.TextSize = 16.000
-
-ToggleStealBtn.MouseButton1Click:Connect(function()
-    autoSteal = not autoSteal
-    if autoSteal then
-        ToggleStealBtn.Text = "Auto Steal Egg: ON"
-        ToggleStealBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
-    else
-        ToggleStealBtn.Text = "Auto Steal Egg: OFF"
-        ToggleStealBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-    end
+-- 1. Auto Steal Egg
+createButton("Auto Steal Egg", "Auto Steal Egg: OFF", function(state)
+    autoSteal = state
 end)
 
--- 2. Tombol Speed Boost
-SpeedBtn.Name = "SpeedBtn"
-SpeedBtn.Parent = MainFrame
-SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-SpeedBtn.Position = UDim2.new(0.1, 0, 0.45, 0)
-SpeedBtn.Size = UDim2.new(0.8, 0, 0, 40)
-SpeedBtn.Font = Enum.Font.SourceSansBold
-SpeedBtn.Text = "Speed (35): OFF"
-SpeedBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-SpeedBtn.TextSize = 16.000
-
-SpeedBtn.MouseButton1Click:Connect(function()
-    speedBoost = not speedBoost
-    local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if speedBoost then
-        SpeedBtn.Text = "Speed (35): ON"
-        SpeedBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
-        if hum then hum.WalkSpeed = 35 end
-    else
-        SpeedBtn.Text = "Speed (35): OFF"
-        SpeedBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-        if hum then hum.WalkSpeed = 16 end
-    end
+-- 2. Speed Boost (32)
+createButton("Speed Boost (32)", "Speed Boost (32): OFF", function(state)
+    walkSpeedActive = state
 end)
 
--- 3. Tombol Highlight Players (ESP)
-EspBtn.Name = "EspBtn"
-EspBtn.Parent = MainFrame
-EspBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-EspBtn.Position = UDim2.new(0.1, 0, 0.68, 0)
-EspBtn.Size = UDim2.new(0.8, 0, 0, 40)
-EspBtn.Font = Enum.Font.SourceSansBold
-EspBtn.Text = "Player ESP: OFF"
-EspBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-EspBtn.TextSize = 16.000
-
-EspBtn.MouseButton1Click:Connect(function()
-    espEnabled = not espEnabled
-    if espEnabled then
-        EspBtn.Text = "Player ESP: ON"
-        EspBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
-        for _, plr in pairs(game.Players:GetPlayers()) do
-            if plr ~= game.Players.LocalPlayer and plr.Character then
-                local hl = Instance.new("Highlight")
-                hl.Name = "ESPHighlight"
-                hl.FillColor = Color3.fromRGB(255, 0, 0)
-                hl.Parent = plr.Character
-            end
-        end
-    else
-        EspBtn.Text = "Player ESP: OFF"
-        EspBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-        for _, plr in pairs(game.Players:GetPlayers()) do
-            if plr.Character and plr.Character:FindFirstChild("ESPHighlight") then
-                plr.Character.ESPHighlight:Destroy()
-            end
-        end
-    end
+-- 3. Infinite Jump
+createButton("Infinite Jump", "Infinite Jump: OFF", function(state)
+    infiniteJumpActive = state
 end)
 
--- Loop Fungsi Auto Steal & Proximity Prompt
-task.spawn(function()
-    while task.wait(0.2) do
-        if autoSteal then
-            -- Memicu ProximityPrompt (Ambil Telur) Otomatis
-            for _, prompt in pairs(workspace:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") then
-                    fireproximityprompt(prompt)
+-- 4. Player ESP (Highlight)
+createButton("Player ESP", "Player ESP: OFF", function(state)
+    espActive = state
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            if espActive then
+                if not plr.Character:FindFirstChild("ESPHighlight") then
+                    local hl = Instance.new("Highlight")
+                    hl.Name = "ESPHighlight"
+                    hl.FillColor = Color3.fromRGB(255, 0, 0)
+                    hl.Parent = plr.Character
+                end
+            else
+                if plr.Character:FindFirstChild("ESPHighlight") then
+                    plr.Character.ESPHighlight:Destroy()
                 end
             end
         end
+    end
+end)
+
+-- 5. Anti-AFK (Otomatis Aktif untuk Mencegah Kick)
+local VirtualUser = game:GetService("VirtualUser")
+LocalPlayer.Idled:Connect(function()
+    if antiAfkActive then
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end
+end)
+
+-- ==========================================
+-- BACKGROUND LOOPS & LOGIC UTAMA
+-- ==========================================
+
+-- Loop Auto Steal & Movement Fix
+task.spawn(function()
+    while task.wait(0.15) do
+        -- Auto Steal Proximity Prompt
+        if autoSteal then
+            pcall(function()
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if obj:IsA("ProximityPrompt") then
+                        fireproximityprompt(obj)
+                    end
+                end
+            end)
+        end
         
-        -- Menjaga keaktifan Speed jika opsi ON
-        if speedBoost and game.Players.LocalPlayer.Character then
-            local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            if hum and hum.WalkSpeed ~= 35 then
-                hum.WalkSpeed = 35
+        -- WalkSpeed Handler
+        if walkSpeedActive and LocalPlayer.Character then
+            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.WalkSpeed ~= speedVal then
+                hum.WalkSpeed = speedVal
             end
         end
     end
 end)
+
+-- Infinite Jump Listener
+local UserInputService = game:GetService("UserInputService")
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpActive and LocalPlayer.Character then
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+print("Steal an Egg Qeeewwie Hub successfully loaded!")
