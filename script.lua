@@ -1,58 +1,53 @@
 -- =========================================================
--- ULTRA FAST AUTO STEAL EGG (STRICT ANTI-TOKO ROBUX)
+-- AUTO STEAL EGG (KHUSUS GAME INDONESIA - ANTI BUKA TOKO)
 -- =========================================================
 
-local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local AutoSteal = true
 
--- Daftar kata terlarang (Jangan pernah di-trigger)
-local BlacklistText = {"buy", "toko", "shop", "pass", "robux", "gandakan", "kecepatan", "boost", "vip"}
-
--- Fungsi cek apakah prompt aman
-local function isSafePrompt(prompt)
-	local action = string.lower(prompt.ActionText or "")
-	local object = string.lower(prompt.ObjectText or "")
-	local parentName = string.lower(prompt.Parent and prompt.Parent.Name or "")
-
-	-- 1. Cek kata-kata blacklist
-	for _, word in ipairs(BlacklistText) do
-		if action:find(word) or object:find(word) or parentName:find(word) then
-			return false
-		end
+-- Fungsi khusus memicu prompt dengan aman
+local function safeFire(prompt)
+	if not prompt or not prompt.Enabled then return end
+	
+	-- Picu prompt seketika
+	if fireproximityprompt then
+		fireproximityprompt(prompt)
+	elseif prompt.InputHoldBegin then
+		prompt:InputHoldBegin()
+		prompt:InputHoldEnd()
 	end
-
-	-- 2. Wajib mengandung kata kunci telur/steal/curi
-	if action:find("steal") or action:find("curi") or action:find("take") or action:find("ambil")
-		or object:find("egg") or object:find("telur") or parentName:find("egg") or parentName:find("telur") then
-		return true
-	end
-
-	return false
 end
 
 -- Loop Auto Steal
 task.spawn(function()
-	print("🔥 Auto Steal Anti-Toko Aktif!")
+	print("🔥 Auto Steal Khusus Game Indonesia Aktif!")
+	
 	while AutoSteal do
-		task.wait(0.05)
+		task.wait(0.05) -- Kecepatan tinggi (20x/detik)
 		
 		for _, prompt in pairs(Workspace:GetDescendants()) do
 			if prompt:IsA("ProximityPrompt") and prompt.Enabled then
-				if isSafePrompt(prompt) then
-					-- Instant Hold Bypass
+				local action = string.lower(prompt.ActionText or "")
+				local object = string.lower(prompt.ObjectText or "")
+				local parentName = string.lower(prompt.Parent and prompt.Parent.Name or "")
+
+				-- 1. FILTER KETAT: Abaikan jika ada kata Toko, Beli, Gamepass, Robux, VIP, atau Halloween Promo
+				local isStore = action:find("beli") or action:find("buy") or action:find("toko") or action:find("shop") 
+				                or object:find("beli") or object:find("toko") or parentName:find("shop") or parentName:find("toko")
+				                or action:find("robux") or object:find("robux")
+
+				-- 2. HANYA JALANKAN jika prompt BENAR-BENAR bertuliskan "Curi" atau "Mencuri" atau "Steal"
+				local isStealPrompt = action:find("curi") or action:find("mencuri") or action:find("steal") or action:find("take")
+
+				if isStealPrompt and not isStore then
+					-- Instant Hold Bypass (0 detik tahan)
 					prompt.HoldDuration = 0
 					
-					-- Teleport sedikit mendekat jika perlu (biar prompt bisa dipicu)
-					if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-						local promptPos = prompt.Parent:IsA("BasePart") and prompt.Parent.Position or prompt.Parent:GetPivot().Position
-						-- Picu ProximityPrompt
-						if fireproximityprompt then
-							fireproximityprompt(prompt)
-						end
-					end
+					-- Eksekusi ambil
+					safeFire(prompt)
 				end
 			end
 		end
