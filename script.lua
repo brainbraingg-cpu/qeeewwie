@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: PLAYERGUI FIXED VERSION (RIDE A PET)
+-- QEEEWWIE HUB: MOBILE TOUCH FIXED EDITION (RIDE A PET)
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -39,6 +39,7 @@ MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
 MainFrame.Size = UDim2.new(0, 260, 0, 360)
 MainFrame.Active = true
 MainFrame.Draggable = true
+MainFrame.ZIndex = 10
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel", MainFrame)
@@ -49,15 +50,17 @@ Title.Size = UDim2.new(0.70, 0, 0, 22)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 16
 Title.BackgroundTransparency = 1
+Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "PlayerGui Fix Edition [⚡]"
+SubTitle.Text = "Mobile Touch Fix [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.09, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 12
 SubTitle.BackgroundTransparency = 1
+SubTitle.ZIndex = 11
 
 -- 2. Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
@@ -68,23 +71,29 @@ MinimizeBtn.Font = Enum.Font.SourceSansBold
 MinimizeBtn.Text = "-"
 MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MinimizeBtn.TextSize = 16
+MinimizeBtn.ZIndex = 11
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(1, 0)
 
--- 3. Floating Icon Senju Kawaragi
-local FloatingIcon = Instance.new("ImageButton", ScreenGui)
-FloatingIcon.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-FloatingIcon.Position = UDim2.new(0.05, 0, 0.15, 0)
-FloatingIcon.Size = UDim2.new(0, 50, 0, 50)
-FloatingIcon.Visible = false
-FloatingIcon.Active = true
-FloatingIcon.Draggable = true
-FloatingIcon.Image = "rbxassetid://10670351745"
-Instance.new("UICorner", FloatingIcon).CornerRadius = UDim.new(1, 0)
+-- 3. Floating Button Pengganti (Dijamin Responsif di HP)
+local FloatingBtn = Instance.new("TextButton", ScreenGui)
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 100)
+FloatingBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
+FloatingBtn.Size = UDim2.new(0, 45, 0, 45)
+FloatingBtn.Font = Enum.Font.SourceSansBold
+FloatingBtn.Text = "⚡ Q"
+FloatingBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FloatingBtn.TextSize = 14
+FloatingBtn.Visible = false
+FloatingBtn.Active = true
+FloatingBtn.Draggable = true
+FloatingBtn.ZIndex = 9999
+Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
 
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
 TabContainer.Position = UDim2.new(0.05, 0, 0.16, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
+TabContainer.ZIndex = 11
 
 local TabFarm = Instance.new("TextButton", TabContainer)
 TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
@@ -93,6 +102,7 @@ TabFarm.Font = Enum.Font.SourceSansBold
 TabFarm.Text = "EGG & FILTER"
 TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabFarm.TextSize = 10
+TabFarm.ZIndex = 12
 Instance.new("UICorner", TabFarm).CornerRadius = UDim.new(0, 6)
 
 local TabPlayer = Instance.new("TextButton", TabContainer)
@@ -103,18 +113,21 @@ TabPlayer.Font = Enum.Font.SourceSansBold
 TabPlayer.Text = "PLAYER SPEED"
 TabPlayer.TextColor3 = Color3.fromRGB(180, 180, 180)
 TabPlayer.TextSize = 10
+TabPlayer.ZIndex = 12
 Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
 PageFarm.Position = UDim2.new(0.05, 0, 0.25, 0)
 PageFarm.Size = UDim2.new(0.9, 0, 0.72, 0)
+PageFarm.ZIndex = 11
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
 PagePlayer.Position = UDim2.new(0.05, 0, 0.25, 0)
 PagePlayer.Size = UDim2.new(0.9, 0, 0.72, 0)
 PagePlayer.Visible = false
+PagePlayer.ZIndex = 11
 
 local InstantGrabBtn = Instance.new("TextButton", PageFarm)
 InstantGrabBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
@@ -124,6 +137,7 @@ InstantGrabBtn.Font = Enum.Font.SourceSansBold
 InstantGrabBtn.Text = "INSTANT GRAB EGG: OFF"
 InstantGrabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 InstantGrabBtn.TextSize = 11
+InstantGrabBtn.ZIndex = 12
 Instance.new("UICorner", InstantGrabBtn).CornerRadius = UDim.new(0, 6)
 
 local ToggleFilterBtn = Instance.new("TextButton", PageFarm)
@@ -134,6 +148,7 @@ ToggleFilterBtn.Font = Enum.Font.SourceSansBold
 ToggleFilterBtn.Text = "SELECT: ALL"
 ToggleFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleFilterBtn.TextSize = 10
+ToggleFilterBtn.ZIndex = 12
 Instance.new("UICorner", ToggleFilterBtn).CornerRadius = UDim.new(0, 6)
 
 local SwitchStatusBtn = Instance.new("TextButton", PageFarm)
@@ -144,6 +159,7 @@ SwitchStatusBtn.Font = Enum.Font.SourceSansBold
 SwitchStatusBtn.Text = "OFF [X]"
 SwitchStatusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SwitchStatusBtn.TextSize = 10
+SwitchStatusBtn.ZIndex = 12
 Instance.new("UICorner", SwitchStatusBtn).CornerRadius = UDim.new(0, 6)
 
 local ActiveInfoLabel = Instance.new("TextLabel", PageFarm)
@@ -155,6 +171,7 @@ ActiveInfoLabel.Text = "Active: ALL"
 ActiveInfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 ActiveInfoLabel.TextSize = 10
 ActiveInfoLabel.TextWrapped = true
+ActiveInfoLabel.ZIndex = 12
 Instance.new("UICorner", ActiveInfoLabel).CornerRadius = UDim.new(0, 6)
 
 local CollectBtn = Instance.new("TextButton", PageFarm)
@@ -165,6 +182,7 @@ CollectBtn.Font = Enum.Font.SourceSansBold
 CollectBtn.Text = "AUTO COLLECT: OFF"
 CollectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CollectBtn.TextSize = 11
+CollectBtn.ZIndex = 12
 Instance.new("UICorner", CollectBtn).CornerRadius = UDim.new(0, 6)
 
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
@@ -175,18 +193,20 @@ SpeedBtn.Font = Enum.Font.SourceSansBold
 SpeedBtn.Text = "SPEED BOOST: OFF"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
+SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
-MinimizeBtn.Activated:Connect(function()
+-- Sistem Minimize & Restore yang Super Responsif di HP
+MinimizeBtn.MouseButton1Click:Connect(function()
+    FloatingBtn.Position = MainFrame.Position
     MainFrame.Visible = false
-    FloatingIcon.Position = MainFrame.Position
-    FloatingIcon.Visible = true
+    FloatingBtn.Visible = true
 end)
 
-FloatingIcon.Activated:Connect(function()
-    MainFrame.Position = FloatingIcon.Position
+FloatingBtn.MouseButton1Click:Connect(function()
+    MainFrame.Position = FloatingBtn.Position
     MainFrame.Visible = true
-    FloatingIcon.Visible = false
+    FloatingBtn.Visible = false
 end)
 
 local function updateFilterUI()
@@ -209,7 +229,7 @@ local function updateFilterUI()
     ActiveInfoLabel.Text = "Active: " .. table.concat(activeNames, ", ")
 end
 
-TabFarm.Activated:Connect(function()
+TabFarm.MouseButton1Click:Connect(function()
     PageFarm.Visible = true
     PagePlayer.Visible = false
     TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
@@ -218,7 +238,7 @@ TabFarm.Activated:Connect(function()
     TabPlayer.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-TabPlayer.Activated:Connect(function()
+TabPlayer.MouseButton1Click:Connect(function()
     PageFarm.Visible = false
     PagePlayer.Visible = true
     TabPlayer.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
@@ -227,7 +247,7 @@ TabPlayer.Activated:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-ToggleFilterBtn.Activated:Connect(function()
+ToggleFilterBtn.MouseButton1Click:Connect(function()
     currentFilterIdx = currentFilterIdx + 1
     if currentFilterIdx > #rarityFilters then
         currentFilterIdx = 1
@@ -235,7 +255,7 @@ ToggleFilterBtn.Activated:Connect(function()
     updateFilterUI()
 end)
 
-SwitchStatusBtn.Activated:Connect(function()
+SwitchStatusBtn.MouseButton1Click:Connect(function()
     local current = rarityFilters[currentFilterIdx]
     if current.name == "ALL" then
         current.active = not current.active
@@ -248,19 +268,19 @@ SwitchStatusBtn.Activated:Connect(function()
     updateFilterUI()
 end)
 
-InstantGrabBtn.Activated:Connect(function()
+InstantGrabBtn.MouseButton1Click:Connect(function()
     instantGrabActive = not instantGrabActive
     InstantGrabBtn.Text = instantGrabActive and "INSTANT GRAB EGG: ON" or "INSTANT GRAB EGG: OFF"
     InstantGrabBtn.BackgroundColor3 = instantGrabActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 100, 50)
 end)
 
-CollectBtn.Activated:Connect(function()
+CollectBtn.MouseButton1Click:Connect(function()
     autoCollectActive = not autoCollectActive
     CollectBtn.Text = autoCollectActive and "AUTO COLLECT: ON" or "AUTO COLLECT: OFF"
     CollectBtn.BackgroundColor3 = autoCollectActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
 end)
 
-SpeedBtn.Activated:Connect(function()
+SpeedBtn.MouseButton1Click:Connect(function()
     speedBoostActive = not speedBoostActive
     SpeedBtn.Text = speedBoostActive and "SPEED BOOST: ON" or "SPEED BOOST: OFF"
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
@@ -296,6 +316,7 @@ task.spawn(function()
                                     shouldGrab = true
                                 else
                                     for i = 2, #rarityFilters do
+                                        let filt = rarityFilters[i] -- syntax fix below
                                         local filt = rarityFilters[i]
                                         if filt.active then
                                             local targetKey = string.lower(filt.name)
