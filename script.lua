@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: GACOR EDITION + AUTO INSTANT STEAL [🔥]
+-- QEEEWWIE HUB: FIXED & UNLOCKED GACOR EDITION [🔥]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -12,7 +12,7 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
 end
 
 local instantGrabActive = false
-local autoInstantStealActive = false -- Fitur Baru Ditambahkan
+local autoInstantStealActive = false
 local autoCollectActive = false
 local speedBoostActive = false
 local espEggActive = false
@@ -37,7 +37,7 @@ ScreenGui.DisplayOrder = 999999
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 420) -- Ukuran ditinggikan sedikit buat nampung tombol baru
+MainFrame.Size = UDim2.new(0, 260, 0, 420)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -54,7 +54,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Gacor + Auto Steal Edition [🔥]"
+SubTitle.Text = "Unlocked Gacor Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -125,7 +125,6 @@ InstantGrabBtn.TextSize = 10
 InstantGrabBtn.ZIndex = 12
 Instance.new("UICorner", InstantGrabBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Baru: Auto Instant Steal
 local AutoStealBtn = Instance.new("TextButton", PageFarm)
 AutoStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoStealBtn.Position = UDim2.new(0, 0, 0.14, 0)
@@ -437,7 +436,7 @@ task.spawn(function()
             end)
         end
 
-        -- 3. AUTO INSTANT STEAL (Khusus Ranch / Base Player Lain)
+        -- 3. AUTO INSTANT STEAL (Khusus Ranch / Base Player Lain dengan HoldDuration = 0)
         if autoInstantStealActive then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
@@ -450,4 +449,5 @@ task.spawn(function()
                         if parentPart then
                             local partName = string.lower(parentPart.Name)
                             local parentName = grandParent and string.lower(grandParent.Name) or ""
-                            local fullStr = partName .. " 
+                            local fullStr = partName .. " " .. parentName
+                            local promptText = string.lower(prompt.ActionText .. " " 
