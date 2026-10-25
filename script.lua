@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: UPDATE NEW RARITY & EGGS (RIDE A PET)
+-- QEEEWWIE HUB: MULTI-SELECT & MINIMIZE (SENJU KAWARAGI)
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -15,26 +15,27 @@ local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
 
--- Daftar Rarity & Egg baru sesuai data game
-local eggNameList = {
-    "ALL", 
-    "Solaris Egg", 
-    "Cherub Egg", 
-    "Seraph Egg", 
-    "Divine", 
-    "Ethereal", 
-    "Blackhole Egg"
+-- Daftar raritinya beserta status aktif (true/false)
+local rarityFilters = {
+    {name = "ALL", active = true},
+    {name = "Solaris Egg", active = false},
+    {name = "Cherub Egg", active = false},
+    {name = "Seraph Egg", active = false},
+    {name = "Divine", active = false},
+    {name = "Ethereal", active = false},
+    {name = "Blackhole Egg", active = false}
 }
-local eggIndex = 1
+local currentFilterIdx = 1
 
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 
+-- 1. Main Frame (Menu Utama)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 350)
+MainFrame.Size = UDim2.new(0, 260, 0, 360)
 MainFrame.Active = true
 MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -43,23 +44,45 @@ local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB"
 Title.TextColor3 = Color3.fromRGB(255, 150, 200)
 Title.Position = UDim2.new(0.08, 0, 0.03, 0)
-Title.Size = UDim2.new(0.85, 0, 0, 22)
+Title.Size = UDim2.new(0.70, 0, 0, 22)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Divine & Blackhole Edition [⚡]"
+SubTitle.Text = "Senju Kawaragi Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
-SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
+SubTitle.Position = UDim2.new(0.08, 0, 0.09, 0)
+SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 12
 SubTitle.BackgroundTransparency = 1
 
+-- 2. Tombol Minimize (-) di Pojok Kanan Atas MainFrame
+local MinimizeBtn = Instance.new("TextButton", MainFrame)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 100)
+MinimizeBtn.Position = UDim2.new(0.80, 0, 0.03, 0)
+MinimizeBtn.Size = UDim2.new(0, 26, 0, 26)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 16
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(1, 0) -- Bentuk bulat
+
+-- 3. Floating Icon (Logo Senju Kawaragi saat Minimized)
+local FloatingIcon = Instance.new("ImageButton", ScreenGui)
+FloatingIcon.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+FloatingIcon.Position = UDim2.new(0.05, 0, 0.15, 0)
+FloatingIcon.Size = UDim2.new(0, 50, 0, 50)
+FloatingIcon.Visible = false
+FloatingIcon.Active = true
+FloatingIcon.Draggable = true
+FloatingIcon.Image = "rbxassetid://10670351745" -- Asset ID gambar anime / Senju Kawaragi (bisa diganti ID decal lain jika mau)
+Instance.new("UICorner", FloatingIcon).CornerRadius = UDim.new(1, 0) -- Bulat estetik
+
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0.05, 0, 0.18, 0)
+TabContainer.Position = UDim2.new(0.05, 0, 0.16, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
 
 local TabFarm = Instance.new("TextButton", TabContainer)
@@ -83,39 +106,60 @@ Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
-PageFarm.Position = UDim2.new(0.05, 0, 0.28, 0)
-PageFarm.Size = UDim2.new(0.9, 0, 0.68, 0)
+PageFarm.Position = UDim2.new(0.05, 0, 0.25, 0)
+PageFarm.Size = UDim2.new(0.9, 0, 0.72, 0)
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
-PagePlayer.Position = UDim2.new(0.05, 0, 0.28, 0)
-PagePlayer.Size = UDim2.new(0.9, 0, 0.68, 0)
+PagePlayer.Position = UDim2.new(0.05, 0, 0.25, 0)
+PagePlayer.Size = UDim2.new(0.9, 0, 0.72, 0)
 PagePlayer.Visible = false
 
 local InstantGrabBtn = Instance.new("TextButton", PageFarm)
 InstantGrabBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
 InstantGrabBtn.Position = UDim2.new(0, 0, 0.02, 0)
-InstantGrabBtn.Size = UDim2.new(1, 0, 0, 32)
+InstantGrabBtn.Size = UDim2.new(1, 0, 0, 30)
 InstantGrabBtn.Font = Enum.Font.SourceSansBold
 InstantGrabBtn.Text = "INSTANT GRAB EGG: OFF"
 InstantGrabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 InstantGrabBtn.TextSize = 11
 Instance.new("UICorner", InstantGrabBtn).CornerRadius = UDim.new(0, 6)
 
-local EggFilterBtn = Instance.new("TextButton", PageFarm)
-EggFilterBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
-EggFilterBtn.Position = UDim2.new(0, 0, 0.38, 0)
-EggFilterBtn.Size = UDim2.new(1, 0, 0, 32)
-EggFilterBtn.Font = Enum.Font.SourceSansBold
-EggFilterBtn.Text = "EGG: ALL"
-EggFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-EggFilterBtn.TextSize = 10
-Instance.new("UICorner", EggFilterBtn).CornerRadius = UDim.new(0, 6)
+local ToggleFilterBtn = Instance.new("TextButton", PageFarm)
+ToggleFilterBtn.BackgroundColor3 = Color3.fromRGB(70, 50, 120)
+ToggleFilterBtn.Position = UDim2.new(0, 0, 0.32, 0)
+ToggleFilterBtn.Size = UDim2.new(0.68, 0, 0, 28)
+ToggleFilterBtn.Font = Enum.Font.SourceSansBold
+ToggleFilterBtn.Text = "SELECT: ALL"
+ToggleFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleFilterBtn.TextSize = 10
+Instance.new("UICorner", ToggleFilterBtn).CornerRadius = UDim.new(0, 6)
+
+local SwitchStatusBtn = Instance.new("TextButton", PageFarm)
+SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+SwitchStatusBtn.Position = UDim2.new(0.71, 0, 0.32, 0)
+SwitchStatusBtn.Size = UDim2.new(0.29, 0, 0, 28)
+SwitchStatusBtn.Font = Enum.Font.SourceSansBold
+SwitchStatusBtn.Text = "OFF [X]"
+SwitchStatusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SwitchStatusBtn.TextSize = 10
+Instance.new("UICorner", SwitchStatusBtn).CornerRadius = UDim.new(0, 6)
+
+local ActiveInfoLabel = Instance.new("TextLabel", PageFarm)
+ActiveInfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+ActiveInfoLabel.Position = UDim2.new(0, 0, 0.46, 0)
+ActiveInfoLabel.Size = UDim2.new(1, 0, 0, 38)
+ActiveInfoLabel.Font = Enum.Font.SourceSans
+ActiveInfoLabel.Text = "Active: ALL"
+ActiveInfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+ActiveInfoLabel.TextSize = 10
+ActiveInfoLabel.TextWrapped = true
+Instance.new("UICorner", ActiveInfoLabel).CornerRadius = UDim.new(0, 6)
 
 local CollectBtn = Instance.new("TextButton", PageFarm)
 CollectBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CollectBtn.Position = UDim2.new(0, 0, 0.73, 0)
-CollectBtn.Size = UDim2.new(1, 0, 0, 32)
+CollectBtn.Position = UDim2.new(0, 0, 0.78, 0)
+CollectBtn.Size = UDim2.new(1, 0, 0, 30)
 CollectBtn.Font = Enum.Font.SourceSansBold
 CollectBtn.Text = "AUTO COLLECT: OFF"
 CollectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -131,6 +175,39 @@ SpeedBtn.Text = "SPEED BOOST: OFF"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
+
+-- 4. Fungsi Minimize & Restore GUI
+MinimizeBtn.Activated:Connect(function()
+    MainFrame.Visible = false
+    FloatingIcon.Position = MainFrame.Position -- Samakan posisi saat diminimize
+    FloatingIcon.Visible = true
+end)
+
+FloatingIcon.Activated:Connect(function()
+    MainFrame.Position = FloatingIcon.Position -- Kembalikan posisi
+    MainFrame.Visible = true
+    FloatingIcon.Visible = false
+end)
+
+local function updateFilterUI()
+    local current = rarityFilters[currentFilterIdx]
+    ToggleFilterBtn.Text = "SEL: " .. current.name
+    if current.active then
+        SwitchStatusBtn.Text = "ON [✓]"
+        SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    else
+        SwitchStatusBtn.Text = "OFF [X]"
+        SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    end
+
+    local activeNames = {}
+    for _, item in ipairs(rarityFilters) do
+        if item.active then
+            table.insert(activeNames, item.name)
+        end
+    end
+    ActiveInfoLabel.Text = "Active Filters: " .. table.concat(activeNames, ", ")
+end
 
 TabFarm.Activated:Connect(function()
     PageFarm.Visible = true
@@ -150,12 +227,25 @@ TabPlayer.Activated:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-EggFilterBtn.Activated:Connect(function()
-    eggIndex = eggIndex + 1
-    if eggIndex > #eggNameList then
-        eggIndex = 1
+ToggleFilterBtn.Activated:Connect(function()
+    currentFilterIdx = currentFilterIdx + 1
+    if currentFilterIdx > #rarityFilters then
+        currentFilterIdx = 1
     end
-    EggFilterBtn.Text = "EGG: " .. string.upper(eggNameList[eggIndex])
+    updateFilterUI()
+end)
+
+SwitchStatusBtn.Activated:Connect(function()
+    local current = rarityFilters[currentFilterIdx]
+    if current.name == "ALL" then
+        current.active = not current.active
+    else
+        current.active = not current.active
+        if current.active then
+            rarityFilters[1].active = false
+        end
+    end
+    updateFilterUI()
 end)
 
 InstantGrabBtn.Activated:Connect(function()
@@ -176,7 +266,7 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Instant Grab dengan Filter Rarity Baru
+-- Engine Instant Grab dengan Multi-Select Filter
 task.spawn(function()
     while true do
         task.wait(0.5)
@@ -184,8 +274,6 @@ task.spawn(function()
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
         if instantGrabActive then
-            local selectedEggName = string.lower(eggNameList[eggIndex])
-            
             for _, prompt in pairs(Workspace:GetDescendants()) do
                 if not instantGrabActive then break end
                 
@@ -198,18 +286,28 @@ task.spawn(function()
                         local parentName = grandParent and string.lower(grandParent.Name) or ""
                         local fullStr = partName .. " " .. parentName
                         
-                        local isEggPrompt = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal")
+                        local isEggPrompt = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole")
                         local isShop = fullStr:find("shop") or fullStr:find("toko")
                         
                         if isEggPrompt and not isShop then
-                            local isMatch = false
-                            if selectedEggName == "all" then
-                                isMatch = true
+                            local shouldGrab = false
+                            
+                            if rarityFilters[1].active then
+                                shouldGrab = true
                             else
-                                isMatch = fullStr:find(selectedEggName)
+                                for i = 2, #rarityFilters do
+                                    local filt = rarityFilters[i]
+                                    if filt.active then
+                                        local keywordMain = string.lower(filt.name):gsub(" egg", "")
+                                        if fullStr:find(string.lower(filt.name)) or fullStr:find(keywordMain) then
+                                            shouldGrab = true
+                                            break
+                                        end
+                                    end
+                                end
                             end
 
-                            if isMatch then
+                            if shouldGrab then
                                 prompt.HoldDuration = 0
                                 if fireproximityprompt then
                                     fireproximityprompt(prompt)
@@ -246,3 +344,5 @@ task.spawn(function()
         end
     end
 end)
+
+updateFilterUI()
