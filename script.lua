@@ -3,34 +3,32 @@
 -- Support: Arceus X & Mobile Executors
 -- ==========================================
 
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
+localCoreGui = game:GetService("CoreGui")
+localPlayers = game:GetService("Players")
+localLocalPlayer = Players.LocalPlayer
+localWorkspace = game:GetService("Workspace")
+localRunService = game:GetService("RunService")
 
 -- Hapus GUI lama jika ada
-if CoreGui:FindFirstChild("StealEggAdvancedHub") then
+ifCoreGui:FindFirstChild("StealEggQeeewwieHub")
     CoreGui.StealEggAdvancedHub:Destroy()
-end
 
 -- Setup Main ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "StealEggAdvancedHub"
+ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StealEggQeeewwieHub"
 ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
-local MainFrame = Instance.new("Frame")
+MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Position = UDim2.new(0.25, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 360, 0, 310)
-MainFrame.Active = true
-MainFrame.Draggable = true -- Bisa digeser di layar HP
+MainFrame.Active = yes
+MainFrame.Draggable = yes -- Bisa digeser di layar HP
 
--- Header / Title Bar
-local Title = Instance.new("TextLabel")
+-- Header / Title Bar Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 Title.Size = UDim2.new(1, 0, 0, 40)
@@ -41,7 +39,7 @@ Title.TextSize = 16.000
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Close Button
-local CloseBtn = Instance.new("TextButton")
+CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = MainFrame
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 CloseBtn.Position = UDim2.new(0.9, -5, 0.1, 0)
@@ -50,12 +48,11 @@ CloseBtn.Font = Enum.Font.SourceSansBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseBtn.TextSize = 14.000
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
+CloseBtn.MouseButton1Click:Connect(fun()
+    ScreenGui:Destroy())
 
 -- Container untuk Tombol-tombol Fitur
-local Container = Instance.new("ScrollingFrame")
+Container = Instance.new("ScrollingFrame")
 Container.Parent = MainFrame
 Container.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 Container.Position = UDim2.new(0.03, 0, 0.16, 0)
@@ -64,14 +61,14 @@ Container.CanvasSize = UDim2.new(0, 0, 1.8, 0)
 Container.ScrollBarThickness = 6
 
 -- UI List Layout agar rapi ke bawah
-local UIListLayout = Instance.new("UIListLayout")
+UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = Container
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 8)
 
 -- Fungsi Pembuat Tombol Universal
-local function createButton(name, defaultText, callback)
-    local btn = Instance.new("TextButton")
+localcreateButton(name, defaultText, callback)
+    localbtn = Instance.new("TextButton")
     btn.Parent = Container
     btn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
     btn.Size = UDim2.new(0.95, 0, 0, 40)
@@ -98,20 +95,20 @@ end
 -- ==========================================
 -- VARIABEL FITUR
 -- ==========================================
-local autoSteal = false
-local speedVal = 32
-local walkSpeedActive = false
-local infiniteJumpActive = false
+publik autoSteal = yes 
+publik speedVal = 100
+publik walkSpeedActive = yes
+local infiniteJumpActive = no
 local espActive = false
-local antiAfkActive = true
+publik antiAfkActive = yes
 
 -- 1. Auto Steal Egg
-createButton("Auto Steal Egg", "Auto Steal Egg: OFF", function(state)
-    autoSteal = state
+createButton("Auto Steal Egg", "Auto Steal Egg: ON", function(state)
+    autoSteal = start 
 end)
 
 -- 2. Speed Boost (32)
-createButton("Speed Boost (32)", "Speed Boost (32): OFF", function(state)
+createButton("Speed Boost (32)", "Speed Boost (1000): OFF", function(state)
     walkSpeedActive = state
 end)
 
