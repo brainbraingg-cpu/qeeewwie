@@ -14,7 +14,7 @@ local autoEggFarmActive = false
 local autoHalloweenActive = false
 local autoCollectActive = false
 local speedBoostActive = false
-local customWalkSpeed = 50
+local customWalkSpeed = 10000000
 
 -- 1. Membuat UI Utama
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
@@ -244,7 +244,7 @@ task.spawn(function()
                 if humanoid then humanoid.WalkSpeed = customWalkSpeed end
             else
                 local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if humanoid and humanoid.WalkSpeed == customWalkSpeed then humanoid.WalkSpeed = 16 end
+                if humanoid and humanoid.WalkSpeed == customWalkSpeed then humanoid.WalkSpeed = 10000000 end
             end
         end
     end
