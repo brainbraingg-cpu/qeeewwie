@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: EXCLUDE PLAYER RANCH EGGS
+-- QEEEWWIE HUB: INSTANT GRAB & EGG FILTER
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -10,7 +10,7 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
-local autoTeleportEggActive = false
+local instantGrabActive = false
 local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
@@ -40,7 +40,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Map Eggs Only [⚡]"
+SubTitle.Text = "Instant Grab Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -83,15 +83,15 @@ PagePlayer.Position = UDim2.new(0.05, 0, 0.28, 0)
 PagePlayer.Size = UDim2.new(0.9, 0, 0.68, 0)
 PagePlayer.Visible = false
 
-local TeleportEggBtn = Instance.new("TextButton", PageFarm)
-TeleportEggBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
-TeleportEggBtn.Position = UDim2.new(0, 0, 0.02, 0)
-TeleportEggBtn.Size = UDim2.new(1, 0, 0, 32)
-TeleportEggBtn.Font = Enum.Font.SourceSansBold
-TeleportEggBtn.Text = "AUTO TP TO EGG: OFF"
-TeleportEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-TeleportEggBtn.TextSize = 11
-Instance.new("UICorner", TeleportEggBtn).CornerRadius = UDim.new(0, 6)
+local InstantGrabBtn = Instance.new("TextButton", PageFarm)
+InstantGrabBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
+InstantGrabBtn.Position = UDim2.new(0, 0, 0.02, 0)
+InstantGrabBtn.Size = UDim2.new(1, 0, 0, 32)
+InstantGrabBtn.Font = Enum.Font.SourceSansBold
+InstantGrabBtn.Text = "INSTANT GRAB EGG: OFF"
+InstantGrabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InstantGrabBtn.TextSize = 11
+Instance.new("UICorner", InstantGrabBtn).CornerRadius = UDim.new(0, 6)
 
 local EggFilterBtn = Instance.new("TextButton", PageFarm)
 EggFilterBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
@@ -149,10 +149,10 @@ EggFilterBtn.Activated:Connect(function()
     EggFilterBtn.Text = "EGG: " .. string.upper(eggNameList[eggIndex])
 end)
 
-TeleportEggBtn.Activated:Connect(function()
-    autoTeleportEggActive = not autoTeleportEggActive
-    TeleportEggBtn.Text = autoTeleportEggActive and "AUTO TP TO EGG: ON" or "AUTO TP TO EGG: OFF"
-    TeleportEggBtn.BackgroundColor3 = autoTeleportEggActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 100, 50)
+InstantGrabBtn.Activated:Connect(function()
+    instantGrabActive = not instantGrabActive
+    InstantGrabBtn.Text = instantGrabActive and "INSTANT GRAB EGG: ON" or "INSTANT GRAB EGG: OFF"
+    InstantGrabBtn.BackgroundColor3 = instantGrabActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 100, 50)
 end)
 
 CollectBtn.Activated:Connect(function()
@@ -167,52 +167,45 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Filter: Hanya Cari Telur di Map Utama (Skip Toko & Ranch Player Lain)
+-- Engine Instant Grab Tanpa Teleport
 task.spawn(function()
     while true do
-        task.wait(1.5)
+        task.wait(0.5)
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
-        if root and autoTeleportEggActive then
+        if instantGrabActive then
             local selectedEggName = string.lower(eggNameList[eggIndex])
             
-            for _, obj in pairs(Workspace:GetDescendants()) do
-                if not autoTeleportEggActive then break end
+            for _, prompt in pairs(Workspace:GetDescendants()) do
+                if not instantGrabActive then break end
                 
-                if obj:IsA("BasePart") then
-                    local nameLower = string.lower(obj.Name)
-                    local parentModel = obj.Parent
-                    local parentName = parentModel and string.lower(parentModel.Name) or ""
+                if prompt:IsA("ProximityPrompt") then
+                    local parentPart = prompt.Parent
+                    local grandParent = parentPart and parentPart.Parent
                     
-                    -- Cek hierarki folder atau nama untuk memastikan ini telur map asli
-                    local fullName = nameLower .. " " .. parentName
-                    
-                    local isEgg = (nameLower:find("egg") or nameLower:find("telur"))
-                    local isShop = (fullName:find("shop") or fullName:find("toko") or fullName:find("store"))
-                    -- Mengabaikan telur yang berada di area ranch/base player lain
-                    local isPlayerRanch = (fullName:find("ranch") or fullName:find("plot") or fullName:find("base") or fullName:find("owner"))
-                    
-                    if isEgg and not isShop and not isPlayerRanch then
-                        local isMatch = false
-                        if selectedEggName == "all" then
-                            isMatch = true
-                        else
-                            isMatch = fullName:find(selectedEggName)
-                        end
+                    if parentPart then
+                        local partName = string.lower(parentPart.Name)
+                        local parentName = grandParent and string.lower(grandParent.Name) or ""
+                        local fullStr = partName .. " " .. parentName
+                        
+                        local isEggPrompt = fullStr:find("egg") or fullStr:find("telur")
+                        local isShop = fullStr:find("shop") or fullStr:find("toko")
+                        
+                        if isEggPrompt and not isShop then
+                            local isMatch = false
+                            if selectedEggName == "all" then
+                                isMatch = true
+                            else
+                                isMatch = fullStr:find(selectedEggName)
+                            end
 
-                        if isMatch then
-                            root.CFrame = CFrame.new(obj.Position + Vector3.new(0, 2, 3))
-                            
-                            for _, prompt in pairs(parentModel:GetDescendants()) do
-                                if prompt:IsA("ProximityPrompt") then
-                                    prompt.HoldDuration = 0
-                                    if fireproximityprompt then fireproximityprompt(prompt) end
+                            if isMatch then
+                                prompt.HoldDuration = 0
+                                if fireproximityprompt then
+                                    fireproximityprompt(prompt)
                                 end
                             end
-                            
-                            task.wait(2.5)
-                            break
                         end
                     end
                 end
