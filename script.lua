@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FIX ALL RARITY TELEPORT TO SHOP
+-- QEEEWWIE HUB: EXCLUDE PLAYER RANCH EGGS
 -- =========================================================
 
 if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
@@ -15,8 +15,8 @@ local autoCollectActive = false
 local speedBoostActive = false
 local customWalkSpeed = 50
 
-local rarityList = {"ALL", "CHERUB", "LEGENDARY", "EPIC", "RARE", "COMMON"}
-local rarityIndex = 1
+local eggNameList = {"ALL", "Cherub", "Legendary", "Epic", "Rare", "Common"}
+local eggIndex = 1
 
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "QeeewwieHubUI"
@@ -40,7 +40,7 @@ Title.TextSize = 16
 Title.BackgroundTransparency = 1
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Fix Shop Teleport [⚡]"
+SubTitle.Text = "Map Eggs Only [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.10, 0)
 SubTitle.Size = UDim2.new(0.85, 0, 0, 18)
@@ -57,7 +57,7 @@ local TabFarm = Instance.new("TextButton", TabContainer)
 TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
 TabFarm.Size = UDim2.new(0.48, 0, 1, 0)
 TabFarm.Font = Enum.Font.SourceSansBold
-TabFarm.Text = "EGG & RARITY"
+TabFarm.Text = "EGG & FILTER"
 TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabFarm.TextSize = 10
 Instance.new("UICorner", TabFarm).CornerRadius = UDim.new(0, 6)
@@ -93,15 +93,15 @@ TeleportEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TeleportEggBtn.TextSize = 11
 Instance.new("UICorner", TeleportEggBtn).CornerRadius = UDim.new(0, 6)
 
-local RarityBtn = Instance.new("TextButton", PageFarm)
-RarityBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
-RarityBtn.Position = UDim2.new(0, 0, 0.38, 0)
-RarityBtn.Size = UDim2.new(1, 0, 0, 32)
-RarityBtn.Font = Enum.Font.SourceSansBold
-RarityBtn.Text = "RARITY: ALL"
-RarityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RarityBtn.TextSize = 11
-Instance.new("UICorner", RarityBtn).CornerRadius = UDim.new(0, 6)
+local EggFilterBtn = Instance.new("TextButton", PageFarm)
+EggFilterBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 150)
+EggFilterBtn.Position = UDim2.new(0, 0, 0.38, 0)
+EggFilterBtn.Size = UDim2.new(1, 0, 0, 32)
+EggFilterBtn.Font = Enum.Font.SourceSansBold
+EggFilterBtn.Text = "EGG: ALL"
+EggFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EggFilterBtn.TextSize = 11
+Instance.new("UICorner", EggFilterBtn).CornerRadius = UDim.new(0, 6)
 
 local CollectBtn = Instance.new("TextButton", PageFarm)
 CollectBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
@@ -141,12 +141,12 @@ TabPlayer.Activated:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-RarityBtn.Activated:Connect(function()
-    rarityIndex = rarityIndex + 1
-    if rarityIndex > #rarityList then
-        rarityIndex = 1
+EggFilterBtn.Activated:Connect(function()
+    eggIndex = eggIndex + 1
+    if eggIndex > #eggNameList then
+        eggIndex = 1
     end
-    RarityBtn.Text = "RARITY: " .. rarityList[rarityIndex]
+    EggFilterBtn.Text = "EGG: " .. string.upper(eggNameList[eggIndex])
 end)
 
 TeleportEggBtn.Activated:Connect(function()
@@ -167,7 +167,7 @@ SpeedBtn.Activated:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Engine Filter yang Aman dari Toko / Shop
+-- Engine Filter: Hanya Cari Telur di Map Utama (Skip Toko & Ranch Player Lain)
 task.spawn(function()
     while true do
         task.wait(1.5)
@@ -175,7 +175,7 @@ task.spawn(function()
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
         if root and autoTeleportEggActive then
-            local selectedRarityName = string.lower(rarityList[rarityIndex])
+            local selectedEggName = string.lower(eggNameList[eggIndex])
             
             for _, obj in pairs(Workspace:GetDescendants()) do
                 if not autoTeleportEggActive then break end
@@ -184,18 +184,21 @@ task.spawn(function()
                     local nameLower = string.lower(obj.Name)
                     local parentModel = obj.Parent
                     local parentName = parentModel and string.lower(parentModel.Name) or ""
+                    
+                    -- Cek hierarki folder atau nama untuk memastikan ini telur map asli
                     local fullName = nameLower .. " " .. parentName
                     
-                    -- Pastikan mendeteksi telur, tapi DI-SKIP jika itu toko/shop
                     local isEgg = (nameLower:find("egg") or nameLower:find("telur"))
                     local isShop = (fullName:find("shop") or fullName:find("toko") or fullName:find("store"))
+                    -- Mengabaikan telur yang berada di area ranch/base player lain
+                    local isPlayerRanch = (fullName:find("ranch") or fullName:find("plot") or fullName:find("base") or fullName:find("owner"))
                     
-                    if isEgg and not isShop then
+                    if isEgg and not isShop and not isPlayerRanch then
                         local isMatch = false
-                        if selectedRarityName == "all" then
+                        if selectedEggName == "all" then
                             isMatch = true
                         else
-                            isMatch = fullName:find(selectedRarityName)
+                            isMatch = fullName:find(selectedEggName)
                         end
 
                         if isMatch then
