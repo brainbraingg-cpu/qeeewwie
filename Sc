@@ -1,67 +1,56 @@
 -- =========================================================
--- COMBO HUB: RIDE PET + AUTO STEAL + FILTER + INSTANT/NORMAL
+-- QEEEWWIE HUB: RIDE PET + AUTO STEAL + FILTER + INSTANT/NORMAL
 -- =========================================================
 
 -- Hapus UI lama jika ada
-if game:GetService("CoreGui"):FindFirstChild("ComboHubUI") then
-    game:GetService("CoreGui").ComboHubUI:Destroy()
+if game:GetService("CoreGui"):FindFirstChild("QeeewwieHubUI") then
+    game:GetService("CoreGui").QeeewwieHubUI:Destroy()
 end
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- Variables Pengaturan
+-- Variabel Pengaturan
 local autoStealActive = false
 local selectedFilter = "ALL"
-local stealSpeedMode = "NORMAL" -- Default mode: NORMAL ("NORMAL" atau "INSTANT")
+local stealSpeedMode = "NORMAL"
 
 -- 1. Membuat Menu Utama di Layar
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local UICorner = Instance.new("UICorner")
-local Title = Instance.new("TextLabel")
-local RideBtn = Instance.new("TextButton")
-local FilterTextBox = Instance.new("TextBox")
-local ModeBtn = Instance.new("TextButton")
-local StealBtn = Instance.new("TextButton")
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "QeeewwieHubUI"
 
-ScreenGui.Name = "ComboHubUI"
-ScreenGui.Parent = game:GetService("CoreGui")
-
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
+local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 190, 0, 220)
 MainFrame.Active = true
-MainFrame.Draggable = true -- Bisa digeser di layar HP
+MainFrame.Draggable = true
 
+local UICorner = Instance.new("UICorner", MainFrame)
 UICorner.CornerRadius = UDim.new(0, 10)
-UICorner.Parent = MainFrame
 
-Title.Name = "Title"
-Title.Parent = MainFrame
-Title.Text = "MENU GACOR V3 🔥"
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Text = "QEEEWWIE HUB"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 15
+Title.BackgroundTransparency = 1
 
 -- Tombol 1: Ride Pet
-RideBtn.Name = "RideBtn"
-RideBtn.Parent = MainFrame
+local RideBtn = Instance.new("TextButton", MainFrame)
 RideBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 RideBtn.Position = UDim2.new(0.1, 0, 0.18, 0)
 RideBtn.Size = UDim2.new(0.8, 0, 0, 28)
 RideBtn.Font = Enum.Font.SourceSansBold
-RideBtn.Text = "RIDE PET 🐾"
+RideBtn.Text = "RIDE PET"
 RideBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 RideBtn.TextSize = 12
+Instance.new("UICorner", RideBtn).CornerRadius = UDim.new(0, 6)
 
 -- Input Box: Egg Filter
-FilterTextBox.Name = "FilterTextBox"
-FilterTextBox.Parent = MainFrame
+local FilterTextBox = Instance.new("TextBox", MainFrame)
 FilterTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 FilterTextBox.Position = UDim2.new(0.1, 0, 0.35, 0)
 FilterTextBox.Size = UDim2.new(0.8, 0, 0, 28)
@@ -70,35 +59,32 @@ FilterTextBox.PlaceholderText = "Filter (kosong = semua)"
 FilterTextBox.Text = ""
 FilterTextBox.TextColor3 = Color3.fromRGB(255, 255, 0)
 FilterTextBox.TextSize = 11
-
-local FilterCorner = Instance.new("UICorner")
-FilterCorner.CornerRadius = UDim.new(0, 6)
-FilterCorner.Parent = FilterTextBox
+Instance.new("UICorner", FilterTextBox).CornerRadius = UDim.new(0, 6)
 
 -- Tombol 2: Mode Instant / Normal
-ModeBtn.Name = "ModeBtn"
-ModeBtn.Parent = MainFrame
+local ModeBtn = Instance.new("TextButton", MainFrame)
 ModeBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 255)
 ModeBtn.Position = UDim2.new(0.1, 0, 0.52, 0)
 ModeBtn.Size = UDim2.new(0.8, 0, 0, 28)
 ModeBtn.Font = Enum.Font.SourceSansBold
-ModeBtn.Text = "MODE: NORMAL 🟢"
+ModeBtn.Text = "MODE: NORMAL"
 ModeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ModeBtn.TextSize = 12
+Instance.new("UICorner", ModeBtn).CornerRadius = UDim.new(0, 6)
 
 -- Tombol 3: Steal Egg (Toggle ON/OFF)
-StealBtn.Name = "StealBtn"
-StealBtn.Parent = MainFrame
+local StealBtn = Instance.new("TextButton", MainFrame)
 StealBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 StealBtn.Position = UDim2.new(0.1, 0, 0.72, 0)
 StealBtn.Size = UDim2.new(0.8, 0, 0, 35)
 StealBtn.Font = Enum.Font.SourceSansBold
-StealBtn.Text = "AUTO STEAL: OFF ❌"
+StealBtn.Text = "AUTO STEAL: OFF"
 StealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 StealBtn.TextSize = 13
+Instance.new("UICorner", StealBtn).CornerRadius = UDim.new(0, 6)
 
 -----------------------------------------------------------
--- 2. SETUP EGG FILTER & MODE SWITCHER
+-- 2. SETUP FILTER & MODE
 -----------------------------------------------------------
 FilterTextBox.FocusLost:Connect(function()
     if FilterTextBox.Text == "" then
@@ -108,21 +94,20 @@ FilterTextBox.FocusLost:Connect(function()
     end
 end)
 
--- Ganti Mode Instant / Normal saat tombol diklik
 ModeBtn.MouseButton1Click:Connect(function()
     if stealSpeedMode == "NORMAL" then
         stealSpeedMode = "INSTANT"
-        ModeBtn.Text = "MODE: INSTANT ⚡"
+        ModeBtn.Text = "MODE: INSTANT"
         ModeBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
     else
         stealSpeedMode = "NORMAL"
-        ModeBtn.Text = "MODE: NORMAL 🟢"
+        ModeBtn.Text = "MODE: NORMAL"
         ModeBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 255)
     end
 end)
 
 -----------------------------------------------------------
--- 3. FITUR RIDE PET (Klik Sekali)
+-- 3. FITUR RIDE PET
 -----------------------------------------------------------
 RideBtn.MouseButton1Click:Connect(function()
     local char = LocalPlayer.Character
@@ -145,40 +130,39 @@ RideBtn.MouseButton1Click:Connect(function()
             weld.Part0 = root
             weld.Part1 = petPart
             weld.Parent = root
-            RideBtn.Text = "TERTEMPEL! ✅"
+            RideBtn.Text = "TERTEMPEL!"
             task.wait(1)
-            RideBtn.Text = "RIDE PET 🐾"
+            RideBtn.Text = "RIDE PET"
         end
     else
-        RideBtn.Text = "PET GA KETEMU ❌"
+        RideBtn.Text = "PET TIDAK ADA"
         task.wait(1)
-        RideBtn.Text = "RIDE PET 🐾"
+        RideBtn.Text = "RIDE PET"
     end
 end)
 
 -----------------------------------------------------------
--- 4. FITUR AUTO STEAL WITH SPEED & FILTER MODE
+-- 4. FITUR AUTO STEAL (DENGAN FILTER & SPEED)
 -----------------------------------------------------------
 StealBtn.MouseButton1Click:Connect(function()
     autoStealActive = not autoStealActive
 
     if autoStealActive then
-        StealBtn.Text = "AUTO STEAL: ON ⚡"
+        StealBtn.Text = "AUTO STEAL: ON"
         StealBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
     else
-        StealBtn.Text = "AUTO STEAL: OFF ❌"
+        StealBtn.Text = "AUTO STEAL: OFF"
         StealBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     end
 end)
 
--- Loop Auto Steal Berdasarkan Mode Kecepatan
+-- Loop Auto Steal
 task.spawn(function()
     while true do
-        -- Menyesuaikan jeda (delay) berdasarkan mode yang dipilih
         if stealSpeedMode == "INSTANT" then
-            task.wait(0.05) -- Super cepat tanpa jeda berarti
+            task.wait(0.05)
         else
-            task.wait(0.4)  -- Mode Normal (aman dari lag/deteksi)
+            task.wait(0.4)
         end
         
         if autoStealActive then
@@ -188,12 +172,10 @@ task.spawn(function()
                     local object = string.lower(prompt.ObjectText or "")
                     local parentName = string.lower(prompt.Parent and prompt.Parent.Name or "")
                     
-                    -- Abaikan toko/robux/beli
                     local isStore = action:find("beli") or action:find("buy") or action:find("toko") or action:find("shop")
                     local isSteal = action:find("curi") or action:find("mencuri") or action:find("steal") or action:find("take")
                     
                     if isSteal and not isStore then
-                        -- Cek Filter Telur
                         local matchesFilter = false
                         if selectedFilter == "ALL" then
                             matchesFilter = true
@@ -203,7 +185,6 @@ task.spawn(function()
                             end
                         end
                         
-                        -- Eksekusi Ambil Telur
                         if matchesFilter then
                             prompt.HoldDuration = 0
                             if fireproximityprompt then
