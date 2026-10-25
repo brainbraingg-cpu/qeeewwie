@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: INSTANT STEAL EDITION [⚡ MAX SPEED]
+-- QEEEWWIE HUB: ULTIMATE INSTANT STEAL & ESP EDITION
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -138,7 +138,6 @@ AutoStealBtn.TextSize = 10
 AutoStealBtn.ZIndex = 12
 Instance.new("UICorner", AutoStealBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Fitur Baru: Instant Steal
 local InstantStealBtn = Instance.new("TextButton", PageFarm)
 InstantStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 InstantStealBtn.Position = UDim2.new(0, 0, 0.27, 0)
@@ -331,14 +330,12 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Main Loop Engine
 task.spawn(function()
     while true do
-        task.wait(0.15) -- Ditingkatkan kecepatannya agar Instant Steal bekerja instan
+        task.wait(0.15)
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
-        -- 1. ESP EGG
         if espEggActive then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
@@ -404,7 +401,6 @@ task.spawn(function()
             end)
         end
 
-        -- 2. INSTANT GRAB, AUTO STEAL, & INSTANT STEAL
         if instantGrabActive or autoStealActive or instantStealActive then
             pcall(function()
                 for _, prompt in pairs(Workspace:GetDescendants()) do
@@ -446,4 +442,10 @@ task.spawn(function()
                                             if fullStr:find(targetKey) or fullStr:find(keywordMain) or promptText:find(targetKey) then
                                                 shouldGrab = true
                                                 break
-                                    
+                                            end
+                                        end
+                                    end
+                                end
+
+                                if shouldGrab then
+            
