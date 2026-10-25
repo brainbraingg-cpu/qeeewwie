@@ -119,4 +119,335 @@ InstantGrabBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
 InstantGrabBtn.Position = UDim2.new(0, 0, 0.01, 0)
 InstantGrabBtn.Size = UDim2.new(1, 0, 0, 26)
 InstantGrabBtn.Font = Enum.Font.SourceSansBold
-InstantGrabBtn.Text = "
+InstantGrabBtn.Text = "INSTANT GRAB EGG: OFF"
+InstantGrabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InstantGrabBtn.TextSize = 10
+InstantGrabBtn.ZIndex = 12
+Instance.new("UICorner", InstantGrabBtn).CornerRadius = UDim.new(0, 6)
+
+-- Tombol Baru: Auto Instant Steal
+local AutoStealBtn = Instance.new("TextButton", PageFarm)
+AutoStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
+AutoStealBtn.Position = UDim2.new(0, 0, 0.14, 0)
+AutoStealBtn.Size = UDim2.new(1, 0, 0, 26)
+AutoStealBtn.Font = Enum.Font.SourceSansBold
+AutoStealBtn.Text = "AUTO INSTANT STEAL: OFF"
+AutoStealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoStealBtn.TextSize = 10
+AutoStealBtn.ZIndex = 12
+Instance.new("UICorner", AutoStealBtn).CornerRadius = UDim.new(0, 6)
+
+local EspEggBtn = Instance.new("TextButton", PageFarm)
+EspEggBtn.BackgroundColor3 = Color3.fromRGB(120, 50, 180)
+EspEggBtn.Position = UDim2.new(0, 0, 0.27, 0)
+EspEggBtn.Size = UDim2.new(1, 0, 0, 26)
+EspEggBtn.Font = Enum.Font.SourceSansBold
+EspEggBtn.Text = "ESP EGG HIGHLIGHT: OFF"
+EspEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspEggBtn.TextSize = 10
+EspEggBtn.ZIndex = 12
+Instance.new("UICorner", EspEggBtn).CornerRadius = UDim.new(0, 6)
+
+local ToggleFilterBtn = Instance.new("TextButton", PageFarm)
+ToggleFilterBtn.BackgroundColor3 = Color3.fromRGB(70, 50, 120)
+ToggleFilterBtn.Position = UDim2.new(0, 0, 0.42, 0)
+ToggleFilterBtn.Size = UDim2.new(0.68, 0, 0, 26)
+ToggleFilterBtn.Font = Enum.Font.SourceSansBold
+ToggleFilterBtn.Text = "SELECT: ALL"
+ToggleFilterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleFilterBtn.TextSize = 10
+ToggleFilterBtn.ZIndex = 12
+Instance.new("UICorner", ToggleFilterBtn).CornerRadius = UDim.new(0, 6)
+
+local SwitchStatusBtn = Instance.new("TextButton", PageFarm)
+SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+SwitchStatusBtn.Position = UDim2.new(0.71, 0, 0.42, 0)
+SwitchStatusBtn.Size = UDim2.new(0.29, 0, 0, 26)
+SwitchStatusBtn.Font = Enum.Font.SourceSansBold
+SwitchStatusBtn.Text = "OFF [X]"
+SwitchStatusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SwitchStatusBtn.TextSize = 10
+SwitchStatusBtn.ZIndex = 12
+Instance.new("UICorner", SwitchStatusBtn).CornerRadius = UDim.new(0, 6)
+
+local ActiveInfoLabel = Instance.new("TextLabel", PageFarm)
+ActiveInfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+ActiveInfoLabel.Position = UDim2.new(0, 0, 0.54, 0)
+ActiveInfoLabel.Size = UDim2.new(1, 0, 0, 32)
+ActiveInfoLabel.Font = Enum.Font.SourceSans
+ActiveInfoLabel.Text = "Active: ALL"
+ActiveInfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+ActiveInfoLabel.TextSize = 10
+ActiveInfoLabel.TextWrapped = true
+ActiveInfoLabel.ZIndex = 12
+Instance.new("UICorner", ActiveInfoLabel).CornerRadius = UDim.new(0, 6)
+
+local CollectBtn = Instance.new("TextButton", PageFarm)
+CollectBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CollectBtn.Position = UDim2.new(0, 0, 0.83, 0)
+CollectBtn.Size = UDim2.new(1, 0, 0, 28)
+CollectBtn.Font = Enum.Font.SourceSansBold
+CollectBtn.Text = "AUTO COLLECT: OFF"
+CollectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CollectBtn.TextSize = 10
+CollectBtn.ZIndex = 12
+Instance.new("UICorner", CollectBtn).CornerRadius = UDim.new(0, 6)
+
+local SpeedBtn = Instance.new("TextButton", PagePlayer)
+SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+SpeedBtn.Position = UDim2.new(0, 0, 0.02, 0)
+SpeedBtn.Size = UDim2.new(1, 0, 0, 35)
+SpeedBtn.Font = Enum.Font.SourceSansBold
+SpeedBtn.Text = "SPEED BOOST: OFF"
+SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBtn.TextSize = 11
+SpeedBtn.ZIndex = 12
+Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
+
+local function clearESP()
+    for _, item in pairs(Workspace:GetDescendants()) do
+        if item:FindFirstChild("QeeewwieESP") then
+            item.QeeewwieESP:Destroy()
+        end
+        if item:FindFirstChild("QeeewwieTag") then
+            item.QeeewwieTag:Destroy()
+        end
+    end
+end
+
+CloseBtn.MouseButton1Click:Connect(function()
+    clearESP()
+    ScreenGui:Destroy()
+end)
+
+local function updateFilterUI()
+    local current = rarityFilters[currentFilterIdx]
+    ToggleFilterBtn.Text = "SEL: " .. current.name
+    if current.active then
+        SwitchStatusBtn.Text = "ON [✓]"
+        SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    else
+        SwitchStatusBtn.Text = "OFF [X]"
+        SwitchStatusBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    end
+
+    local activeNames = {}
+    for _, item in ipairs(rarityFilters) do
+        if item.active then
+            table.insert(activeNames, item.name)
+        end
+    end
+    ActiveInfoLabel.Text = "Active: " .. table.concat(activeNames, ", ")
+end
+
+TabFarm.MouseButton1Click:Connect(function()
+    PageFarm.Visible = true
+    PagePlayer.Visible = false
+    TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
+    TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabPlayer.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    TabPlayer.TextColor3 = Color3.fromRGB(180, 180, 180)
+end)
+
+TabPlayer.MouseButton1Click:Connect(function()
+    PageFarm.Visible = false
+    PagePlayer.Visible = true
+    TabPlayer.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
+    TabPlayer.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabFarm.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
+end)
+
+ToggleFilterBtn.MouseButton1Click:Connect(function()
+    currentFilterIdx = currentFilterIdx + 1
+    if currentFilterIdx > #rarityFilters then
+        currentFilterIdx = 1
+    end
+    updateFilterUI()
+end)
+
+SwitchStatusBtn.MouseButton1Click:Connect(function()
+    local current = rarityFilters[currentFilterIdx]
+    if current.name == "ALL" then
+        current.active = not current.active
+    else
+        current.active = not current.active
+        if current.active then
+            rarityFilters[1].active = false
+        end
+    end
+    updateFilterUI()
+end)
+
+InstantGrabBtn.MouseButton1Click:Connect(function()
+    instantGrabActive = not instantGrabActive
+    InstantGrabBtn.Text = instantGrabActive and "INSTANT GRAB EGG: ON" or "INSTANT GRAB EGG: OFF"
+    InstantGrabBtn.BackgroundColor3 = instantGrabActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 100, 50)
+end)
+
+AutoStealBtn.MouseButton1Click:Connect(function()
+    autoInstantStealActive = not autoInstantStealActive
+    AutoStealBtn.Text = autoInstantStealActive and "AUTO INSTANT STEAL: ON" or "AUTO INSTANT STEAL: OFF"
+    AutoStealBtn.BackgroundColor3 = autoInstantStealActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
+end)
+
+EspEggBtn.MouseButton1Click:Connect(function()
+    espEggActive = not espEggActive
+    EspEggBtn.Text = espEggActive and "ESP EGG HIGHLIGHT: ON" or "ESP EGG HIGHLIGHT: OFF"
+    EspEggBtn.BackgroundColor3 = espEggActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(120, 50, 180)
+    if not espEggActive then
+        clearESP()
+    end
+end)
+
+CollectBtn.MouseButton1Click:Connect(function()
+    autoCollectActive = not autoCollectActive
+    CollectBtn.Text = autoCollectActive and "AUTO COLLECT: ON" or "AUTO COLLECT: OFF"
+    CollectBtn.BackgroundColor3 = autoCollectActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+end)
+
+SpeedBtn.MouseButton1Click:Connect(function()
+    speedBoostActive = not speedBoostActive
+    SpeedBtn.Text = speedBoostActive and "SPEED BOOST: ON" or "SPEED BOOST: OFF"
+    SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+
+        -- 1. ESP EGG
+        if espEggActive then
+            pcall(function()
+                for _, prompt in pairs(Workspace:GetDescendants()) do
+                    if not espEggActive then break end
+                    if prompt:IsA("ProximityPrompt") then
+                        local parentPart = prompt.Parent
+                        local grandParent = parentPart and parentPart.Parent
+                        
+                        if parentPart then
+                            local partName = string.lower(parentPart.Name)
+                            local parentName = grandParent and string.lower(grandParent.Name) or ""
+                            local fullStr = partName .. " " .. parentName
+                            local promptText = string.lower(prompt.ActionText .. " " .. prompt.ObjectText)
+
+                            local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole")
+                            local isRestricted = promptText:find("robux") or promptText:find("buy") or fullStr:find("shop") or fullStr:find("toko")
+
+                            if isEgg and not isRestricted then
+                                local targetObj = parentPart:IsA("Model") and parentPart or (grandParent:IsA("Model") and grandParent or parentPart)
+                                
+                                if not targetObj:FindFirstChild("QeeewwieESP") then
+                                    local hl = Instance.new("Highlight")
+                                    hl.Name = "QeeewwieESP"
+                                    hl.Adornee = targetObj
+                                    hl.FillTransparency = 0.3
+                                    hl.OutlineTransparency = 0
+                                    
+                                    if fullStr:find("blackhole") then
+                                        hl.FillColor = Color3.fromRGB(150, 0, 255)
+                                        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                                    elseif fullStr:find("solaris") then
+                                        hl.FillColor = Color3.fromRGB(255, 215, 0)
+                                    elseif fullStr:find("divine") then
+                                        hl.FillColor = Color3.fromRGB(0, 191, 255)
+                                    else
+                                        hl.FillColor = Color3.fromRGB(255, 105, 180)
+                                    end
+                                    hl.Parent = targetObj
+                                end
+
+                                if not targetObj:FindFirstChild("QeeewwieTag") then
+                                    local bg = Instance.new("BillboardGui")
+                                    bg.Name = "QeeewwieTag"
+                                    bg.Adornee = targetObj
+                                    bg.Size = UDim2.new(0, 120, 0, 35)
+                                    bg.StudsOffset = Vector3.new(0, 3.5, 0)
+                                    bg.AlwaysOnTop = true
+
+                                    local lbl = Instance.new("TextLabel", bg)
+                                    lbl.Size = UDim2.new(1, 0, 1, 0)
+                                    lbl.BackgroundTransparency = 1
+                                    lbl.Font = Enum.Font.SourceSansBold
+                                    lbl.TextSize = 13
+                                    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                    lbl.TextStrokeTransparency = 0
+                                    lbl.Text = targetObj.Name
+                                    bg.Parent = targetObj
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        -- 2. INSTANT GRAB EGG (Map Umum)
+        if instantGrabActive then
+            pcall(function()
+                for _, prompt in pairs(Workspace:GetDescendants()) do
+                    if not instantGrabActive then break end
+                    
+                    if prompt:IsA("ProximityPrompt") then
+                        local parentPart = prompt.Parent
+                        local grandParent = parentPart and parentPart.Parent
+                        
+                        if parentPart then
+                            local partName = string.lower(parentPart.Name)
+                            local parentName = grandParent and string.lower(grandParent.Name) or ""
+                            local fullStr = partName .. " " .. parentName
+                            local promptText = string.lower(prompt.ActionText .. " " .. prompt.ObjectText)
+                            
+                            local isEggPrompt = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole")
+                            local isRanch = fullStr:find("ranch") or fullStr:find("'s") or fullStr:find("base")
+                            local isRestricted = promptText:find("robux") or promptText:find("buy") or promptText:find("purchase") or promptText:find("lewat") or promptText:find("skip") or fullStr:find("shop") or fullStr:find("toko")
+                            
+                            if isEggPrompt and not isRestricted and not isRanch then
+                                local shouldGrab = false
+                                
+                                if rarityFilters[1].active then
+                                    shouldGrab = true
+                                else
+                                    for i = 2, #rarityFilters do
+                                        local filt = rarityFilters[i]
+                                        if filt.active then
+                                            local targetKey = string.lower(filt.name)
+                                            local keywordMain = targetKey:gsub(" egg", "")
+                                            
+                                            if fullStr:find(targetKey) or fullStr:find(keywordMain) or promptText:find(targetKey) then
+                                                shouldGrab = true
+                                                break
+                                            end
+                                        end
+                                    end
+                                end
+
+                                if shouldGrab then
+                                    prompt.HoldDuration = 0
+                                    if fireproximityprompt then
+                                        fireproximityprompt(prompt)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+
+        -- 3. AUTO INSTANT STEAL (Khusus Ranch / Base Player Lain)
+        if autoInstantStealActive then
+            pcall(function()
+                for _, prompt in pairs(Workspace:GetDescendants()) do
+                    if not autoInstantStealActive then break end
+                    
+                    if prompt:IsA("ProximityPrompt") then
+                        local parentPart = prompt.Parent
+                        local grandParent = parentPart and parentPart.Parent
+                        
+                        if parentPart then
+                            local partName = string.lower(parentPart.Name)
+                            local parentName = grandParent and string.lower(grandParent.Name) or ""
+                            local fullStr = partName .. " 
