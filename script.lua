@@ -1,170 +1,353 @@
+-- QEEWWWIE PANEL | GUI ONLY
+-- Aman untuk demo UI; toggle tidak mengubah gameplay.
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Bersihkan GUI lama jika ada
-if playerGui:FindFirstChild("QeeewwiePanel") then
- playerGui.QeeewwiePanel:Destroy()
+-- Hapus GUI lama jika ada
+local oldGui = playerGui:FindFirstChild("QeeewwiePanel")
+if oldGui then
+    oldGui:Destroy()
 end
 
--- Buat ScreenGui utama
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "QeeewwiePanel"
-ScreenGui.Parent = playerGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.ResetOnSpawn = false
+local gui = Instance.new("ScreenGui")
+gui.Name = "QeeewwiePanel"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 999
+gui.Parent = playerGui
 
--- Panel utama dengan sudut melengkung dan bayangan
-local MainPanel = Instance.new("Frame")
-MainPanel.Size = UDim2.fromOffset(420, 480)
-MainPanel.Position = UDim2.new(0.02, 0, 0.5, -240)
-MainPanel.BackgroundColor3 = Color3.fromHex("#121217")
-MainPanel.CornerRadius = UDim.new(0, 16)
-MainPanel.Parent = ScreenGui
+-- Warna
+local BG = Color3.fromRGB(18, 20, 28)
+local CARD = Color3.fromRGB(29, 32, 43)
+local ACCENT = Color3.fromRGB(130, 90, 255)
+local TEXT = Color3.fromRGB(245, 245, 255)
+local MUTED = Color3.fromRGB(155, 160, 180)
+local GREEN = Color3.fromRGB(65, 210, 140)
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 16)
-UICorner.Parent = MainPanel
+local function addCorner(obj, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius)
+    corner.Parent = obj
+    return corner
+end
 
-local UIShadow = Instance.new("UIGradient")
-UIShadow.Rotation = 90
-UIShadow.Transparency = NumberSequence.new{0, 0.1}
-UIShadow.Parent = MainPanel
+local function addStroke(obj, color, transparency)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color
+    stroke.Transparency = transparency or 0
+    stroke.Thickness = 1
+    stroke.Parent = obj
+    return stroke
+end
 
--- Header yang bisa digeser
-local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 52)
-Header.BackgroundColor3 = Color3.fromHex("#1a1a21")
-Header.CornerRadius = UDim.new(0, 16)
-Header.Parent = MainPanel
-Header.Active = true
-Header.Draggable = true
+local function tween(obj, duration, goals)
+    local info = TweenInfo.new(
+        duration,
+        Enum.EasingStyle.Quad,
+        Enum.EasingDirection.Out
+    )
+    local animation = TweenService:Create(obj, info, goals)
+    animation:Play()
+    return animation
+end
 
-local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 16)
-HeaderCorner.Parent = Header
+-- Panel utama
+local main = Instance.new("Frame")
+main.Name = "MainPanel"
+main.Size = UDim2.fromOffset(310, 390)
+main.Position = UDim2.new(0.5, -155, 0.5, -195)
+main.BackgroundColor3 = BG
+main.BorderSizePixel = 0
+main.Parent = gui
+addCorner(main, 14)
+addStroke(main, ACCENT, 0.45)
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -60, 1, 0)
-Title.Position = UDim2.fromOffset(20, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "qeeewwie • Control Panel"
-Title.TextColor3 = Color3.fromHex("#e2e8f0")
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 15
-Title.Parent = Header
+-- Header
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 58)
+header.BackgroundColor3 = Color3.fromRGB(27, 25, 43)
+header.BorderSizePixel = 0
+header.Parent = main
+addCorner(header, 14)
 
--- Tombol minimize
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Size = UDim2.fromOffset(32, 32)
-MinimizeBtn.Position = UDim2.new(1, -44, 0.5, -16)
-MinimizeBtn.BackgroundColor3 = Color3.fromHex("#27272f")
-MinimizeBtn.Text = "−"
-MinimizeBtn.TextColor3 = Color3.new(1,1,1)
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.TextSize = 18
-MinimizeBtn.Parent = Header
+-- Tutup bagian bawah sudut header agar menyatu dengan panel
+local headerFill = Instance.new("Frame")
+headerFill.Size = UDim2.new(1, 0, 0, 14)
+headerFill.Position = UDim2.new(0, 0, 1, -14)
+headerFill.BackgroundColor3 = header.BackgroundColor3
+headerFill.BorderSizePixel = 0
+headerFill.Parent = header
 
-Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 8)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -85, 0, 28)
+title.Position = UDim2.fromOffset(14, 7)
+title.BackgroundTransparency = 1
+title.Text = "QEEEWWIE PANEL"
+title.TextColor3 = TEXT
+title.TextSize = 17
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
 
--- Bar status FPS & Waktu
-local StatusBar = Instance.new("Frame")
-StatusBar.Size = UDim2.new(1, -32, 0, 28)
-StatusBar.Position = UDim2.fromOffset(16, 64)
-StatusBar.BackgroundColor3 = Color3.fromHex("#1a1a21")
-StatusBar.CornerRadius = UDim.new(0, 8)
-StatusBar.Parent = MainPanel
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -85, 0, 18)
+subtitle.Position = UDim2.fromOffset(14, 32)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "UI CONTROL • DEMO MODE"
+subtitle.TextColor3 = MUTED
+subtitle.TextSize = 9
+subtitle.Font = Enum.Font.GothamMedium
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.Parent = header
 
-Instance.new("UICorner", StatusBar).CornerRadius = UDim.new(0, 8)
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.fromOffset(32, 32)
+minimize.Position = UDim2.new(1, -43, 0, 13)
+minimize.BackgroundColor3 = CARD
+minimize.Text = "—"
+minimize.TextColor3 = TEXT
+minimize.TextSize = 18
+minimize.Font = Enum.Font.GothamBold
+minimize.AutoButtonColor = false
+minimize.Parent = header
+addCorner(minimize, 9)
 
-local StatusText = Instance.new("TextLabel")
-StatusText.Size = UDim2.new(1, 0, 1, 0)
-StatusText.BackgroundTransparency = 1
-StatusText.TextColor3 = Color3.fromHex("#94a3b8")
-StatusText.Font = Enum.Font.Gotham
-StatusText.TextSize = 12
-StatusText.Parent = StatusBar
+-- Area isi
+local content = Instance.new("Frame")
+content.Name = "Content"
+content.Size = UDim2.new(1, -24, 1, -122)
+content.Position = UDim2.fromOffset(12, 68)
+content.BackgroundTransparency = 1
+content.Parent = main
 
-local StartTime = os.time()
-RunService.RenderStepped:Connect(function()
- local fps = math.floor(1 / task.wait())
- local elapsed = os.difftime(os.time(), StartTime)
- local mins = math.floor(elapsed / 60)
- local secs = elapsed % 60
- StatusText.Text = string.format("  FPS: %d  •  Sesi: %02d:%02d", fps, mins, secs)
-end)
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 7)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = content
 
--- Container tombol dengan desain kartu
-local ButtonContainer = Instance.new("Frame")
-ButtonContainer.Size = UDim2.new(1, -32, 1, -116)
-ButtonContainer.Position = UDim2.fromOffset(16, 100)
-ButtonContainer.BackgroundTransparency = 1
-ButtonContainer.Parent = MainPanel
-
-local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.Padding = UDim.new(0, 12)
-UIListLayout.Parent = ButtonContainer
-
--- Daftar fitur
-local Features = {
-    "Auto Farm", "Auto Steal", "Instant Grab", "No Knockback", "Anti AFK", "Event Automation"
+local features = {
+    "Auto Farm",
+    "Auto Steal",
+    "Instant Grab",
+    "No Knockback",
+    "Anti AFK",
+    "Event Automation"
 }
 
-local TweenOn = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local TweenOff = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local toggleStates = {}
+local toggleButtons = {}
 
-for _, feature in Features do
- local Card = Instance.new("Frame")
-    Card.Size = UDim2.new(1, 0, 0, 44)
- Card.BackgroundColor3 = Color3.fromHex("#1e1e26")
- Card.Parent = ButtonContainer
- Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 10)
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -24, 0, 20)
+status.Position = UDim2.new(0, 12, 1, -48)
+status.BackgroundTransparency = 1
+status.Text = "Status: GUI siap"
+status.TextColor3 = MUTED
+status.TextSize = 11
+status.Font = Enum.Font.Gotham
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.Parent = main
 
- local Label = Instance.new("TextLabel")
- Label.Size = UDim2.new(1, -60, 1, 0)
- Label.Position = UDim2.fromOffset(16, 0)
- Label.BackgroundTransparency = 1
- Label.Text = feature
-    Label.TextColor3 = Color3.fromHex("#cbd5e1")
- Label.Font = Enum.Font.Gotham
- Label.TextSize = 14
-    Label.Parent = Card
+for index, featureName in ipairs(features) do
+    toggleStates[featureName] = false
 
-    local Toggle = Instance.new("Frame")
-    Toggle.Size = UDim2.fromOffset(44, 24)
- Toggle.Position = UDim2.new(1, -56, 0.5, -12)
- Toggle.BackgroundColor3 = Color3.fromHex("#333340")
- Toggle.CornerRadius = UDim.new(1, 0)
- Toggle.Parent = Card
-    Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1, 0)
+    local card = Instance.new("Frame")
+    card.Name = featureName:gsub("%s+", "") .. "Card"
+    card.Size = UDim2.new(1, 0, 0, 38)
+    card.BackgroundColor3 = CARD
+    card.BorderSizePixel = 0
+    card.LayoutOrder = index
+    card.Parent = content
+    addCorner(card, 9)
 
- local Knob = Instance.new("Frame")
-    Knob.Size = UDim2.fromOffset(18, 18)
- Knob.Position = UDim2.fromOffset(3, 3)
- Knob.BackgroundColor3 = Color3.fromHex("#666677")
- Knob.CornerRadius = UDim.new(1, 0)
- Knob.Parent = Toggle
-    Instance.new("UICorner", Knob).CornerRadius = UDim.new(1, 0)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -85, 1, 0)
+    label.Position = UDim2.fromOffset(11, 0)
+    label.BackgroundTransparency = 1
+    label.Text = featureName
+    label.TextColor3 = TEXT
+    label.TextSize = 12
+    label.Font = Enum.Font.GothamMedium
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = card
 
- local Active = false
- Card.InputBegan:Connect(function(input)
- if input.UserInputType == Enum.UserInputType.MouseButton1 then
- Active = not Active
- if Active then
-                TweenService:Tween(Toggle, TweenOn, {BackgroundColor3 = Color3.fromHex("#10b981")})
-      TweenService:Tween(Knob, TweenOn, {Position = UDim2.fromOffset(23, 3), BackgroundColor3 = Color3.new(1,1,1)})
-            else
-                TweenService:Tween(Toggle, TweenOff, {BackgroundColor3 = Color3.fromHex("#333340")})
-      TweenService:Tween(Knob, TweenOff, {Position = UDim2.fromOffset(3, 3), BackgroundColor3 = Color3.fromHex("#666677")})
-  end
- end
- end)
+    local toggle = Instance.new("TextButton")
+    toggle.Name = "Toggle"
+    toggle.Size = UDim2.fromOffset(48, 24)
+    toggle.Position = UDim2.new(1, -59, 0.5, -12)
+    toggle.BackgroundColor3 = Color3.fromRGB(65, 68, 82)
+    toggle.Text = ""
+    toggle.AutoButtonColor = false
+    toggle.Parent = card
+    addCorner(toggle, 12)
+
+    local knob = Instance.new("Frame")
+    knob.Name = "Knob"
+    knob.Size = UDim2.fromOffset(18, 18)
+    knob.Position = UDim2.fromOffset(3, 3)
+    knob.BackgroundColor3 = Color3.fromRGB(245, 245, 250)
+    knob.BorderSizePixel = 0
+    knob.Parent = toggle
+    addCorner(knob, 9)
+
+    toggleButtons[featureName] = {
+        button = toggle,
+        knob = knob
+    }
+
+    toggle.Activated:Connect(function()
+        local newState = not toggleStates[featureName]
+        toggleStates[featureName] = newState
+
+        if newState then
+            tween(toggle, 0.16, {BackgroundColor3 = ACCENT})
+            tween(knob, 0.16, {
+                Position = UDim2.new(1, -21, 0, 3)
+            })
+            status.Text = featureName .. ": ON (UI saja)"
+        else
+            tween(toggle, 0.16, {
+                BackgroundColor3 = Color3.fromRGB(65, 68, 82)
+            })
+            tween(knob, 0.16, {
+                Position = UDim2.fromOffset(3, 3)
+            })
+            status.Text = featureName .. ": OFF"
+        end
+    end)
 end
-```
 
----
+-- Status bar
+local statusBar = Instance.new("Frame")
+statusBar.Size = UDim2.new(1, -24, 0, 24)
+statusBar.Position = UDim2.new(0, 12, 1, -26)
+statusBar.BackgroundColor3 = Color3.fromRGB(27, 30, 41)
+statusBar.BorderSizePixel = 0
+statusBar.Parent = main
+addCorner(statusBar, 7)
+
+local fpsLabel = Instance.new("TextLabel")
+fpsLabel.Size = UDim2.new(0.5, -8, 1, 0)
+fpsLabel.Position = UDim2.fromOffset(8, 0)
+fpsLabel.BackgroundTransparency = 1
+fpsLabel.Text = "FPS: --"
+fpsLabel.TextColor3 = GREEN
+fpsLabel.TextSize = 10
+fpsLabel.Font = Enum.Font.GothamMedium
+fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
+fpsLabel.Parent = statusBar
+
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Size = UDim2.new(0.5, -8, 1, 0)
+timeLabel.Position = UDim2.new(0.5, 0, 0, 0)
+timeLabel.BackgroundTransparency = 1
+timeLabel.Text = "Session: 00:00"
+timeLabel.TextColor3 = MUTED
+timeLabel.TextSize = 10
+timeLabel.Font = Enum.Font.GothamMedium
+timeLabel.TextXAlignment = Enum.TextXAlignment.Right
+timeLabel.Parent = statusBar
+
+-- FPS dan waktu sesi
+local elapsed = 0
+local frames = 0
+local fpsElapsed = 0
+
+local renderConnection
+renderConnection = RunService.RenderStepped:Connect(function(dt)
+    elapsed += dt
+    frames += 1
+    fpsElapsed += dt
+
+    if fpsElapsed >= 1 then
+        fpsLabel.Text = "FPS: " .. tostring(math.floor(frames / fpsElapsed))
+        frames = 0
+        fpsElapsed = 0
+    end
+
+    local totalSeconds = math.floor(elapsed)
+    local minutes = math.floor(totalSeconds / 60)
+    local seconds = totalSeconds % 60
+    timeLabel.Text = string.format("Session: %02d:%02d", minutes, seconds)
+end)
+
+-- Minimize / restore
+local minimized = false
+local fullSize = UDim2.fromOffset(310, 390)
+
+minimize.Activated:Connect(function()
+    minimized = not minimized
+
+    if minimized then
+        content.Visible = false
+        status.Visible = false
+        statusBar.Visible = false
+        minimize.Text = "+"
+        tween(main, 0.2, {
+            Size = UDim2.fromOffset(310, 58)
+        })
+    else
+        minimize.Text = "—"
+        tween(main, 0.2, {Size = fullSize})
+        task.delay(0.2, function()
+            if gui.Parent and not minimized then
+                content.Visible = true
+                status.Visible = true
+                statusBar.Visible = true
+            end
+        end)
+    end
+end)
+
+-- Drag panel: mouse dan layar sentuh
+local dragging = false
+local dragInput
+local dragStart
+local startPosition
+
+header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPosition = main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+header.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(
+            startPosition.X.Scale,
+            startPosition.X.Offset + delta.X,
+            startPosition.Y.Scale,
+            startPosition.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Munculkan panel dengan animasi
+main.Size = UDim2.fromOffset(0, 0)
+tween(main, 0.3, {Size = fullSize})
+
+print("Qeeewwie Panel loaded.")
