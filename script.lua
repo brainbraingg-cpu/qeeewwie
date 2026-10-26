@@ -1,5 +1,5 @@
 -- ========================================================
--- Qeeewwie Hub | Smart Tween & Fly Mode Edition
+-- Qeeewwie Hub | Sena Exclusive Style Edition
 -- Game: Steal an Egg
 -- ========================================================
 
@@ -19,6 +19,10 @@ if PlayerGui:FindFirstChild("QeeewwieStatusHUD") then PlayerGui.QeeewwieStatusHU
 task.wait(0.5)
 
 local runningStates = {}
+local config = {
+    TweenSpeed = 350, -- Kecepatan geser agar aman dari anti-cheat
+    EggFilter = "All" -- Filter jenis telur
+}
 
 local function smartWait(id, duration)
     local elapsed = 0
@@ -53,8 +57,8 @@ Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 150)
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
-MainFrame.Position = UDim2.new(0.5, -190, 0.5, -170)
-MainFrame.Size = UDim2.new(0, 380, 0, 390)
+MainFrame.Position = UDim2.new(0.5, -190, 0.5, -185)
+MainFrame.Size = UDim2.new(0, 380, 0, 410)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -71,7 +75,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | Fly & Farm Edition"
+Title.Text = "Qeeewwie Hub | Exclusive Mode"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -171,7 +175,7 @@ HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Fly Mode HUD"
+HudTitle.Text = "Steal Egg | Exclusive Mode Active"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
 
@@ -180,23 +184,74 @@ HudInfo.BackgroundTransparency = 1
 HudInfo.Position = UDim2.new(0, 12, 0, 26)
 HudInfo.Size = UDim2.new(1, -24, 0, 18)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Status: Flying & Safe Mode"
+HudInfo.Text = "Status: Smooth Tween & Safe Delivery"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
 
 local HudStats = Instance.new("TextLabel", HudFrame)
 HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Anti-Cheat Bypass Active"
+HudStats.Text = "Anti-Kick Bypass: Enabled"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
 
 -- ================= FITUR UTAMA =================
 
--- 1. Mode Fly (Terbang Bebas Mengikuti Kamera)
+-- 1. Exclusive Auto Steal (Smooth Tween + Safe Return ala Sena)
+createFeatureToggle("ExclusiveSteal", "Exclusive Auto Steal", "Ambil telur mulus & anti jatuh", function(state)
+    HudFrame.Visible = state
+    if state then
+        task.spawn(function()
+            while runningStates["ExclusiveSteal"] do
+                pcall(function()
+                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local root = char:WaitForChild("HumanoidRootPart")
+                    local initPos = root.CFrame
+                    
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if not runningStates["ExclusiveSteal"] then break end
+                        
+                        local nameLower = obj.Name:lower()
+                        if nameLower:find("egg") or nameLower:find("telur") then
+                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
+                            
+                            if part then
+                                local distance = (root.Position - part.Position).Magnitude
+                                local travelTime = math.clamp(distance / config.TweenSpeed, 0.3, 1.8)
+                                
+                                -- Tween halus ke posisi telur
+                                local tween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = part.CFrame + Vector3.new(0, 3, 0)})
+                                tween:Play()
+                                tween.Completed:Wait()
+                                
+                                if not smartWait("ExclusiveSteal", 0.3) then break end
+                                
+                                if firetouchinterest then
+                                    firetouchinterest(root, part, 0)
+                                    firetouchinterest(root, part, 1)
+                                end
+                                
+                                task.wait(0.2)
+                                
+                                -- Kembali ke pangkalan/posisi awal secara aman
+                                local returnTween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = initPos})
+                                returnTween:Play()
+                                returnTween.Completed:Wait()
+                                
+                                if not smartWait("ExclusiveSteal", 0.5) then break end
+                            end
+                        end
+                    end
+                end)
+                if not smartWait("ExclusiveSteal", 2.0) then break end
+            end
+        end)
+    end
+end)
+
+-- 2. Mode Fly (Terbang Bebas)
 local flyConn = nil
 createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di udara", function(state)
-    HudFrame.Visible = state
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
     
@@ -222,55 +277,6 @@ createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di 
         if flyConn then flyConn:Disconnect() flyConn = nil end
         if root:FindFirstChild("QeeewwieFlyGyro") then root.QeeewwieFlyGyro:Destroy() end
         if root:FindFirstChild("QeeewwieFlyVelocity") then root.QeeewwieFlyVelocity:Destroy() end
-    end
-end)
-
--- 2. Smart Tween Farm
-createFeatureToggle("SmartTween", "Smart Tween Farm", "Geser halus ke telur & kembali aman", function(state)
-    if state then
-        task.spawn(function()
-            while runningStates["SmartTween"] do
-                pcall(function()
-                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-                    local root = char:WaitForChild("HumanoidRootPart")
-                    local initPos = root.CFrame
-                    
-                    for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if not runningStates["SmartTween"] then break end
-                        
-                        local nameLower = obj.Name:lower()
-                        if nameLower:find("egg") or nameLower:find("telur") then
-                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
-                            
-                            if part then
-                                local distance = (root.Position - part.Position).Magnitude
-                                local travelTime = math.clamp(distance / 400, 0.2, 1.5)
-                                
-                                local tween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = part.CFrame + Vector3.new(0, 3, 0)})
-                                tween:Play()
-                                tween.Completed:Wait()
-                                
-                                if not smartWait("SmartTween", 0.4) then break end
-                                
-                                if firetouchinterest then
-                                    firetouchinterest(root, part, 0)
-                                    firetouchinterest(root, part, 1)
-                                end
-                                
-                                task.wait(0.2)
-                                
-                                local returnTween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = initPos})
-                                returnTween:Play()
-                                returnTween.Completed:Wait()
-                                
-                                if not smartWait("SmartTween", 0.5) then break end
-                            end
-                        end
-                    end
-                end)
-                if not smartWait("SmartTween", 2.0) then break end
-            end
-        end)
     end
 end)
 
@@ -325,4 +331,4 @@ createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK otomatis", 
     end
 end)
 
-print("[Qeeewwie Hub] Fly & Smart Edition Loaded Successfully!")
+print("[Qeeewwie Hub] Exclusive Edition Loaded Successfully!")
