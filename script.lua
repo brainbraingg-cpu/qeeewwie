@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: EXACT PRIORITY & SPEED-WALK FUSION [SC]
+-- QEEEWWIE HUB: SUPREME CLEAN & MASTER EDITION [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,16 +11,23 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
-local autoTpFarmActive = false
-local speedBoostActive = false
-local autoRideEnabled = true
-local prioritizeRare = true
-local customWalkSpeed = 95
+-- =========================================================
+-- 1. KONFIGURASI & VARIABEL UTAMA
+-- =========================================================
+local Config = {
+    AutoFarmActive = false,
+    SpeedBoostActive = false,
+    AutoRideEnabled = true,
+    PrioritizeRare = true,
+    CustomWalkSpeed = 95,
+    NormalWalkSpeed = 16
+}
+
 local basePosition = nil
 local collectedEggsMemory = {}
 
 -- =========================================================
--- PEMBUATAN UI UTAMA
+-- 2. PEMBUATAN UI SUPREME (ESTETIKA & RAPI)
 -- =========================================================
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
@@ -69,7 +76,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Exact Priority Edition [⚡]"
+SubTitle.Text = "Master Clean Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -145,7 +152,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "EXACT PRIORITY FARM: OFF"
+AutoFarmBtn.Text = "MASTER FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -178,7 +185,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1 detik -> Steal 0.1ms -> TP Fusion -> Scan Base -> Jalan pake Speed Boost."
+InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal 0.1ms -> TP Fusion -> Scan Base -> Jalan pake Speed Boost."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -197,7 +204,7 @@ SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
 -- =========================================================
--- KONEKSI UI
+-- 3. KONEKSI EVENT UI
 -- =========================================================
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
@@ -232,11 +239,11 @@ TabPlayer.MouseButton1Click:Connect(function()
 end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
-    autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "EXACT PRIORITY FARM: ON" or "EXACT PRIORITY FARM: OFF"
-    AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
+    Config.AutoFarmActive = not Config.AutoFarmActive
+    AutoFarmBtn.Text = Config.AutoFarmActive and "MASTER FARM: ON" or "MASTER FARM: OFF"
+    AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
-    if autoTpFarmActive then
+    if Config.AutoFarmActive then
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
         if root then
@@ -248,46 +255,34 @@ AutoFarmBtn.MouseButton1Click:Connect(function()
 end)
 
 RideToggleBtn.MouseButton1Click:Connect(function()
-    autoRideEnabled = not autoRideEnabled
-    if autoRideEnabled then
-        RideToggleBtn.Text = "AUTO RIDE PET: ON"
-        RideToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
-    else
-        RideToggleBtn.Text = "AUTO RIDE PET: OFF"
-        RideToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
-    end
+    Config.AutoRideEnabled = not Config.AutoRideEnabled
+    RideToggleBtn.Text = Config.AutoRideEnabled and "AUTO RIDE PET: ON" or "AUTO RIDE PET: OFF"
+    RideToggleBtn.BackgroundColor3 = Config.AutoRideEnabled and Color3.fromRGB(50, 150, 100) or Color3.fromRGB(150, 50, 50)
 end)
 
 PriorityBtn.MouseButton1Click:Connect(function()
-    prioritizeRare = not prioritizeRare
-    if prioritizeRare then
-        PriorityBtn.Text = "TARGET: PRIORITAS EGG LANGKA / JAUH"
-        PriorityBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
-    else
-        PriorityBtn.Text = "TARGET: RANDOM ALL EGGS"
-        PriorityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-    end
+    Config.PrioritizeRare = not Config.PrioritizeRare
+    PriorityBtn.Text = Config.PrioritizeRare and "TARGET: PRIORITAS EGG LANGKA / JAUH" or "TARGET: RANDOM ALL EGGS"
+    PriorityBtn.BackgroundColor3 = Config.PrioritizeRare and Color3.fromRGB(150, 50, 200) or Color3.fromRGB(50, 50, 80)
 end)
 
 SpeedBtn.MouseButton1Click:Connect(function()
-    speedBoostActive = not speedBoostActive
-    SpeedBtn.Text = speedBoostActive and "SUPREME SPEED: ON" or "SUPREME SPEED: OFF"
-    SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
+    Config.SpeedBoostActive = not Config.SpeedBoostActive
+    SpeedBtn.Text = Config.SpeedBoostActive and "SUPREME SPEED: ON" or "SUPREME SPEED: OFF"
+    SpeedBtn.BackgroundColor3 = Config.SpeedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
 -- =========================================================
--- FUNGSI SAFE AUTO-RIDE
+-- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION SCAN)
 -- =========================================================
 local function safeAutoRide()
-    if not autoRideEnabled then return end
+    if not Config.AutoRideEnabled then return end
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
         
-        if humanoid and humanoid.SeatPart then
-            return
-        end
+        if humanoid and humanoid.SeatPart then return end
 
         for _, obj in pairs(Workspace:GetDescendants()) do
             if obj:IsA("ProximityPrompt") then
@@ -308,11 +303,8 @@ local function safeAutoRide()
     end)
 end
 
--- =========================================================
--- PENCARIAN TEMPAT FUSION TERDEKAT
--- =========================================================
 local function findNearestFusion(currentPos)
-    local nearestPos = currentPos + Vector3.new(0, 75, 0) -- Default aman jika tidak ketemu
+    local nearestPos = currentPos + Vector3.new(0, 75, 0)
     local shortestDist = math.huge
     pcall(function()
         for _, obj in pairs(Workspace:GetDescendants()) do
@@ -331,13 +323,8 @@ local function findNearestFusion(currentPos)
     return nearestPos
 end
 
--- =========================================================
--- VALIDASI EGG
--- =========================================================
 local function isValidEgg(prompt, parentPart)
-    if collectedEggsMemory[prompt] then
-        return false
-    end
+    if collectedEggsMemory[prompt] then return false end
 
     local partName = string.lower(parentPart.Name)
     local parentObj = parentPart.Parent
@@ -362,9 +349,7 @@ local function isValidEgg(prompt, parentPart)
     local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("forest")
     local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass")
     
-    if not (isEgg and not isRestricted) then
-        return false
-    end
+    if not (isEgg and not isRestricted) then return false end
     
     local isRare = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary") or fullStr:find("halloween") or fullStr:find("lubang hitam")
     
@@ -372,12 +357,12 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA SESUAI URUTAN MUTLAK
+-- 5. MESIN UTAMA (URUTAN PRIORITAS MUTLAK)
 -- =========================================================
 task.spawn(function()
     while true do
         task.wait(0.4)
-        if autoTpFarmActive then
+        if Config.AutoFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
                 if not char then return end
@@ -389,12 +374,11 @@ task.spawn(function()
                     basePosition = root.CFrame
                 end
                 
-                -- Pastikan naik pet
                 safeAutoRide()
                 
                 local availableEggs = {}
                 for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not autoTpFarmActive then break end
+                    if not Config.AutoFarmActive then break end
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
                         if parentPart and parentPart:IsA("BasePart") then
@@ -408,62 +392,55 @@ task.spawn(function()
                 
                 if #availableEggs > 0 then
                     table.sort(availableEggs, function(a, b)
-                        if prioritizeRare then
-                            if a.isRare and not b.isRare then
-                                return true
-                            elseif not a.isRare and b.isRare then
-                                return false
-                            end
+                        if Config.PrioritizeRare then
+                            if a.isRare and not b.isRare then return true end
+                            if not a.isRare and b.isRare then return false end
                         end
                         return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
                     end)
                     
                     local target = availableEggs[1]
-                    if target and autoTpFarmActive then
+                    if target and Config.AutoFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. TP KE EGG
+                        -- STEP 1: TP KE EGG
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- 2. DIEM 1 DETIK
+                        -- STEP 2: DIAM 1 DETIK DI EGG
                         task.wait(1.0)
                         
-                        -- 3. STEAL 0,1 MILIDETIK (0.0001 detik / kilat instan)
+                        -- STEP 3: STEAL KILAT 0,1 MILIDETIK
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         task.wait(0.0001)
                         
-                        -- 4. KE TEMPAT FUSION TERDEKAT
+                        -- STEP 4: TP KE TEMPAT FUSION TERDEKAT
                         local fusionPos = findNearestFusion(root.Position)
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = CFrame.new(fusionPos)
                         task.wait(0.3)
                         
-                        -- 5. SCAN BASE KITA & JALAN DENGAN SPEED BOOST
-                        if basePosition and autoTpFarmActive then
-                            -- Aktifkan speed boost otomatis saat perjalanan pulang
-                            humanoid.WalkSpeed = customWalkSpeed
+                        -- STEP 5: SCAN BASE KITA & JALAN PULANG PAKAI SPEED BOOST
+                        if basePosition and Config.AutoFarmActive then
+                            humanoid.WalkSpeed = Config.CustomWalkSpeed
                             
-                            -- Pindah ke atas/dekat base hasil scanning sebentar biar mulus jalurnya
                             local scannedBaseTop = basePosition.Position + Vector3.new(0, 15, 0)
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = CFrame.new(scannedBaseTop)
                             task.wait(0.2)
                             
-                            -- Jalan kaki pakai pet menuju titik dasar base
                             humanoid:MoveTo(basePosition.Position)
                             
                             local startTime = tick()
                             repeat
                                 task.wait(0.2)
-                                if not autoTpFarmActive then break end
+                                if not Config.AutoFarmActive then break end
                             until (root.Position - basePosition.Position).Magnitude < 8 or (tick() - startTime) > 4
                             
-                            -- Kembalikan walkspeed normal setelah sampai base
-                            humanoid.WalkSpeed = 16
+                            humanoid.WalkSpeed = Config.NormalWalkSpeed
                         end
                         
                         task.wait(0.4)
@@ -476,9 +453,9 @@ task.spawn(function()
         end
 
         local char = LocalPlayer.Character
-        if speedBoostActive and char then
+        if Config.SpeedBoostActive and char then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if humanoid then humanoid.WalkSpeed = customWalkSpeed end
+            if humanoid then humanoid.WalkSpeed = Config.CustomWalkSpeed end
         end
     end
 end)
