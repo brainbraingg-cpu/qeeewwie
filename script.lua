@@ -1,5 +1,5 @@
 -- ========================================================
--- Qeeewwie Hub v8.4 | UI Fix Edition (PlayerGui Support)
+-- Qeeewwie Hub v8.5 | DisplayOrder & Position Fix Edition
 -- ========================================================
 
 local Players = game:GetService("Players")
@@ -13,6 +13,8 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("QeeewwieMasterHub") then PlayerGui.QeeewwieMasterHub:Destroy() end
 if PlayerGui:FindFirstChild("QeeewwieStatusHUD") then PlayerGui.QeeewwieStatusHUD:Destroy() end
 
+task.wait(0.5) -- Jeda stabilisasi PlayerGui
+
 local runningStates = {}
 
 local function smartWait(id, duration)
@@ -25,21 +27,23 @@ local function smartWait(id, duration)
     return runningStates[id]
 end
 
--- ================= UI UTAMA (PINDAH KE PLAYERGUI) =================
+-- ================= UI UTAMA (DIPAKSA DI LAYER PALING ATAS) =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QeeewwieMasterHub"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 999999 -- Pastikan tampil di atas segalanya (termasuk menu executor)
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
--- Tombol Utama (Dibuat lebih besar & mencolok di layar)
+-- Tombol dipindah ke atas (X: 160, Y: 15) agar tidak nabrak bar executor di kiri
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-ToggleBtn.Position = UDim2.new(0, 30, 0, 150)
-ToggleBtn.Size = UDim2.new(0, 150, 0, 50)
+ToggleBtn.Position = UDim2.new(0, 160, 0, 15)
+ToggleBtn.Size = UDim2.new(0, 140, 0, 42)
 ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.Text = "👑 Qeeewwie Hub"
 ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 150)
-ToggleBtn.TextSize = 14
+ToggleBtn.TextSize = 13
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 10)
@@ -49,7 +53,7 @@ local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
 MainFrame.Position = UDim2.new(0.5, -190, 0.5, -170)
 MainFrame.Size = UDim2.new(0, 380, 0, 360)
-MainFrame.Visible = false -- Sengaja disembunyikan dulu, dibuka pakai tombol ToggleBtn
+MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -65,7 +69,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | v8.4 Fixed"
+Title.Text = "Qeeewwie Hub | v8.5 Fixed"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -152,6 +156,7 @@ end
 local StatusGui = Instance.new("ScreenGui")
 StatusGui.Name = "QeeewwieStatusHUD"
 StatusGui.ResetOnSpawn = false
+StatusGui.DisplayOrder = 999998
 StatusGui.Parent = PlayerGui
 
 local HudFrame = Instance.new("Frame", StatusGui)
@@ -169,7 +174,7 @@ HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | PlayerGui HUD Tracker"
+HudTitle.Text = "Steal Egg | Layer-Fixed HUD Tracker"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
 
@@ -183,9 +188,7 @@ HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
 
 local HudStats = Instance.new("TextLabel", HudFrame)
-HudStats.BackgroundTransparency = 1
-HudStats.Position = UDim2.new(0, 12, 0, 44)
-HudStats.Size = UDim2.new(1, -24, 0, 16)
+HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
 HudStats.Text = "Attempts: 0 | Touches: 0"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
@@ -217,7 +220,7 @@ createFeatureToggle("AutoSteal", "Auto Steal Instant (HUD)", "Teleport instan am
                                     firetouchinterest(root, part, 1)
                                     touches = touches + 1
                                 end
-                                HudStats.Text = "Attempts: " .. attempts + " | Touches: " .. touches
+                                HudStats.Text = "Attempts: " .. attempts .. " | Touches: " .. touches
                                 root.CFrame = initPos
                                 if not smartWait("AutoSteal", 0.5) then break end
                             end
@@ -285,4 +288,4 @@ createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Bypass anti-AFK aman", functi
     end
 end)
 
-print("[Qeeewwie Hub v8.4] PlayerGui Edition Loaded Successfully!")
+print("[Qeeewwie Hub v8.5] DisplayOrder Fixed Successfully!")
