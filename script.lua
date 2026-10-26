@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTIMATE MAXIMUM POWER [⚡ MAX SPEED & STEAL]
+-- QEEEWWIE HUB: ULTIMATE SUPREME POWER [SC MAX EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,11 +11,11 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Fitur Maximum Power
+-- Variabel Supreme Power
 local forestInstantStealActive = false
 local speedBoostActive = false
-local customWalkSpeed = 85 -- Kecepatan Super Maksimal!
-local maxInteractDistance = 60 -- Jangkauan diperluas seluas-luasnya!
+local customWalkSpeed = 95 -- Kecepatan Super Kilat!
+local maxInteractDistance = 70 -- Jangkauan Super Luas!
 
 -- Pembuatan UI Utama (Lapisan Tertinggi)
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
@@ -23,20 +23,26 @@ ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 2147483647
 
--- Tombol Logo Mengambang (Floating Icon SC) pas Menu Diperkecil
+-- =========================================================
+-- [SUPREME] FLOATING ICON SC (MENYALA & ELEGAN)
+-- =========================================================
 local FloatingBtn = Instance.new("TextButton", ScreenGui)
-FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
-FloatingBtn.Size = UDim2.new(0, 48, 0, 48)
-FloatingBtn.Font = Enum.Font.SourceSansBold
+FloatingBtn.Size = UDim2.new(0, 54, 0, 54)
+FloatingBtn.Font = Enum.Font.GothamBold
 FloatingBtn.Text = "SC"
-FloatingBtn.TextColor3 = Color3.fromRGB(255, 100, 180)
-FloatingBtn.TextSize = 18
+FloatingBtn.TextColor3 = Color3.fromRGB(255, 100, 185)
+FloatingBtn.TextSize = 22
 FloatingBtn.Visible = false
 FloatingBtn.Active = true
 FloatingBtn.Draggable = true
 FloatingBtn.ZIndex = 9999
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
+
+local FloatingStroke = Instance.new("UIStroke", FloatingBtn)
+FloatingStroke.Color = Color3.fromRGB(255, 100, 185)
+FloatingStroke.Thickness = 3
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
@@ -47,9 +53,13 @@ MainFrame.Draggable = true
 MainFrame.ZIndex = 10
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
+local MainStroke = Instance.new("UIStroke", MainFrame)
+MainStroke.Color = Color3.fromRGB(255, 100, 185)
+MainStroke.Thickness = 2
+
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB [SC]"
-Title.TextColor3 = Color3.fromRGB(255, 100, 180)
+Title.TextColor3 = Color3.fromRGB(255, 100, 185)
 Title.Position = UDim2.new(0.08, 0, 0.02, 0)
 Title.Size = UDim2.new(0.70, 0, 0, 22)
 Title.Font = Enum.Font.SourceSansBold
@@ -58,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Ultimate Maximum Power [🔥]"
+SubTitle.Text = "Ultimate Supreme [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -133,7 +143,7 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.76, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Auto Instant Steal Maximum
+-- Tombol Auto Instant Steal Supreme
 local ForestStealBtn = Instance.new("TextButton", PageFarm)
 ForestStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 ForestStealBtn.Position = UDim2.new(0, 0, 0.02, 0)
@@ -145,13 +155,13 @@ ForestStealBtn.TextSize = 11
 ForestStealBtn.ZIndex = 12
 Instance.new("UICorner", ForestStealBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol TP to Nearest Egg Maximum
+-- Tombol TP to Nearest Egg Supreme
 local TpToEggBtn = Instance.new("TextButton", PageFarm)
 TpToEggBtn.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
 TpToEggBtn.Position = UDim2.new(0, 0, 0.28, 0)
 TpToEggBtn.Size = UDim2.new(1, 0, 0, 36)
 TpToEggBtn.Font = Enum.Font.SourceSansBold
-TpToEggBtn.Text = "TP TO NEAREST EGG [MAX]"
+TpToEggBtn.Text = "TP TO NEAREST EGG [SUPREME]"
 TpToEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TpToEggBtn.TextSize = 11
 TpToEggBtn.ZIndex = 12
@@ -162,7 +172,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.54, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 52)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Maximum Engine Active (0.05s Loop).\nAnti-Robux Lock + Logo SC Ready."
+InfoLabel.Text = "Status: Supreme Power Active (0.03s Loop).\nAnti-Robux Lock + Logo SC Supreme Ready."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -175,7 +185,7 @@ SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 SpeedBtn.Position = UDim2.new(0, 0, 0.02, 0)
 SpeedBtn.Size = UDim2.new(1, 0, 0, 38)
 SpeedBtn.Font = Enum.Font.SourceSansBold
-SpeedBtn.Text = "MAX SPEED: OFF"
+SpeedBtn.Text = "SUPREME SPEED: OFF"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
@@ -220,7 +230,7 @@ ForestStealBtn.MouseButton1Click:Connect(function()
     ForestStealBtn.BackgroundColor3 = forestInstantStealActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
 end)
 
--- TP To Egg Maximum Power
+-- TP To Egg Supreme Power
 TpToEggBtn.MouseButton1Click:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
@@ -267,14 +277,16 @@ end)
 
 SpeedBtn.MouseButton1Click:Connect(function()
     speedBoostActive = not speedBoostActive
-    SpeedBtn.Text = speedBoostActive and "MAX SPEED: ON" or "MAX SPEED: OFF"
+    SpeedBtn.Text = speedBoostActive and "SUPREME SPEED: ON" or "SUPREME SPEED: OFF"
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Mesin Utama Maximum Performance (Loop 0.05s)
+-- =========================================================
+-- MESIN UTAMA SUPREME (LOOP 0.03s: ULTRA INSTANT STEAL)
+-- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.05) -- Kecepatan super kilat anti-keduluan
+        task.wait(0.03) -- Kecepatan super kilat dewa!
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
