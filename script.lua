@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: MASSIVE OVERHAUL UPDATE [SC EDITION]
+-- QEEEWWIE HUB: MASSIVE OVERHAUL + AUTO RIDE PET [SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -17,10 +17,11 @@ end)
 
 local Config = {
     AutoFarmActive = false,
-    StealMode = "Instant", -- Pilihan: "Instant" atau "Fly"
-    MoveMode = "TP",       -- Pilihan: "TP" atau "Walk"
+    StealMode = "Instant", -- "Instant" atau "Fly"
+    MoveMode = "TP",       -- "TP" atau "Walk"
     EggEspActive = false,
     PetAntiClip = true,
+    AutoRideEnabled = true, -- Fitur Auto Ride Pet
     HalloweenEvent = true,
     YinYangEvent = true,
     MultiSpeed = 50,
@@ -59,11 +60,11 @@ FloatingBtn.Active = true
 FloatingBtn.Draggable = true
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
 
--- Main Frame (Diperbesar untuk menu update gede)
+-- Main Frame (Diperbesar untuk menampung tombol tambahan)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-MainFrame.Position = UDim2.new(0.5, -140, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 280, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -140, 0.18, 0)
+MainFrame.Size = UDim2.new(0, 280, 0, 470)
 MainFrame.Active = true
 MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -73,9 +74,9 @@ MainStroke.Color = Color3.fromRGB(255, 100, 185)
 MainStroke.Thickness = 2
 
 local Title = Instance.new("TextLabel", MainFrame)
-Title.Text = "QEEEWWIE HUB [MASSIVE UPDATE]"
+Title.Text = "QEEEWWIE HUB [FULL UPDATE]"
 Title.TextColor3 = Color3.fromRGB(255, 100, 185)
-Title.Position = UDim2.new(0.05, 0, 0.03, 0)
+Title.Position = UDim2.new(0.05, 0, 0.02, 0)
 Title.Size = UDim2.new(0.75, 0, 0, 25)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 14
@@ -83,7 +84,7 @@ Title.BackgroundTransparency = 1
 
 local CloseBtn = Instance.new("TextButton", MainFrame)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseBtn.Position = UDim2.new(0.82, 0, 0.03, 0)
+CloseBtn.Position = UDim2.new(0.82, 0, 0.02, 0)
 CloseBtn.Size = UDim2.new(0, 25, 0, 25)
 CloseBtn.Font = Enum.Font.SourceSansBold
 CloseBtn.Text = "X"
@@ -96,22 +97,23 @@ local function createButton(name, posY, color)
     local btn = Instance.new("TextButton", MainFrame)
     btn.BackgroundColor3 = color
     btn.Position = UDim2.new(0.08, 0, posY, 0)
-    btn.Size = UDim2.new(0.84, 0, 0, 36)
+    btn.Size = UDim2.new(0.84, 0, 0, 34)
     btn.Font = Enum.Font.SourceSansBold
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 12
+    btn.TextSize = 11
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     return btn
 end
 
-local AutoFarmBtn = createButton("AUTO STEAL FARM: OFF", 0.12, Color3.fromRGB(180, 40, 100))
-local StealModeBtn = createButton("STEAL MODE: INSTANT", 0.23, Color3.fromRGB(50, 100, 200))
-local MoveModeBtn = createButton("MOVE MODE: TP", 0.34, Color3.fromRGB(100, 50, 200))
-local EspBtn = createButton("EGG ESP: OFF", 0.45, Color3.fromRGB(50, 150, 150))
-local AntiClipBtn = createButton("PET ANTI-CLIP: ON", 0.56, Color3.fromRGB(150, 100, 50))
-local HalloweenBtn = createButton("EVENT HALLOWEEN: ON", 0.67, Color3.fromRGB(200, 100, 0))
-local YinYangBtn = createButton("EVENT YIN-YANG STONE: ON", 0.78, Color3.fromRGB(80, 80, 80))
+local AutoFarmBtn = createButton("AUTO STEAL FARM: OFF", 0.10, Color3.fromRGB(180, 40, 100))
+local StealModeBtn = createButton("STEAL MODE: INSTANT", 0.19, Color3.fromRGB(50, 100, 200))
+local MoveModeBtn = createButton("MOVE MODE: TP", 0.28, Color3.fromRGB(100, 50, 200))
+local RidePetBtn = createButton("AUTO RIDE PET: ON", 0.37, Color3.fromRGB(50, 150, 100))
+local EspBtn = createButton("EGG ESP: OFF", 0.46, Color3.fromRGB(50, 150, 150))
+local AntiClipBtn = createButton("PET ANTI-CLIP: ON", 0.55, Color3.fromRGB(150, 100, 50))
+local HalloweenBtn = createButton("EVENT HALLOWEEN: ON", 0.64, Color3.fromRGB(200, 100, 0))
+local YinYangBtn = createButton("EVENT YIN-YANG STONE: ON", 0.73, Color3.fromRGB(80, 80, 80))
 
 -- UI Event Handlers
 CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() espFolder:Destroy() end)
@@ -150,6 +152,12 @@ MoveModeBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+RidePetBtn.MouseButton1Click:Connect(function()
+    Config.AutoRideEnabled = not Config.AutoRideEnabled
+    RidePetBtn.Text = Config.AutoRideEnabled and "AUTO RIDE PET: ON" or "AUTO RIDE PET: OFF"
+    RidePetBtn.BackgroundColor3 = Config.AutoRideEnabled and Color3.fromRGB(50, 150, 100) or Color3.fromRGB(150, 50, 50)
+end)
+
 EspBtn.MouseButton1Click:Connect(function()
     Config.EggEspActive = not Config.EggEspActive
     EspBtn.Text = Config.EggEspActive and "EGG ESP: ON" or "EGG ESP: OFF"
@@ -174,6 +182,29 @@ YinYangBtn.MouseButton1Click:Connect(function()
 end)
 
 -- Utility Functions
+local function safeAutoRide()
+    if not Config.AutoRideEnabled then return end
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.SeatPart then return end
+
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") then
+                local parent = obj.Parent
+                if parent then
+                    local nameStr = string.lower(parent.Name .. " " .. (obj.ActionText or "") .. " " .. (obj.ObjectText or ""))
+                    if nameStr:find("ride") or nameStr:find("naik") or nameStr:find("mount") or nameStr:find("pet") then
+                        obj.HoldDuration = 0
+                        if fireproximityprompt then fireproximityprompt(obj) task.wait(0.05) break end
+                    end
+                end
+            end
+        end
+    end)
+end
+
 local function findNearestFusion(currentPos)
     local nearestPos = currentPos + Vector3.new(0, 75, 0)
     local shortestDist = math.huge
@@ -195,7 +226,6 @@ local function isValidTarget(prompt, parentPart)
     if collectedEggsMemory[prompt] then return false end
     local nameStr = string.lower(parentPart.Name .. " " .. (prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
     
-    -- Filter Event Halloween / Yin-Yang / Telur Biasa
     local isEgg = nameStr:find("egg") or nameStr:find("telur")
     local isHalloween = Config.HalloweenEvent and (nameStr:find("halloween") or nameStr:find("pumpkin") or nameStr:find("hallow"))
     local isYinYang = Config.YinYangEvent and (nameStr:find("yin") or nameStr:find("yang") or nameStr:find("batu") or nameStr:find("stone"))
@@ -208,7 +238,7 @@ local function isValidTarget(prompt, parentPart)
     return false
 end
 
--- ESP SYSTEM UPDATE
+-- ESP & ANTI-CLIP RUNSERVICE
 RunService.RenderStepped:Connect(function()
     if Config.EggEspActive then
         pcall(function()
@@ -235,7 +265,6 @@ RunService.RenderStepped:Connect(function()
         end)
     end
     
-    -- PET & HEWAN ANTI-CLIP
     if Config.PetAntiClip then
         pcall(function()
             local char = LocalPlayer.Character
@@ -250,7 +279,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- MESIN UTAMA AUTO STEAL & EVENT FARM
+-- MESIN UTAMA AUTO STEAL & FARM
 task.spawn(function()
     while true do
         task.wait(0.2)
@@ -263,6 +292,9 @@ task.spawn(function()
                 if not root or not humanoid then return end
                 
                 if not startingBaseCFrame then startingBaseCFrame = root.CFrame end
+                
+                -- Jalankan pengecekan auto ride pet
+                safeAutoRide()
                 
                 local targets = {}
                 for _, prompt in pairs(Workspace:GetDescendants()) do
@@ -284,7 +316,6 @@ task.spawn(function()
                         
                         -- STEAL MODE: FLY vs INSTANT
                         if Config.StealMode == "Fly" then
-                            -- Simulasi terbang mulus ke target
                             local steps = 10
                             local currentPos = root.CFrame
                             for i = 1, steps do
@@ -293,7 +324,6 @@ task.spawn(function()
                                 task.wait(0.02)
                             end
                         else
-                            -- INSTANT TP MODE
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                             task.wait(0.2)
