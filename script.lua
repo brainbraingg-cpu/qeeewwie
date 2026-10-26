@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: AUTO RIDE PET + RARE PRIORITY [SC]
+-- QEEEWWIE HUB: STABLE AUTO-RIDE & ANTI-FAIL [SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -13,7 +13,7 @@ end
 
 local autoTpFarmActive = false
 local speedBoostActive = false
-local autoRideEnabled = true -- Status aktif untuk Auto Ride Pet
+local autoRideEnabled = true
 local prioritizeRare = true
 local customWalkSpeed = 95
 local basePosition = nil
@@ -48,7 +48,7 @@ FloatingStroke.Thickness = 3
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 480) -- Diperpanjang sedikit untuk tombol tambahan
+MainFrame.Size = UDim2.new(0, 260, 0, 480)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -69,7 +69,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Dedicated Auto Ride Toggle [⚡]"
+SubTitle.Text = "Stable Fixed Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -140,19 +140,17 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.8, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Utama Auto Farm
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "RARE PRIORITY & RIDE: OFF"
+AutoFarmBtn.Text = "STABLE FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Toggle Auto Ride Pet (BARU)
 local RideToggleBtn = Instance.new("TextButton", PageFarm)
 RideToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
 RideToggleBtn.Position = UDim2.new(0, 0, 0.23, 0)
@@ -164,7 +162,6 @@ RideToggleBtn.TextSize = 10
 RideToggleBtn.ZIndex = 12
 Instance.new("UICorner", RideToggleBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Prioritas Rare
 local PriorityBtn = Instance.new("TextButton", PageFarm)
 PriorityBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
 PriorityBtn.Position = UDim2.new(0, 0, 0.42, 0)
@@ -181,7 +178,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Auto Ride Pet dapat di-on/off via tombol hijau. Mencegah error Delivery Failed."
+InfoLabel.Text = "Status: Auto Ride diperhalus. Aman dari error dan siap sedot telur langka."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -236,7 +233,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "RARE PRIORITY & RIDE: ON" or "RARE PRIORITY & RIDE: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "STABLE FARM: ON" or "STABLE FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -250,7 +247,6 @@ AutoFarmBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Tombol Interaksi Toggle Auto Ride
 RideToggleBtn.MouseButton1Click:Connect(function()
     autoRideEnabled = not autoRideEnabled
     if autoRideEnabled then
@@ -280,28 +276,33 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FUNGSI AUTO RIDE PET (DENGAN KONTROL TOGGLE)
+-- FUNGSI SAFE AUTO-RIDE (DIJAMIN AMAN DARI ERROR)
 -- =========================================================
-local function forceRidePet()
+local function safeAutoRide()
     if not autoRideEnabled then return end
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
         
+        -- Kalau sudah duduk/naik kendaraan/pet, biarkan
         if humanoid and humanoid.SeatPart then
-            return true
+            return
         end
 
-        for _, prompt in pairs(Workspace:GetDescendants()) do
-            if prompt:IsA("ProximityPrompt") then
-                local text = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-                if text:find("ride") or text:find("naik") or text:find("mount") or text:find("tumpangi") then
-                    prompt.HoldDuration = 0
-                    if fireproximityprompt then
-                        fireproximityprompt(prompt)
-                        task.wait(0.15)
-                        break
+        -- Cari objek ProximityPrompt yang ada kata 'ride' atau 'mount' secara aman
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") then
+                local parent = obj.Parent
+                if parent then
+                    local nameStr = string.lower(parent.Name .. " " .. (obj.ActionText or "") .. " " .. (obj.ObjectText or ""))
+                    if nameStr:find("ride") or nameStr:find("naik") or nameStr:find("mount") then
+                        obj.HoldDuration = 0
+                        if fireproximityprompt then
+                            fireproximityprompt(obj)
+                            task.wait(0.1)
+                            break
+                        end
                     end
                 end
             end
@@ -310,7 +311,7 @@ local function forceRidePet()
 end
 
 -- =========================================================
--- VALIDASI EGG & PRIORITAS RARE
+-- VALIDASI EGG
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
     if collectedEggsMemory[prompt] then
@@ -350,7 +351,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: AUTO RIDE + WIDE RARE PRIORITY & STEAL
+-- MESIN UTAMA FARMING
 -- =========================================================
 task.spawn(function()
     while true do
@@ -366,8 +367,8 @@ task.spawn(function()
                     basePosition = root.CFrame
                 end
                 
-                -- Coba naiki pet otomatis jika toggle aktif
-                forceRidePet()
+                -- Jalankan fungsi auto ride secara aman
+                safeAutoRide()
                 
                 local availableEggs = {}
                 for _, prompt in pairs(Workspace:GetDescendants()) do
@@ -399,27 +400,29 @@ task.spawn(function()
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- Teleport ke target telur langka
+                        -- 1. Teleport ke Telur Target
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        task.wait(1)
+                        -- Jeda sinkronisasi server stabil
+                        task.wait(0.3)
                         
-                        -- Steal / Ambil Telur
+                        -- 2. Ambil / Steal Telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        task.wait(1)
+                        -- Jeda delivery aman
+                        task.wait(0.5)
                         
-                        -- Return to Base
+                        -- 3. Pulang ke Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(1)
+                        task.wait(0.4)
                     end
                 else
                     table.clear(collectedEggsMemory)
