@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: RIDING-SYNC & ANTI-FAIL [SC EDITION]
+-- QEEEWWIE HUB: ULTRA RARE FARM & AUTO RIDE PET [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -19,7 +19,7 @@ local basePosition = nil
 local collectedEggsMemory = {}
 
 -- =========================================================
--- PEMBUATAN UI UTAMA (ESTETIKA SUPREME & STABIL)
+-- PEMBUATAN UI UTAMA
 -- =========================================================
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
@@ -68,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Riding-Sync Edition [⚡]"
+SubTitle.Text = "Auto Ride & Wide Range [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -144,7 +144,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "RIDING-SYNC FARM: OFF"
+AutoFarmBtn.Text = "WIDE RARE STEAL: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -155,9 +155,9 @@ RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
 RarityBtn.Position = UDim2.new(0, 0, 0.28, 0)
 RarityBtn.Size = UDim2.new(1, 0, 0, 34)
 RarityBtn.Font = Enum.Font.SourceSansBold
-RarityBtn.Text = "RARITY FILTER: ALL EGGS"
+RarityBtn.Text = "RARITY FILTER: ALL EGGS (RARE INCLUDED)"
 RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-RarityBtn.TextSize = 10
+RarityBtn.TextSize = 9
 RarityBtn.ZIndex = 12
 Instance.new("UICorner", RarityBtn).CornerRadius = UDim.new(0, 6)
 
@@ -166,7 +166,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Pastikan sedang naik hewan (riding).\nFix Delivery Failed & Sinkronisasi Server."
+InfoLabel.Text = "Status: Auto Ride Pet + Jarak Maksimal.\nSiap berburu Egg Rare/Langka tanpa Delivery Fail."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -218,7 +218,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "RIDING-SYNC FARM: ON" or "RIDING-SYNC FARM: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "WIDE RARE STEAL: ON" or "WIDE RARE STEAL: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -239,7 +239,7 @@ RarityBtn.MouseButton1Click:Connect(function()
         RarityBtn.BackgroundColor3 = Color3.fromRGB(200, 120, 40)
         RarityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     else
-        RarityBtn.Text = "RARITY FILTER: ALL EGGS"
+        RarityBtn.Text = "RARITY FILTER: ALL EGGS (RARE INCLUDED)"
         RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
         RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
     end
@@ -251,6 +251,40 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
+-- =========================================================
+-- FUNGSI AUTO RIDE PET (Otomatis Menaiki Hewan Terbaik)
+-- =========================================================
+local function ensureRidingPet()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        
+        -- Cek apakah karakter sudah menaiki hewan (Seated)
+        if humanoid and humanoid.SeatPart then
+            return true
+        end
+
+        -- Cari ProximityPrompt atau tombol "Ride" terdekat dari Pet pemain
+        for _, prompt in pairs(Workspace:GetDescendants()) do
+            if prompt:IsA("ProximityPrompt") then
+                local text = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
+                if text:find("ride") or text:find("naik") or text:find("mount") then
+                    prompt.HoldDuration = 0
+                    if fireproximityprompt then
+                        fireproximityprompt(prompt)
+                        task.wait(0.1)
+                        break
+                    end
+                end
+            end
+        end
+    end)
+end
+
+-- =========================================================
+-- FILTER TELUR DENGAN JARAK MAKSIMAL SELURUH MAP
+-- =========================================================
 local function isValidEgg(prompt, parentPart)
     if collectedEggsMemory[prompt] then
         return false
@@ -294,11 +328,11 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: RIDING-SYNC TP & STABLE SERVER CLAIM
+-- MESIN UTAMA: AUTO RIDE + WIDE RANGE TP & STEAL
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.5) -- Jeda lebih longgar agar server mencatat status riding & klaim dengan sempurna
+        task.wait(0.4)
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -310,7 +344,11 @@ task.spawn(function()
                     basePosition = root.CFrame
                 end
                 
+                -- Pastikan selalu menaiki hewan sebelum teleport
+                ensureRidingPet()
+                
                 local availableEggs = {}
+                -- PENCARIAN TANPA BATAS JARAK KE SELURUH MAP
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not autoTpFarmActive then break end
                     if prompt:IsA("ProximityPrompt") then
@@ -332,29 +370,29 @@ task.spawn(function()
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. Teleport ke Telur Liar
+                        -- 1. Teleport ke Telur Liar di Seluruh Map
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- Jeda sinkronisasi agar sistem game mengenali posisi saat naik hewan
-                        task.wait(1)
+                        -- Jeda sinkronisasi server
+                        task.wait(0.2)
                         
-                        -- 2. Eksekusi klaim/steal telur
+                        -- 2. Steal Telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        -- Jeda penting agar server sukses memproses pengiriman telur tanpa "Delivery Failed"
-                        task.wait(1)
+                        -- Jeda klaim sukses server
+                        task.wait(0.4)
                         
-                        -- 3. Teleport kembali ke Base setelah sukses
+                        -- 3. Teleport Balik ke Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(1)
+                        task.wait(0.4)
                     end
                 else
                     table.clear(collectedEggsMemory)
