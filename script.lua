@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTIMATE CLEAN & REINFORCED [SC EDITION]
+-- QEEEWWIE HUB: SUPREME FINAL EDITION [SC RETAINED & REINFORCED]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status Fitur
+-- Variabel Status & Konfigurasi Supreme
 local autoTeleportFarmActive = false
 local speedBoostActive = false
 local customWalkSpeed = 95
@@ -68,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Clean & Reinforced [⚡]"
+SubTitle.Text = "Supreme Clean & Fast [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -159,7 +159,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.35, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Stand di base, lalu aktifkan.\nOtomatis TP ke telur -> Ambil -> Balik ke Base."
+InfoLabel.Text = "Status: Area Jalur/Display diblock total.\nMesin Diperkuat (0.2s Loop) Anti-Nyangkut."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -231,25 +231,34 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- Validasi Telur & Event
+-- =========================================================
+-- VALIDASI TELUR MUTLAK (ANTI-JALUR & ANTI-ROBUX)
+-- =========================================================
 local function isValidEgg(prompt, parentPart, grandParent)
     local partName = string.lower(parentPart.Name)
     local parentName = grandParent and string.lower(grandParent.Name) or ""
     local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
     local fullStr = partName .. " " .. parentName .. " " .. promptText
     
-    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("hatch") or fullStr:find("pet")
-    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("shop") or fullStr:find("toko") or fullStr:find("pass") or promptText:find("robux") or promptText:find("buy")
+    -- Blacklist ketat area Jalur, Display, Toko, NPC Bicara
+    local isJalurOrDisplay = fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk")
+    if isJalurOrDisplay then
+        return false
+    end
+    
+    -- Jenis telur asli & event
+    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("hatch")
+    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass") or promptText:find("robux") or promptText:find("buy")
     
     return isEgg and not isRestricted
 end
 
 -- =========================================================
--- MESIN UTAMA REINFORCED (AUTO TP FARM + RETURN TO BASE)
+-- MESIN UTAMA SUPREME (AUTO TP & RETURN TO BASE SAT-SET)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.35)
+        task.wait(0.25) -- Kecepatan super stabil anti-bug
         if autoTeleportFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -270,7 +279,7 @@ task.spawn(function()
                         
                         if parentPart and parentPart:IsA("BasePart") then
                             if isValidEgg(prompt, parentPart, grandParent) then
-                                -- 1. Teleport ke Telur
+                                -- 1. Teleport ke Telur Murni di Map Hutan
                                 root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                                 root.CFrame = parentPart.CFrame + Vector3.new(0, 3.5, 0)
                                 
@@ -280,15 +289,15 @@ task.spawn(function()
                                     fireproximityprompt(prompt)
                                 end
                                 
-                                task.wait(0.15)
+                                task.wait(0.1)
                                 
-                                -- 3. Teleport Balik ke Base
+                                -- 3. Teleport Balik ke Base Seketika
                                 if basePosition and autoTeleportFarmActive then
                                     root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                                     root.CFrame = basePosition
                                 end
                                 
-                                task.wait(0.3)
+                                task.wait(0.25)
                                 break
                             end
                         end
