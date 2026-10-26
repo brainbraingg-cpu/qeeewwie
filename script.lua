@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ANTI-DELIVERY FAILED [SC STABLE EDITION]
+-- QEEEWWIE HUB: ANTI-DELIVERY FAILED & SYNCED [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,7 +11,6 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status & Konfigurasi Anti-Fail
 local autoTpFarmActive = false
 local speedBoostActive = false
 local lowRarityOnly = false
@@ -27,7 +26,6 @@ ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 2147483647
 
--- Logo SC Mengambang (Glowing)
 local FloatingBtn = Instance.new("TextButton", ScreenGui)
 FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
@@ -46,7 +44,6 @@ local FloatingStroke = Instance.new("UIStroke", FloatingBtn)
 FloatingStroke.Color = Color3.fromRGB(255, 100, 185)
 FloatingStroke.Thickness = 3
 
--- Jendela Utama Hub
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
@@ -60,7 +57,6 @@ local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(255, 100, 185)
 MainStroke.Thickness = 2
 
--- Header & Judul
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB [SC]"
 Title.TextColor3 = Color3.fromRGB(255, 100, 185)
@@ -72,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Anti-Fail Safe Edition [⚡]"
+SubTitle.Text = "Synced Delivery Fix [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -81,7 +77,6 @@ SubTitle.TextSize = 11
 SubTitle.BackgroundTransparency = 1
 SubTitle.ZIndex = 11
 
--- Tombol Kontrol (Minimize & Close)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
 MinimizeBtn.Position = UDim2.new(0.70, 0, 0.02, 0)
@@ -104,7 +99,6 @@ CloseBtn.TextSize = 14
 CloseBtn.ZIndex = 11
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
--- Navigasi Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
 TabContainer.Position = UDim2.new(0.05, 0, 0.12, 0)
@@ -132,7 +126,6 @@ TabPlayer.TextSize = 10
 TabPlayer.ZIndex = 12
 Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
--- Halaman Konten
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
 PageFarm.Position = UDim2.new(0.05, 0, 0.19, 0)
@@ -146,19 +139,17 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Safe TP & Steal
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "SAFE TP & STEAL: OFF"
+AutoFarmBtn.Text = "SYNCED STEAL FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
--- Tombol Filter Rarity
 local RarityBtn = Instance.new("TextButton", PageFarm)
 RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
 RarityBtn.Position = UDim2.new(0, 0, 0.28, 0)
@@ -175,14 +166,13 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Anti-Delivery Failed (AT-9783) Fix.\nTP stabil -> Ambil -> Pulang ke Base."
+InfoLabel.Text = "Status: Fix Error AT-xxxx (Delivery Failed).\nJeda server disesuaikan agar telur sukses diklaim."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
 InfoLabel.ZIndex = 12
 Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 
--- Tombol Halaman Player
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 SpeedBtn.Position = UDim2.new(0, 0, 0.05, 0)
@@ -194,9 +184,6 @@ SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
--- =========================================================
--- KONEKSI INTERAKSI UI
--- =========================================================
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -231,7 +218,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "SAFE TP & STEAL: ON" or "SAFE TP & STEAL: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "SYNCED STEAL FARM: ON" or "SYNCED STEAL FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -264,9 +251,6 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
--- =========================================================
--- FILTER VALIDASI TELUR (ANTI-BASE, ANTI-JALUR)
--- =========================================================
 local function isValidEgg(prompt, parentPart)
     if collectedEggsMemory[prompt] then
         return false
@@ -284,12 +268,10 @@ local function isValidEgg(prompt, parentPart)
     
     local fullStr = partName .. " " .. parentName .. " " .. grandName .. " " .. greatName .. " " .. promptText
     
-    -- Blacklist area Jalur, Display, Toko, NPC
     if fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk") or fullStr:find("board") then
         return false
     end
     
-    -- Blacklist area Base / Claimed / Tycoon
     if fullStr:find("base") or fullStr:find("plot") or fullStr:find("claim") or fullStr:find("tycoon") or fullStr:find("pedestal") or fullStr:find("stand") or fullStr:find("placed") or fullStr:find("mybase") then
         return false
     end
@@ -312,11 +294,11 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: SAFE TP + STABLE INSTANT STEAL + RETURN BASE
+-- MESIN UTAMA: SYNCED TP + STABLE SERVER STEAL & RETURN
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.3) -- Jeda stabil untuk mencegah error "Egg Delivery Failed" (AT-9783)
+        task.wait(0.4)
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -354,24 +336,25 @@ task.spawn(function()
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- Jeda mikro stabil agar server mengenali posisi TP sebelum mengambil
-                        task.wait(0.08)
+                        -- Jeda sinkronisasi server agar posisi TP valid
+                        task.wait(0.2)
                         
-                        -- 2. Instant Steal yang aman dan valid di mata server
+                        -- 2. Eksekusi Ambil/Steal Telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        task.wait(0.12)
+                        -- Jeda penting agar server game selesai memproses pengiriman telur ke inventaris
+                        task.wait(0.35)
                         
-                        -- 3. Teleport kembali pulang ke Base
+                        -- 3. Teleport Pulang ke Base setelah sukses diterima server
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(0.3)
+                        task.wait(0.4)
                     end
                 else
                     table.clear(collectedEggsMemory)
