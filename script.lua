@@ -1,9 +1,10 @@
 -- =========================================================
--- QEEEWWIE HUB: STRICT TP-TO-SHOP SEQUENCE [SC]
+-- QEEEWWIE HUB: FUSION-DIRECT + ANTICLIP & INVISIBLE [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -17,6 +18,8 @@ end
 local Config = {
     AutoFarmActive = false,
     SpeedBoostActive = false,
+    AntiClipActive = false,
+    InvisibleActive = false,
     AutoRideEnabled = true,
     PrioritizeRare = true,
     CustomWalkSpeed = 95,
@@ -76,7 +79,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Strict TP-Shop Edition [⚡]"
+SubTitle.Text = "Master Edition + Bypass [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -128,7 +131,7 @@ TabPlayer.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 TabPlayer.Position = UDim2.new(0.52, 0, 0, 0)
 TabPlayer.Size = UDim2.new(0.48, 0, 1, 0)
 TabPlayer.Font = Enum.Font.SourceSansBold
-TabPlayer.Text = "PLAYER SPEED"
+TabPlayer.Text = "PLAYER MODS"
 TabPlayer.TextColor3 = Color3.fromRGB(180, 180, 180)
 TabPlayer.TextSize = 10
 TabPlayer.ZIndex = 12
@@ -152,7 +155,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "STRICT FARM: OFF"
+AutoFarmBtn.Text = "FUSION FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -185,23 +188,46 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Toko Dulu -> Baru Jalan ke Base."
+InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Fusion Atas -> Jalan pulang ke base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
 InfoLabel.ZIndex = 12
 Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 
+-- TOMBOL PLAYER MODS (SPEED, ANTICLIP, INVISIBLE)
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
-SpeedBtn.Position = UDim2.new(0, 0, 0.05, 0)
-SpeedBtn.Size = UDim2.new(1, 0, 0, 38)
+SpeedBtn.Position = UDim2.new(0, 0, 0.02, 0)
+SpeedBtn.Size = UDim2.new(1, 0, 0, 36)
 SpeedBtn.Font = Enum.Font.SourceSansBold
 SpeedBtn.Text = "SUPREME SPEED: OFF"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
+
+local AntiClipBtn = Instance.new("TextButton", PagePlayer)
+AntiClipBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50)
+AntiClipBtn.Position = UDim2.new(0, 0, 0.22, 0)
+AntiClipBtn.Size = UDim2.new(1, 0, 0, 36)
+AntiClipBtn.Font = Enum.Font.SourceSansBold
+AntiClipBtn.Text = "ANTI CLIP (NOCLIP): OFF"
+AntiClipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AntiClipBtn.TextSize = 11
+AntiClipBtn.ZIndex = 12
+Instance.new("UICorner", AntiClipBtn).CornerRadius = UDim.new(0, 6)
+
+local InvisibleBtn = Instance.new("TextButton", PagePlayer)
+InvisibleBtn.BackgroundColor3 = Color3.fromRGB(100, 50, 150)
+InvisibleBtn.Position = UDim2.new(0, 0, 0.42, 0)
+InvisibleBtn.Size = UDim2.new(1, 0, 0, 36)
+InvisibleBtn.Font = Enum.Font.SourceSansBold
+InvisibleBtn.Text = "INVISIBLE (STEALTH): OFF"
+InvisibleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InvisibleBtn.TextSize = 11
+InvisibleBtn.ZIndex = 12
+Instance.new("UICorner", InvisibleBtn).CornerRadius = UDim.new(0, 6)
 
 -- =========================================================
 -- 3. KONEKSI EVENT UI
@@ -240,7 +266,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "STRICT FARM: ON" or "STRICT FARM: OFF"
+    AutoFarmBtn.Text = Config.AutoFarmActive and "FUSION FARM: ON" or "FUSION FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if Config.AutoFarmActive then
@@ -272,8 +298,20 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = Config.SpeedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
+AntiClipBtn.MouseButton1Click:Connect(function()
+    Config.AntiClipActive = not Config.AntiClipActive
+    AntiClipBtn.Text = Config.AntiClipActive and "ANTI CLIP (NOCLIP): ON" or "ANTI CLIP (NOCLIP): OFF"
+    AntiClipBtn.BackgroundColor3 = Config.AntiClipActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(150, 100, 50)
+end)
+
+InvisibleBtn.MouseButton1Click:Connect(function()
+    Config.InvisibleActive = not Config.InvisibleActive
+    InvisibleBtn.Text = Config.InvisibleActive and "INVISIBLE (STEALTH): ON" or "INVISIBLE (STEALTH): OFF"
+    InvisibleBtn.BackgroundColor3 = Config.InvisibleActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(100, 50, 150)
+end)
+
 -- =========================================================
--- 4. FUNGSI PENDUKUNG (SAFE RIDE & VALID SHOP FINDER)
+-- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION FINDER)
 -- =========================================================
 local function safeAutoRide()
     if not Config.AutoRideEnabled then return end
@@ -303,35 +341,24 @@ local function safeAutoRide()
     end)
 end
 
-local function findValidShop()
-    local targetPos = nil
+local function findNearestFusion(currentPos)
+    local nearestPos = currentPos + Vector3.new(0, 75, 0)
+    local shortestDist = math.huge
     pcall(function()
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("Model") or obj:IsA("Folder") then
+            if obj:IsA("BasePart") then
                 local name = string.lower(obj.Name)
-                if (name:find("shop") or name:find("toko") or name:find("store")) and not name:find("rock") and not name:find("stone") and not name:find("batu") then
-                    local primaryPart = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-                    if primaryPart then
-                        targetPos = primaryPart.CFrame + Vector3.new(0, 4, 0)
-                        break
-                    end
-                end
-            end
-        end
-        
-        if not targetPos then
-            for _, obj in pairs(Workspace:GetDescendants()) do
-                if obj:IsA("BasePart") then
-                    local name = string.lower(obj.Name)
-                    if (name:find("shop") or name:find("toko")) and not name:find("rock") and not name:find("stone") then
-                        targetPos = obj.CFrame + Vector3.new(0, 4, 0)
-                        break
+                if name:find("fusion") or name:find("fuse") or name:find("upgrade") then
+                    local dist = (obj.Position - currentPos).Magnitude
+                    if dist < shortestDist then
+                        shortestDist = dist
+                        nearestPos = obj.Position + Vector3.new(0, 10, 0)
                     end
                 end
             end
         end
     end)
-    return targetPos
+    return nearestPos
 end
 
 local function isValidEgg(prompt, parentPart)
@@ -358,112 +385,5 @@ local function isValidEgg(prompt, parentPart)
     end
     
     local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("forest")
-    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass")
+    local isRestricted = fullStr:find
     
-    if not (isEgg and not isRestricted) then return false end
-    
-    local isRare = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary") or fullStr:find("halloween") or fullStr:find("lubang hitam")
-    
-    return true, isRare
-end
-
--- =========================================================
--- 5. MESIN UTAMA (URUTAN MUTLAK: TP EGG -> STEAL -> TP TOKO -> JALAN KE BASE)
--- =========================================================
-task.spawn(function()
-    while true do
-        task.wait(0.4)
-        if Config.AutoFarmActive then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if not char then return end
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if not root or not humanoid then return end
-                
-                if not startingBaseCFrame then
-                    startingBaseCFrame = root.CFrame
-                end
-                
-                safeAutoRide()
-                
-                local availableEggs = {}
-                for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not Config.AutoFarmActive then break end
-                    if prompt:IsA("ProximityPrompt") then
-                        local parentPart = prompt.Parent
-                        if parentPart and parentPart:IsA("BasePart") then
-                            local valid, isRare = isValidEgg(prompt, parentPart)
-                            if valid then
-                                table.insert(availableEggs, {prompt = prompt, part = parentPart, isRare = isRare})
-                            end
-                        end
-                    end
-                end
-                
-                if #availableEggs > 0 then
-                    table.sort(availableEggs, function(a, b)
-                        if Config.PrioritizeRare then
-                            if a.isRare and not b.isRare then return true end
-                            if not a.isRare and b.isRare then return false end
-                        end
-                        if not a.part or not b.part or not root then return false end
-                        return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
-                    end)
-                    
-                    local target = availableEggs[1]
-                    if target and target.part and target.prompt and Config.AutoFarmActive then
-                        collectedEggsMemory[target.prompt] = true
-                        
-                        -- STEP 1: TP KE EGG
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
-                        
-                        -- STEP 2: DIAM 1 DETIK DI EGG
-                        task.wait(1.0)
-                        
-                        -- STEP 3: STEAL KILAT 0,1 MILIDETIK
-                        target.prompt.HoldDuration = 0
-                        if fireproximityprompt then
-                            fireproximityprompt(target.prompt)
-                        end
-                        task.wait(0.0001)
-                        
-                        -- STEP 4: LANGSUNG TP KE TOKO (DIJAMIN TANPA JALAN DULU)
-                        local shopCFrame = findValidShop()
-                        if shopCFrame then
-                            humanoid.WalkSpeed = 0
-                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = shopCFrame
-                            task.wait(0.3)
-                        end
-                        
-                        -- STEP 5: JALAN PULANG KE BASE DENGAN SPEED BOOST AKTIF
-                        if startingBaseCFrame and Config.AutoFarmActive then
-                            humanoid.WalkSpeed = Config.CustomWalkSpeed
-                            humanoid:MoveTo(startingBaseCFrame.Position)
-                            
-                            local startTime = tick()
-                            repeat
-                                task.wait(0.2)
-                                if not Config.AutoFarmActive then break end
-                            until (root.Position - startingBaseCFrame.Position).Magnitude < 6 or (tick() - startTime) > 5
-                        end
-                        
-                        humanoid.WalkSpeed = Config.NormalWalkSpeed
-                        task.wait(0.4)
-                    end
-                else
-                    table.clear(collectedEggsMemory)
-                    task.wait(1)
-                end
-            end)
-        end
-
-        local char = LocalPlayer.Character
-        if Config.SpeedBoostActive and char then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if humanoid then humanoid.WalkSpeed = Config.CustomWalkSpeed end
-        end
-    end
-end)
