@@ -1,11 +1,12 @@
 -- =========================================================
--- QEEEWWIE HUB: STABLE AUTO-RIDE & ANTI-FAIL [SC EDITION]
+-- QEEEWWIE HUB: WALK-BACK DELIVERY & FUSION SAFE [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local PathfindingService = game:GetService("PathfindingService")
 
 if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
@@ -69,7 +70,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Stable Fixed Edition [⚡]"
+SubTitle.Text = "Walk-Back Delivery [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -145,7 +146,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "STABLE FARM: OFF"
+AutoFarmBtn.Text = "WALK-BACK FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -178,7 +179,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Auto Ride diperhalus. Aman dari error dan siap sedot telur langka."
+InfoLabel.Text = "Status: TP ke Telur -> Steal -> Berjalan Pulang Otomatis ke Base/Fusion. Anti Delivery Failed!"
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -233,7 +234,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "STABLE FARM: ON" or "STABLE FARM: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "WALK-BACK FARM: ON" or "WALK-BACK FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -276,7 +277,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FUNGSI SAFE AUTO-RIDE (DIJAMIN AMAN DARI ERROR)
+-- FUNGSI SAFE AUTO-RIDE
 -- =========================================================
 local function safeAutoRide()
     if not autoRideEnabled then return end
@@ -285,12 +286,10 @@ local function safeAutoRide()
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
         
-        -- Kalau sudah duduk/naik kendaraan/pet, biarkan
         if humanoid and humanoid.SeatPart then
             return
         end
 
-        -- Cari objek ProximityPrompt yang ada kata 'ride' atau 'mount' secara aman
         for _, obj in pairs(Workspace:GetDescendants()) do
             if obj:IsA("ProximityPrompt") then
                 local parent = obj.Parent
@@ -351,7 +350,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA FARMING
+-- MESIN UTAMA: TP -> STEAL -> WALK BACK TO BASE
 -- =========================================================
 task.spawn(function()
     while true do
@@ -361,13 +360,14 @@ task.spawn(function()
                 local char = LocalPlayer.Character
                 if not char then return end
                 local root = char and char:FindFirstChild("HumanoidRootPart")
-                if not root then return end
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+                if not root or not humanoid then return end
                 
                 if not basePosition then
                     basePosition = root.CFrame
                 end
                 
-                -- Jalankan fungsi auto ride secara aman
+                -- 1. Pastikan naik pet sebelum beraksi
                 safeAutoRide()
                 
                 local availableEggs = {}
@@ -400,29 +400,35 @@ task.spawn(function()
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. Teleport ke Telur Target
+                        -- 2. Teleport ke Telur Target
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- Jeda sinkronisasi server stabil
-                        task.wait(0.3)
+                        -- Jeda sinkronisasi server singkat
+                        task.wait(0.2)
                         
-                        -- 2. Ambil / Steal Telur
+                        -- 3. Instant Steal Telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        -- Jeda delivery aman
+                        -- Jeda penting agar server mencatat telur sukses diklaim
                         task.wait(0.5)
                         
-                        -- 3. Pulang ke Base
+                        -- 4. PULANG KE BASE DENGAN CARA BERJALAN SENDIRI (Menghindari Delivery Failed)
                         if basePosition and autoTpFarmActive then
-                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = basePosition
+                            humanoid:MoveTo(basePosition.Position)
+                            
+                            -- Tunggu sampai karakter mendekati area base (maksimal 6 detik berjalan)
+                            local startTime = tick()
+                            repeat
+                                task.wait(0.2)
+                                if not autoTpFarmActive then break end
+                            until (root.Position - basePosition.Position).Magnitude < 10 or (tick() - startTime) > 6
                         end
                         
-                        task.wait(0.4)
+                        task.wait(0.3)
                     end
                 else
                     table.clear(collectedEggsMemory)
