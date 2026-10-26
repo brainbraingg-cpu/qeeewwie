@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTRA RARE FARM & AUTO RIDE PET [SC]
+-- QEEEWWIE HUB: AUTO RIDE PET + RARE PRIORITY [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -13,7 +13,8 @@ end
 
 local autoTpFarmActive = false
 local speedBoostActive = false
-local lowRarityOnly = false
+local autoRideEnabled = true -- Status aktif untuk Auto Ride Pet
+local prioritizeRare = true
 local customWalkSpeed = 95
 local basePosition = nil
 local collectedEggsMemory = {}
@@ -47,7 +48,7 @@ FloatingStroke.Thickness = 3
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 450)
+MainFrame.Size = UDim2.new(0, 260, 0, 480) -- Diperpanjang sedikit untuk tombol tambahan
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -68,9 +69,9 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Auto Ride & Wide Range [⚡]"
+SubTitle.Text = "Dedicated Auto Ride Toggle [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
+SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 11
@@ -101,7 +102,7 @@ Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0.05, 0, 0.12, 0)
+TabContainer.Position = UDim2.new(0.05, 0, 0.11, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
 TabContainer.ZIndex = 11
 
@@ -128,45 +129,59 @@ Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
-PageFarm.Position = UDim2.new(0.05, 0, 0.19, 0)
-PageFarm.Size = UDim2.new(0.9, 0, 0.78, 0)
+PageFarm.Position = UDim2.new(0.05, 0, 0.17, 0)
+PageFarm.Size = UDim2.new(0.9, 0, 0.8, 0)
 PageFarm.ZIndex = 11
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
-PagePlayer.Position = UDim2.new(0.05, 0, 0.19, 0)
-PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
+PagePlayer.Position = UDim2.new(0.05, 0, 0.17, 0)
+PagePlayer.Size = UDim2.new(0.9, 0, 0.8, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
+-- Tombol Utama Auto Farm
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
-AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
-AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
+AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
+AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "WIDE RARE STEAL: OFF"
+AutoFarmBtn.Text = "RARE PRIORITY & RIDE: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
-local RarityBtn = Instance.new("TextButton", PageFarm)
-RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-RarityBtn.Position = UDim2.new(0, 0, 0.28, 0)
-RarityBtn.Size = UDim2.new(1, 0, 0, 34)
-RarityBtn.Font = Enum.Font.SourceSansBold
-RarityBtn.Text = "RARITY FILTER: ALL EGGS (RARE INCLUDED)"
-RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-RarityBtn.TextSize = 9
-RarityBtn.ZIndex = 12
-Instance.new("UICorner", RarityBtn).CornerRadius = UDim.new(0, 6)
+-- Tombol Toggle Auto Ride Pet (BARU)
+local RideToggleBtn = Instance.new("TextButton", PageFarm)
+RideToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
+RideToggleBtn.Position = UDim2.new(0, 0, 0.23, 0)
+RideToggleBtn.Size = UDim2.new(1, 0, 0, 32)
+RideToggleBtn.Font = Enum.Font.SourceSansBold
+RideToggleBtn.Text = "AUTO RIDE PET: ON"
+RideToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RideToggleBtn.TextSize = 10
+RideToggleBtn.ZIndex = 12
+Instance.new("UICorner", RideToggleBtn).CornerRadius = UDim.new(0, 6)
+
+-- Tombol Prioritas Rare
+local PriorityBtn = Instance.new("TextButton", PageFarm)
+PriorityBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+PriorityBtn.Position = UDim2.new(0, 0, 0.42, 0)
+PriorityBtn.Size = UDim2.new(1, 0, 0, 32)
+PriorityBtn.Font = Enum.Font.SourceSansBold
+PriorityBtn.Text = "TARGET: PRIORITAS EGG LANGKA / JAUH"
+PriorityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PriorityBtn.TextSize = 9
+PriorityBtn.ZIndex = 12
+Instance.new("UICorner", PriorityBtn).CornerRadius = UDim.new(0, 6)
 
 local InfoLabel = Instance.new("TextLabel", PageFarm)
 InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
-InfoLabel.Size = UDim2.new(1, 0, 0, 75)
+InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
+InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Auto Ride Pet + Jarak Maksimal.\nSiap berburu Egg Rare/Langka tanpa Delivery Fail."
+InfoLabel.Text = "Status: Auto Ride Pet dapat di-on/off via tombol hijau. Mencegah error Delivery Failed."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -184,6 +199,9 @@ SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
+-- =========================================================
+-- KONEKSI UI
+-- =========================================================
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -218,7 +236,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "WIDE RARE STEAL: ON" or "WIDE RARE STEAL: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "RARE PRIORITY & RIDE: ON" or "RARE PRIORITY & RIDE: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -232,16 +250,26 @@ AutoFarmBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-RarityBtn.MouseButton1Click:Connect(function()
-    lowRarityOnly = not lowRarityOnly
-    if lowRarityOnly then
-        RarityBtn.Text = "RARITY: LOW / COMMON ONLY"
-        RarityBtn.BackgroundColor3 = Color3.fromRGB(200, 120, 40)
-        RarityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+-- Tombol Interaksi Toggle Auto Ride
+RideToggleBtn.MouseButton1Click:Connect(function()
+    autoRideEnabled = not autoRideEnabled
+    if autoRideEnabled then
+        RideToggleBtn.Text = "AUTO RIDE PET: ON"
+        RideToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
     else
-        RarityBtn.Text = "RARITY FILTER: ALL EGGS (RARE INCLUDED)"
-        RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-        RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        RideToggleBtn.Text = "AUTO RIDE PET: OFF"
+        RideToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    end
+end)
+
+PriorityBtn.MouseButton1Click:Connect(function()
+    prioritizeRare = not prioritizeRare
+    if prioritizeRare then
+        PriorityBtn.Text = "TARGET: PRIORITAS EGG LANGKA / JAUH"
+        PriorityBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+    else
+        PriorityBtn.Text = "TARGET: RANDOM ALL EGGS"
+        PriorityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
     end
 end)
 
@@ -252,28 +280,27 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FUNGSI AUTO RIDE PET (Otomatis Menaiki Hewan Terbaik)
+-- FUNGSI AUTO RIDE PET (DENGAN KONTROL TOGGLE)
 -- =========================================================
-local function ensureRidingPet()
+local function forceRidePet()
+    if not autoRideEnabled then return end
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
         
-        -- Cek apakah karakter sudah menaiki hewan (Seated)
         if humanoid and humanoid.SeatPart then
             return true
         end
 
-        -- Cari ProximityPrompt atau tombol "Ride" terdekat dari Pet pemain
         for _, prompt in pairs(Workspace:GetDescendants()) do
             if prompt:IsA("ProximityPrompt") then
                 local text = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-                if text:find("ride") or text:find("naik") or text:find("mount") then
+                if text:find("ride") or text:find("naik") or text:find("mount") or text:find("tumpangi") then
                     prompt.HoldDuration = 0
                     if fireproximityprompt then
                         fireproximityprompt(prompt)
-                        task.wait(0.1)
+                        task.wait(0.15)
                         break
                     end
                 end
@@ -283,7 +310,7 @@ local function ensureRidingPet()
 end
 
 -- =========================================================
--- FILTER TELUR DENGAN JARAK MAKSIMAL SELURUH MAP
+-- VALIDASI EGG & PRIORITAS RARE
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
     if collectedEggsMemory[prompt] then
@@ -317,18 +344,13 @@ local function isValidEgg(prompt, parentPart)
         return false
     end
     
-    if lowRarityOnly then
-        local isHighRarity = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary")
-        if isHighRarity then
-            return false
-        end
-    end
+    local isRare = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary") or fullStr:find("halloween") or fullStr:find("lubang hitam")
     
-    return true
+    return true, isRare
 end
 
 -- =========================================================
--- MESIN UTAMA: AUTO RIDE + WIDE RANGE TP & STEAL
+-- MESIN UTAMA: AUTO RIDE + WIDE RARE PRIORITY & STEAL
 -- =========================================================
 task.spawn(function()
     while true do
@@ -344,18 +366,18 @@ task.spawn(function()
                     basePosition = root.CFrame
                 end
                 
-                -- Pastikan selalu menaiki hewan sebelum teleport
-                ensureRidingPet()
+                -- Coba naiki pet otomatis jika toggle aktif
+                forceRidePet()
                 
                 local availableEggs = {}
-                -- PENCARIAN TANPA BATAS JARAK KE SELURUH MAP
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not autoTpFarmActive then break end
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
                         if parentPart and parentPart:IsA("BasePart") then
-                            if isValidEgg(prompt, parentPart) then
-                                table.insert(availableEggs, {prompt = prompt, part = parentPart})
+                            local valid, isRare = isValidEgg(prompt, parentPart)
+                            if valid then
+                                table.insert(availableEggs, {prompt = prompt, part = parentPart, isRare = isRare})
                             end
                         end
                     end
@@ -363,30 +385,35 @@ task.spawn(function()
                 
                 if #availableEggs > 0 then
                     table.sort(availableEggs, function(a, b)
-                        return (root.Position - a.part.Position).Magnitude < (root.Position - b.part.Position).Magnitude
+                        if prioritizeRare then
+                            if a.isRare and not b.isRare then
+                                return true
+                            elseif not a.isRare and b.isRare then
+                                return false
+                            end
+                        end
+                        return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
                     end)
                     
                     local target = availableEggs[1]
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. Teleport ke Telur Liar di Seluruh Map
+                        -- Teleport ke target telur langka
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- Jeda sinkronisasi server
-                        task.wait(0.2)
+                        task.wait(0.25)
                         
-                        -- 2. Steal Telur
+                        -- Steal / Ambil Telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        -- Jeda klaim sukses server
                         task.wait(0.4)
                         
-                        -- 3. Teleport Balik ke Base
+                        -- Return to Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
