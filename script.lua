@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTIMATE SUPREME POWER [SC MAX EDITION]
+-- QEEEWWIE HUB: ULTIMATE CLEAN & REINFORCED [SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,21 +11,19 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Supreme Power
-local forestInstantStealActive = false
+-- Variabel Status Fitur
+local autoTeleportFarmActive = false
 local speedBoostActive = false
-local customWalkSpeed = 95 -- Kecepatan Super Kilat!
-local maxInteractDistance = 70 -- Jangkauan Super Luas!
+local customWalkSpeed = 95
+local basePosition = nil
 
--- Pembuatan UI Utama (Lapisan Tertinggi)
+-- Pembuatan UI Utama (Lapisan Tertinggi & Stabil)
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 2147483647
 
--- =========================================================
--- [SUPREME] FLOATING ICON SC (MENYALA & ELEGAN)
--- =========================================================
+-- Tombol Mengambang Logo SC (Glow & Elegan)
 local FloatingBtn = Instance.new("TextButton", ScreenGui)
 FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
@@ -44,6 +42,7 @@ local FloatingStroke = Instance.new("UIStroke", FloatingBtn)
 FloatingStroke.Color = Color3.fromRGB(255, 100, 185)
 FloatingStroke.Thickness = 3
 
+-- Jendela Utama Hub
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
@@ -57,6 +56,7 @@ local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(255, 100, 185)
 MainStroke.Thickness = 2
 
+-- Header & Judul
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB [SC]"
 Title.TextColor3 = Color3.fromRGB(255, 100, 185)
@@ -68,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Ultimate Supreme [⚡]"
+SubTitle.Text = "Clean & Reinforced [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -77,7 +77,7 @@ SubTitle.TextSize = 11
 SubTitle.BackgroundTransparency = 1
 SubTitle.ZIndex = 11
 
--- Tombol Minimize (-)
+-- Tombol Kontrol (Minimize & Close)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
 MinimizeBtn.Position = UDim2.new(0.70, 0, 0.02, 0)
@@ -89,7 +89,6 @@ MinimizeBtn.TextSize = 16
 MinimizeBtn.ZIndex = 11
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(1, 0)
 
--- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton", MainFrame)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 CloseBtn.Position = UDim2.new(0.85, 0, 0.02, 0)
@@ -112,7 +111,7 @@ local TabFarm = Instance.new("TextButton", TabContainer)
 TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
 TabFarm.Size = UDim2.new(0.48, 0, 1, 0)
 TabFarm.Font = Enum.Font.SourceSansBold
-TabFarm.Text = "FOREST FARM"
+TabFarm.Text = "AUTO FARM"
 TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabFarm.TextSize = 10
 TabFarm.ZIndex = 12
@@ -129,7 +128,7 @@ TabPlayer.TextSize = 10
 TabPlayer.ZIndex = 12
 Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
--- Halaman Konten (Pages)
+-- Halaman Konten
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
 PageFarm.Position = UDim2.new(0.05, 0, 0.21, 0)
@@ -143,36 +142,24 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.76, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Auto Instant Steal Supreme
-local ForestStealBtn = Instance.new("TextButton", PageFarm)
-ForestStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
-ForestStealBtn.Position = UDim2.new(0, 0, 0.02, 0)
-ForestStealBtn.Size = UDim2.new(1, 0, 0, 36)
-ForestStealBtn.Font = Enum.Font.SourceSansBold
-ForestStealBtn.Text = "AUTO INSTANT STEAL: OFF"
-ForestStealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ForestStealBtn.TextSize = 11
-ForestStealBtn.ZIndex = 12
-Instance.new("UICorner", ForestStealBtn).CornerRadius = UDim.new(0, 6)
-
--- Tombol TP to Nearest Egg Supreme
-local TpToEggBtn = Instance.new("TextButton", PageFarm)
-TpToEggBtn.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
-TpToEggBtn.Position = UDim2.new(0, 0, 0.28, 0)
-TpToEggBtn.Size = UDim2.new(1, 0, 0, 36)
-TpToEggBtn.Font = Enum.Font.SourceSansBold
-TpToEggBtn.Text = "TP TO NEAREST EGG [SUPREME]"
-TpToEggBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-TpToEggBtn.TextSize = 11
-TpToEggBtn.ZIndex = 12
-Instance.new("UICorner", TpToEggBtn).CornerRadius = UDim.new(0, 6)
+-- Tombol Fitur Auto Farm
+local AutoFarmBtn = Instance.new("TextButton", PageFarm)
+AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
+AutoFarmBtn.Position = UDim2.new(0, 0, 0.05, 0)
+AutoFarmBtn.Size = UDim2.new(1, 0, 0, 42)
+AutoFarmBtn.Font = Enum.Font.SourceSansBold
+AutoFarmBtn.Text = "AUTO TP & RETURN BASE: OFF"
+AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoFarmBtn.TextSize = 11
+AutoFarmBtn.ZIndex = 12
+Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
 local InfoLabel = Instance.new("TextLabel", PageFarm)
 InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-InfoLabel.Position = UDim2.new(0, 0, 0.54, 0)
-InfoLabel.Size = UDim2.new(1, 0, 0, 52)
+InfoLabel.Position = UDim2.new(0, 0, 0.35, 0)
+InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Supreme Power Active (0.03s Loop).\nAnti-Robux Lock + Logo SC Supreme Ready."
+InfoLabel.Text = "Status: Stand di base, lalu aktifkan.\nOtomatis TP ke telur -> Ambil -> Balik ke Base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -182,7 +169,7 @@ Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 -- Tombol Halaman Player
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
-SpeedBtn.Position = UDim2.new(0, 0, 0.02, 0)
+SpeedBtn.Position = UDim2.new(0, 0, 0.05, 0)
 SpeedBtn.Size = UDim2.new(1, 0, 0, 38)
 SpeedBtn.Font = Enum.Font.SourceSansBold
 SpeedBtn.Text = "SUPREME SPEED: OFF"
@@ -191,7 +178,7 @@ SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
--- Fungsi Minimize & Floating Logo SC
+-- Koneksi Tombol UI
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -224,55 +211,18 @@ TabPlayer.MouseButton1Click:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-ForestStealBtn.MouseButton1Click:Connect(function()
-    forestInstantStealActive = not forestInstantStealActive
-    ForestStealBtn.Text = forestInstantStealActive and "AUTO INSTANT STEAL: ON" or "AUTO INSTANT STEAL: OFF"
-    ForestStealBtn.BackgroundColor3 = forestInstantStealActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
-end)
-
--- TP To Egg Supreme Power
-TpToEggBtn.MouseButton1Click:Connect(function()
-    pcall(function()
+AutoFarmBtn.MouseButton1Click:Connect(function()
+    autoTeleportFarmActive = not autoTeleportFarmActive
+    AutoFarmBtn.Text = autoTeleportFarmActive and "AUTO TP & RETURN BASE: ON" or "AUTO TP & RETURN BASE: OFF"
+    AutoFarmBtn.BackgroundColor3 = autoTeleportFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
+    
+    if autoTeleportFarmActive then
         local char = LocalPlayer.Character
-        if not char then return end
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        
-        local closestEgg = nil
-        local shortestDist = math.huge
-        
-        for _, prompt in pairs(Workspace:GetDescendants()) do
-            if prompt:IsA("ProximityPrompt") then
-                local parentPart = prompt.Parent
-                local grandParent = parentPart and parentPart.Parent
-                
-                if parentPart and parentPart:IsA("BasePart") then
-                    local dist = (root.Position - parentPart.Position).Magnitude
-                    if dist <= maxInteractDistance then
-                        local partName = string.lower(parentPart.Name)
-                        local parentName = grandParent and string.lower(grandParent.Name) or ""
-                        local fullStr = partName .. " " .. parentName
-                        local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-                        
-                        local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole")
-                        local isRestricted = promptText:find("robux") or promptText:find("buy") or promptText:find("purchase") or promptText:find("lewat") or promptText:find("skip") or fullStr:find("shop") or fullStr:find("toko")
-                        
-                        if isEgg and not isRestricted then
-                            if dist < shortestDist then
-                                shortestDist = dist
-                                closestEgg = parentPart
-                            end
-                        end
-                    end
-                end
-            end
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if root then
+            basePosition = root.CFrame
         end
-        
-        if closestEgg then
-            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-            root.CFrame = closestEgg.CFrame + Vector3.new(0, 3.5, 0)
-        end
-    end)
+    end
 end)
 
 SpeedBtn.MouseButton1Click:Connect(function()
@@ -281,38 +231,65 @@ SpeedBtn.MouseButton1Click:Connect(function()
     SpeedBtn.BackgroundColor3 = speedBoostActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 255)
 end)
 
+-- Validasi Telur & Event
+local function isValidEgg(prompt, parentPart, grandParent)
+    local partName = string.lower(parentPart.Name)
+    local parentName = grandParent and string.lower(grandParent.Name) or ""
+    local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
+    local fullStr = partName .. " " .. parentName .. " " .. promptText
+    
+    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("hatch") or fullStr:find("pet")
+    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("shop") or fullStr:find("toko") or fullStr:find("pass") or promptText:find("robux") or promptText:find("buy")
+    
+    return isEgg and not isRestricted
+end
+
 -- =========================================================
--- MESIN UTAMA SUPREME (LOOP 0.03s: ULTRA INSTANT STEAL)
+-- MESIN UTAMA REINFORCED (AUTO TP FARM + RETURN TO BASE)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.03) -- Kecepatan super kilat dewa!
-        local char = LocalPlayer.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-
-        if forestInstantStealActive and root then
+        task.wait(0.35)
+        if autoTeleportFarmActive then
             pcall(function()
+                local char = LocalPlayer.Character
+                if not char then return end
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+                
+                if not basePosition then
+                    basePosition = root.CFrame
+                end
+                
                 for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not forestInstantStealActive then break end
+                    if not autoTeleportFarmActive then break end
                     
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
                         local grandParent = parentPart and parentPart.Parent
                         
-                        if parentPart and parentPart:IsA("BasePart") and (root.Position - parentPart.Position).Magnitude <= maxInteractDistance then
-                            local partName = string.lower(parentPart.Name)
-                            local parentName = grandParent and string.lower(grandParent.Name) or ""
-                            local fullStr = partName .. " " .. parentName
-                            local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-                            
-                            local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole")
-                            local isRestricted = promptText:find("robux") or promptText:find("buy") or promptText:find("purchase") or promptText:find("lewat") or promptText:find("skip") or fullStr:find("shop") or fullStr:find("toko")
-                            
-                            if isEgg and not isRestricted then
+                        if parentPart and parentPart:IsA("BasePart") then
+                            if isValidEgg(prompt, parentPart, grandParent) then
+                                -- 1. Teleport ke Telur
+                                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                root.CFrame = parentPart.CFrame + Vector3.new(0, 3.5, 0)
+                                
+                                -- 2. Eksekusi Ambil Instan
                                 prompt.HoldDuration = 0
                                 if fireproximityprompt then
                                     fireproximityprompt(prompt)
                                 end
+                                
+                                task.wait(0.15)
+                                
+                                -- 3. Teleport Balik ke Base
+                                if basePosition and autoTeleportFarmActive then
+                                    root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                    root.CFrame = basePosition
+                                end
+                                
+                                task.wait(0.3)
+                                break
                             end
                         end
                     end
@@ -320,6 +297,7 @@ task.spawn(function()
             end)
         end
 
+        local char = LocalPlayer.Character
         if speedBoostActive and char then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             if humanoid then humanoid.WalkSpeed = customWalkSpeed end
