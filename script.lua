@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTRA-SPEED INSTANT STEAL & RETURN [SC]
+-- QEEEWWIE HUB: ANTI-DELIVERY FAILED [SC STABLE EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status & Konfigurasi Ultra-Speed
+-- Variabel Status & Konfigurasi Anti-Fail
 local autoTpFarmActive = false
 local speedBoostActive = false
 local lowRarityOnly = false
@@ -72,7 +72,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Ultra-Speed Instant Steal [⚡]"
+SubTitle.Text = "Anti-Fail Safe Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -146,15 +146,15 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Ultra-Speed TP
+-- Tombol Fitur Safe TP & Steal
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "ULTRA SPEED STEAL: OFF"
+AutoFarmBtn.Text = "SAFE TP & STEAL: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoFarmBtn.TextSize = 10
+AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
@@ -175,7 +175,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Kecepatan TP & Instant Steal Dipercepat Maksimal.\nTanpa jeda lambat, langsung sedot & pulang."
+InfoLabel.Text = "Status: Anti-Delivery Failed (AT-9783) Fix.\nTP stabil -> Ambil -> Pulang ke Base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -231,7 +231,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "ULTRA SPEED STEAL: ON" or "ULTRA SPEED STEAL: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "SAFE TP & STEAL: ON" or "SAFE TP & STEAL: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -312,11 +312,11 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: ULTRA-SPEED TP & INSTANT STEAL
+-- MESIN UTAMA: SAFE TP + STABLE INSTANT STEAL + RETURN BASE
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.08) -- Loop dipercepat ekstrem (hampir tanpa jeda antar deteksi)
+        task.wait(0.3) -- Jeda stabil untuk mencegah error "Egg Delivery Failed" (AT-9783)
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -350,30 +350,32 @@ task.spawn(function()
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. Teleport kilat ke telur liar
+                        -- 1. Teleport ke Telur Liar
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- 2. INSTANT STEAL KILAT (Picu tembus beruntun tanpa delay)
+                        -- Jeda mikro stabil agar server mengenali posisi TP sebelum mengambil
+                        task.wait(0.08)
+                        
+                        -- 2. Instant Steal yang aman dan valid di mata server
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
-                            fireproximityprompt(target.prompt) -- Double trigger biar langsung tembus ke-steal
                         end
                         
-                        task.wait(0.04) -- Jeda ultra singkat setelah ambil
+                        task.wait(0.12)
                         
-                        -- 3. Teleport balik kilat ke Base
+                        -- 3. Teleport kembali pulang ke Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(0.08) -- Jeda kilat sebelum lanjut ke telur berikutnya
+                        task.wait(0.3)
                     end
                 else
                     table.clear(collectedEggsMemory)
-                    task.wait(0.5)
+                    task.wait(1)
                 end
             end)
         end
