@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: SUPREME FINAL EDITION [SC RETAINED & REINFORCED]
+-- QEEEWWIE HUB: PURE AUTO STEAL & SPEED [NO BUG TP]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,11 +11,11 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status & Konfigurasi Supreme
-local autoTeleportFarmActive = false
+-- Variabel Status Fitur
+local autoStealActive = false
 local speedBoostActive = false
 local customWalkSpeed = 95
-local basePosition = nil
+local maxInteractDistance = 75 -- Jangkauan sedot diperluas biar makin jauh bisa kena
 
 -- Pembuatan UI Utama (Lapisan Tertinggi & Stabil)
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
@@ -46,7 +46,7 @@ FloatingStroke.Thickness = 3
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 420)
+MainFrame.Size = UDim2.new(0, 260, 0, 380)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -68,9 +68,9 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Supreme Clean & Fast [⚡]"
+SubTitle.Text = "Pure Auto Steal Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
+SubTitle.Position = UDim2.new(0.08, 0, 0.08, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 11
@@ -103,7 +103,7 @@ Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 -- Navigasi Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0.05, 0, 0.13, 0)
+TabContainer.Position = UDim2.new(0.05, 0, 0.16, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
 TabContainer.ZIndex = 11
 
@@ -111,7 +111,7 @@ local TabFarm = Instance.new("TextButton", TabContainer)
 TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
 TabFarm.Size = UDim2.new(0.48, 0, 1, 0)
 TabFarm.Font = Enum.Font.SourceSansBold
-TabFarm.Text = "AUTO FARM"
+TabFarm.Text = "AUTO STEAL"
 TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabFarm.TextSize = 10
 TabFarm.ZIndex = 12
@@ -131,35 +131,35 @@ Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 -- Halaman Konten
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
-PageFarm.Position = UDim2.new(0.05, 0, 0.21, 0)
-PageFarm.Size = UDim2.new(0.9, 0, 0.76, 0)
+PageFarm.Position = UDim2.new(0.05, 0, 0.25, 0)
+PageFarm.Size = UDim2.new(0.9, 0, 0.70, 0)
 PageFarm.ZIndex = 11
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
-PagePlayer.Position = UDim2.new(0.05, 0, 0.21, 0)
-PagePlayer.Size = UDim2.new(0.9, 0, 0.76, 0)
+PagePlayer.Position = UDim2.new(0.05, 0, 0.25, 0)
+PagePlayer.Size = UDim2.new(0.9, 0, 0.70, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Auto Farm
-local AutoFarmBtn = Instance.new("TextButton", PageFarm)
-AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
-AutoFarmBtn.Position = UDim2.new(0, 0, 0.05, 0)
-AutoFarmBtn.Size = UDim2.new(1, 0, 0, 42)
-AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "AUTO TP & RETURN BASE: OFF"
-AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoFarmBtn.TextSize = 11
-AutoFarmBtn.ZIndex = 12
-Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
+-- Tombol Fitur Auto Steal Murni
+local AutoStealBtn = Instance.new("TextButton", PageFarm)
+AutoStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
+AutoStealBtn.Position = UDim2.new(0, 0, 0.05, 0)
+AutoStealBtn.Size = UDim2.new(1, 0, 0, 42)
+AutoStealBtn.Font = Enum.Font.SourceSansBold
+AutoStealBtn.Text = "AUTO INSTANT STEAL: OFF"
+AutoStealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoStealBtn.TextSize = 11
+AutoStealBtn.ZIndex = 12
+Instance.new("UICorner", AutoStealBtn).CornerRadius = UDim.new(0, 6)
 
 local InfoLabel = Instance.new("TextLabel", PageFarm)
 InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-InfoLabel.Position = UDim2.new(0, 0, 0.35, 0)
+InfoLabel.Position = UDim2.new(0, 0, 0.38, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Area Jalur/Display diblock total.\nMesin Diperkuat (0.2s Loop) Anti-Nyangkut."
+InfoLabel.Text = "Status: Tanpa Auto TP (Bebas Nyangkut).\nRadius sedot 75 studs. Jauhkan dari area Jalur."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -211,18 +211,10 @@ TabPlayer.MouseButton1Click:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-AutoFarmBtn.MouseButton1Click:Connect(function()
-    autoTeleportFarmActive = not autoTeleportFarmActive
-    AutoFarmBtn.Text = autoTeleportFarmActive and "AUTO TP & RETURN BASE: ON" or "AUTO TP & RETURN BASE: OFF"
-    AutoFarmBtn.BackgroundColor3 = autoTeleportFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
-    
-    if autoTeleportFarmActive then
-        local char = LocalPlayer.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if root then
-            basePosition = root.CFrame
-        end
-    end
+AutoStealBtn.MouseButton1Click:Connect(function()
+    autoStealActive = not autoStealActive
+    AutoStealBtn.Text = autoStealActive and "AUTO INSTANT STEAL: ON" or "AUTO INSTANT STEAL: OFF"
+    AutoStealBtn.BackgroundColor3 = autoStealActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
 end)
 
 SpeedBtn.MouseButton1Click:Connect(function()
@@ -232,7 +224,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- VALIDASI TELUR MUTLAK (ANTI-JALUR & ANTI-ROBUX)
+-- VALIDASI TELUR BERSIH DARI JALUR & DISPLAY
 -- =========================================================
 local function isValidEgg(prompt, parentPart, grandParent)
     local partName = string.lower(parentPart.Name)
@@ -240,13 +232,12 @@ local function isValidEgg(prompt, parentPart, grandParent)
     local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
     local fullStr = partName .. " " .. parentName .. " " .. promptText
     
-    -- Blacklist ketat area Jalur, Display, Toko, NPC Bicara
+    -- Blacklist mutlak area Jalur / Display / Toko / NPC
     local isJalurOrDisplay = fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk")
     if isJalurOrDisplay then
         return false
     end
     
-    -- Jenis telur asli & event
     local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("hatch")
     local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass") or promptText:find("robux") or promptText:find("buy")
     
@@ -254,51 +245,33 @@ local function isValidEgg(prompt, parentPart, grandParent)
 end
 
 -- =========================================================
--- MESIN UTAMA SUPREME (AUTO TP & RETURN TO BASE SAT-SET)
+-- MESIN UTAMA PURE AUTO STEAL (TANPA TP, NYEDOT DALAM RADIUS)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.25) -- Kecepatan super stabil anti-bug
-        if autoTeleportFarmActive then
+        task.wait(0.05)
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+
+        if autoStealActive and root then
             pcall(function()
-                local char = LocalPlayer.Character
-                if not char then return end
-                local root = char:FindFirstChild("HumanoidRootPart")
-                if not root then return end
-                
-                if not basePosition then
-                    basePosition = root.CFrame
-                end
-                
                 for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not autoTeleportFarmActive then break end
+                    if not autoStealActive then break end
                     
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
                         local grandParent = parentPart and parentPart.Parent
                         
+                        -- Cek apakah telur berada dalam radius jangkauan karakter
                         if parentPart and parentPart:IsA("BasePart") then
-                            if isValidEgg(prompt, parentPart, grandParent) then
-                                -- 1. Teleport ke Telur Murni di Map Hutan
-                                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                root.CFrame = parentPart.CFrame + Vector3.new(0, 3.5, 0)
-                                
-                                -- 2. Eksekusi Ambil Instan
-                                prompt.HoldDuration = 0
-                                if fireproximityprompt then
-                                    fireproximityprompt(prompt)
+                            local dist = (root.Position - parentPart.Position).Magnitude
+                            if dist <= maxInteractDistance then
+                                if isValidEgg(prompt, parentPart, grandParent) then
+                                    prompt.HoldDuration = 0
+                                    if fireproximityprompt then
+                                        fireproximityprompt(prompt)
+                                    end
                                 end
-                                
-                                task.wait(0.1)
-                                
-                                -- 3. Teleport Balik ke Base Seketika
-                                if basePosition and autoTeleportFarmActive then
-                                    root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                    root.CFrame = basePosition
-                                end
-                                
-                                task.wait(0.25)
-                                break
                             end
                         end
                     end
@@ -306,7 +279,6 @@ task.spawn(function()
             end)
         end
 
-        local char = LocalPlayer.Character
         if speedBoostActive and char then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             if humanoid then humanoid.WalkSpeed = customWalkSpeed end
