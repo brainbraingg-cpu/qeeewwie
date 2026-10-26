@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FIXED & REINFORCED [SC EDITION]
+-- QEEEWWIE HUB: SUPREME ULTIMATE FINAL [FULL AUTO SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -17,6 +17,7 @@ local speedBoostActive = false
 local lowRarityOnly = false
 local customWalkSpeed = 95
 local basePosition = nil
+local collectedEggsMemory = {}
 
 -- =========================================================
 -- PEMBUATAN UI UTAMA (ESTETIKA SUPREME & STABIL)
@@ -71,7 +72,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Bug Fixed & Reinforced [⚡]"
+SubTitle.Text = "Supreme Final Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -145,13 +146,13 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Auto Farm TP
+-- Tombol Fitur Auto Farm TP + Instant Grab
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "INFINITE SWEEP TP: OFF"
+AutoFarmBtn.Text = "FULL AUTO SWEEP: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -174,7 +175,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Typo fixed (task.wait dipasang).\nAnti-Jalur & Rarity Filter Berfungsi Sempurna."
+InfoLabel.Text = "Status: Anti-Jalur + Smart Memory Aktif.\nFull Auto TP, Instant Grab, & Return Base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -230,7 +231,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "INFINITE SWEEP TP: ON" or "INFINITE SWEEP TP: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "FULL AUTO SWEEP: ON" or "FULL AUTO SWEEP: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -239,6 +240,8 @@ AutoFarmBtn.MouseButton1Click:Connect(function()
         if root then
             basePosition = root.CFrame
         end
+    else
+        table.clear(collectedEggsMemory)
     end
 end)
 
@@ -262,9 +265,13 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FILTER VALIDASI TELUR (ANTI-JALUR & RARITY CHECK)
+-- FILTER VALIDASI TELUR (ANTI-JALUR & SMART MEMORY)
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
+    if collectedEggsMemory[prompt] then
+        return false
+    end
+
     local partName = string.lower(parentPart.Name)
     local parentObj = parentPart.Parent
     local grandParent = parentObj and parentObj.Parent
@@ -299,11 +306,11 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA SUPREME (INFINITE SWEEP + RARITY + RETURN BASE)
+-- MESIN UTAMA SUPREME (FULL AUTO SWEEP & RETURN BASE)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.25) -- Diperbaiki dari typo "it" menjadi task.wait yang benar
+        task.wait(0.25)
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -335,11 +342,14 @@ task.spawn(function()
                     
                     local target = availableEggs[1]
                     if target and autoTpFarmActive then
-                        -- 1. Teleport ke Telur (Seluruh Map)
+                        -- Masukkan ke memori agar telur ini tidak diteleport ulang
+                        collectedEggsMemory[target.prompt] = true
+                        
+                        -- 1. Teleport otomatis ke telur
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- 2. Ambil instan
+                        -- 2. Auto Instant Grab (Ambil otomatis tanpa pencet)
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
@@ -347,7 +357,7 @@ task.spawn(function()
                         
                         task.wait(0.12)
                         
-                        -- 3. Pulang seketika ke Base
+                        -- 3. Auto Return Teleport ke Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
@@ -355,6 +365,10 @@ task.spawn(function()
                         
                         task.wait(0.25)
                     end
+                else
+                    -- Jika semua telur tersapu bersih, reset memori secara berkala
+                    table.clear(collectedEggsMemory)
+                    task.wait(1)
                 end
             end)
         end
