@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: PURE AUTO STEAL & SPEED [NO BUG TP]
+-- QEEEWWIE HUB: SAFE TP FARM & RETURN TO BASE [ANTI-BUG]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,19 +11,18 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status Fitur
-local autoStealActive = false
+local autoTpFarmActive = false
 local speedBoostActive = false
 local customWalkSpeed = 95
-local maxInteractDistance = 75 -- Jangkauan sedot diperluas biar makin jauh bisa kena
+local basePosition = nil
 
--- Pembuatan UI Utama (Lapisan Tertinggi & Stabil)
+-- Pembuatan UI Utama
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 2147483647
 
--- Tombol Mengambang Logo SC (Glow & Elegan)
+-- Logo SC Mengambang
 local FloatingBtn = Instance.new("TextButton", ScreenGui)
 FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
@@ -42,11 +41,10 @@ local FloatingStroke = Instance.new("UIStroke", FloatingBtn)
 FloatingStroke.Color = Color3.fromRGB(255, 100, 185)
 FloatingStroke.Thickness = 3
 
--- Jendela Utama Hub
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 380)
+MainFrame.Size = UDim2.new(0, 260, 0, 420)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -56,7 +54,6 @@ local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(255, 100, 185)
 MainStroke.Thickness = 2
 
--- Header & Judul
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB [SC]"
 Title.TextColor3 = Color3.fromRGB(255, 100, 185)
@@ -68,16 +65,15 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Pure Auto Steal Edition [⚡]"
+SubTitle.Text = "Safe TP & Return [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.Position = UDim2.new(0.08, 0, 0.08, 0)
+SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 11
 SubTitle.BackgroundTransparency = 1
 SubTitle.ZIndex = 11
 
--- Tombol Kontrol (Minimize & Close)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
 MinimizeBtn.Position = UDim2.new(0.70, 0, 0.02, 0)
@@ -100,10 +96,9 @@ CloseBtn.TextSize = 14
 CloseBtn.ZIndex = 11
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
--- Navigasi Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0.05, 0, 0.16, 0)
+TabContainer.Position = UDim2.new(0.05, 0, 0.13, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
 TabContainer.ZIndex = 11
 
@@ -111,7 +106,7 @@ local TabFarm = Instance.new("TextButton", TabContainer)
 TabFarm.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
 TabFarm.Size = UDim2.new(0.48, 0, 1, 0)
 TabFarm.Font = Enum.Font.SourceSansBold
-TabFarm.Text = "AUTO STEAL"
+TabFarm.Text = "AUTO FARM"
 TabFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabFarm.TextSize = 10
 TabFarm.ZIndex = 12
@@ -128,45 +123,42 @@ TabPlayer.TextSize = 10
 TabPlayer.ZIndex = 12
 Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
--- Halaman Konten
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
-PageFarm.Position = UDim2.new(0.05, 0, 0.25, 0)
-PageFarm.Size = UDim2.new(0.9, 0, 0.70, 0)
+PageFarm.Position = UDim2.new(0.05, 0, 0.21, 0)
+PageFarm.Size = UDim2.new(0.9, 0, 0.76, 0)
 PageFarm.ZIndex = 11
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
-PagePlayer.Position = UDim2.new(0.05, 0, 0.25, 0)
-PagePlayer.Size = UDim2.new(0.9, 0, 0.70, 0)
+PagePlayer.Position = UDim2.new(0.05, 0, 0.21, 0)
+PagePlayer.Size = UDim2.new(0.9, 0, 0.76, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Auto Steal Murni
-local AutoStealBtn = Instance.new("TextButton", PageFarm)
-AutoStealBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
-AutoStealBtn.Position = UDim2.new(0, 0, 0.05, 0)
-AutoStealBtn.Size = UDim2.new(1, 0, 0, 42)
-AutoStealBtn.Font = Enum.Font.SourceSansBold
-AutoStealBtn.Text = "AUTO INSTANT STEAL: OFF"
-AutoStealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoStealBtn.TextSize = 11
-AutoStealBtn.ZIndex = 12
-Instance.new("UICorner", AutoStealBtn).CornerRadius = UDim.new(0, 6)
+local AutoFarmBtn = Instance.new("TextButton", PageFarm)
+AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
+AutoFarmBtn.Position = UDim2.new(0, 0, 0.05, 0)
+AutoFarmBtn.Size = UDim2.new(1, 0, 0, 42)
+AutoFarmBtn.Font = Enum.Font.SourceSansBold
+AutoFarmBtn.Text = "SAFE TP & RETURN BASE: OFF"
+AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoFarmBtn.TextSize = 11
+AutoFarmBtn.ZIndex = 12
+Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
 local InfoLabel = Instance.new("TextLabel", PageFarm)
 InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-InfoLabel.Position = UDim2.new(0, 0, 0.38, 0)
+InfoLabel.Position = UDim2.new(0, 0, 0.35, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Tanpa Auto TP (Bebas Nyangkut).\nRadius sedot 75 studs. Jauhkan dari area Jalur."
+InfoLabel.Text = "Status: Anti-Bug Paten.\nDijamin tidak akan nyasar ke Jalur/Display toko."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
 InfoLabel.ZIndex = 12
 Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 
--- Tombol Halaman Player
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 SpeedBtn.Position = UDim2.new(0, 0, 0.05, 0)
@@ -178,7 +170,6 @@ SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
--- Koneksi Tombol UI
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -211,10 +202,18 @@ TabPlayer.MouseButton1Click:Connect(function()
     TabFarm.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
-AutoStealBtn.MouseButton1Click:Connect(function()
-    autoStealActive = not autoStealActive
-    AutoStealBtn.Text = autoStealActive and "AUTO INSTANT STEAL: ON" or "AUTO INSTANT STEAL: OFF"
-    AutoStealBtn.BackgroundColor3 = autoStealActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
+AutoFarmBtn.MouseButton1Click:Connect(function()
+    autoTpFarmActive = not autoTpFarmActive
+    AutoFarmBtn.Text = autoTpFarmActive and "SAFE TP & RETURN BASE: ON" or "SAFE TP & RETURN BASE: OFF"
+    AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
+    
+    if autoTpFarmActive then
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if root then
+            basePosition = root.CFrame
+        end
+    end
 end)
 
 SpeedBtn.MouseButton1Click:Connect(function()
@@ -224,54 +223,79 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- VALIDASI TELUR BERSIH DARI JALUR & DISPLAY
+-- FILTER SUPER KETAT (BLOKIR SEMUA HAL SELAIN TELUR HUTAN)
 -- =========================================================
-local function isValidEgg(prompt, parentPart, grandParent)
+local function isValidEgg(prompt, parentPart)
     local partName = string.lower(parentPart.Name)
-    local parentName = grandParent and string.lower(grandParent.Name) or ""
-    local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-    local fullStr = partName .. " " .. parentName .. " " .. promptText
+    local parentObj = parentPart.Parent
+    local grandParent = parentObj and parentObj.Parent
     
-    -- Blacklist mutlak area Jalur / Display / Toko / NPC
-    local isJalurOrDisplay = fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk")
-    if isJalurOrDisplay then
+    local parentName = parentObj and string.lower(parentObj.Name) or ""
+    local grandName = grandParent and string.lower(grandParent.Name) or ""
+    local promptText = string.lower((prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
+    
+    local fullStr = partName .. " " .. parentName .. " " .. grandName .. " " .. promptText
+    
+    -- BLACKLIST MUTLAK: Jika ada kata-kata display, toko, atau Jalur, langsung TOLAK
+    if fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk") or fullStr:find("leaderboard") then
         return false
     end
     
-    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("cherub") or fullStr:find("divine") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("hatch")
-    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass") or promptText:find("robux") or promptText:find("buy")
+    -- Harus benar-benar ada kata telur/egg atau event spesial hutan
+    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween")
+    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass")
     
     return isEgg and not isRestricted
 end
 
 -- =========================================================
--- MESIN UTAMA PURE AUTO STEAL (TANPA TP, NYEDOT DALAM RADIUS)
+-- MESIN UTAMA SAFE TP & RETURN TO BASE
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.05)
-        local char = LocalPlayer.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-
-        if autoStealActive and root then
+        task.wait(0.6) -- Jeda aman agar tidak memberatkan game
+        if autoTpFarmActive then
             pcall(function()
+                local char = LocalPlayer.Character
+                if not char then return end
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+                
+                if not basePosition then
+                    basePosition = root.CFrame
+                end
+                
+                local foundEgg = false
+                
                 for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not autoStealActive then break end
+                    if not autoTpFarmActive then break end
                     
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
-                        local grandParent = parentPart and parentPart.Parent
-                        
-                        -- Cek apakah telur berada dalam radius jangkauan karakter
                         if parentPart and parentPart:IsA("BasePart") then
-                            local dist = (root.Position - parentPart.Position).Magnitude
-                            if dist <= maxInteractDistance then
-                                if isValidEgg(prompt, parentPart, grandParent) then
-                                    prompt.HoldDuration = 0
-                                    if fireproximityprompt then
-                                        fireproximityprompt(prompt)
-                                    end
+                            if isValidEgg(prompt, parentPart) then
+                                foundEgg = true
+                                
+                                -- 1. Teleport ke Telur
+                                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                root.CFrame = parentPart.CFrame + Vector3.new(0, 3.5, 0)
+                                
+                                -- 2. Ambil instan
+                                prompt.HoldDuration = 0
+                                if fireproximityprompt then
+                                    fireproximityprompt(prompt)
                                 end
+                                
+                                task.wait(0.2)
+                                
+                                -- 3. Pulang ke Base
+                                if basePosition and autoTpFarmActive then
+                                    root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                    root.CFrame = basePosition
+                                end
+                                
+                                task.wait(0.5)
+                                break
                             end
                         end
                     end
@@ -279,6 +303,7 @@ task.spawn(function()
             end)
         end
 
+        local char = LocalPlayer.Character
         if speedBoostActive and char then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             if humanoid then humanoid.WalkSpeed = customWalkSpeed end
