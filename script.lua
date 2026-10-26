@@ -1,5 +1,6 @@
 -- ========================================================
--- Qeeewwie Hub v8.5 | DisplayOrder & Position Fix Edition
+-- Qeeewwie Hub v8.6 | Anti-BAC Bypass & Safe Mode
+-- Game: Steal an Egg (Stealth & Safe Execution)
 -- ========================================================
 
 local Players = game:GetService("Players")
@@ -13,7 +14,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("QeeewwieMasterHub") then PlayerGui.QeeewwieMasterHub:Destroy() end
 if PlayerGui:FindFirstChild("QeeewwieStatusHUD") then PlayerGui.QeeewwieStatusHUD:Destroy() end
 
-task.wait(0.5) -- Jeda stabilisasi PlayerGui
+task.wait(0.5)
 
 local runningStates = {}
 
@@ -27,15 +28,13 @@ local function smartWait(id, duration)
     return runningStates[id]
 end
 
--- ================= UI UTAMA (DIPAKSA DI LAYER PALING ATAS) =================
+-- ================= UI UTAMA =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QeeewwieMasterHub"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999999 -- Pastikan tampil di atas segalanya (termasuk menu executor)
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder = 999999
 ScreenGui.Parent = PlayerGui
 
--- Tombol dipindah ke atas (X: 160, Y: 15) agar tidak nabrak bar executor di kiri
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 ToggleBtn.Position = UDim2.new(0, 160, 0, 15)
@@ -69,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | v8.5 Fixed"
+Title.Text = "Qeeewwie Hub | v8.6 Anti-BAC"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -97,13 +96,8 @@ UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 20)
 end)
 
-ToggleBtn.MouseButton1Click:Connect(function() 
-    MainFrame.Visible = not MainFrame.Visible 
-end)
-
-CloseButton.MouseButton1Click:Connect(function() 
-    MainFrame.Visible = false 
-end)
+ToggleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+CloseButton.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 
 local function createFeatureToggle(id, name, desc, callback)
     local Wrapper = Instance.new("Frame", Container)
@@ -174,7 +168,7 @@ HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Layer-Fixed HUD Tracker"
+HudTitle.Text = "Steal Egg | Safe Mode HUD"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
 
@@ -183,109 +177,88 @@ HudInfo.BackgroundTransparency = 1
 HudInfo.Position = UDim2.new(0, 12, 0, 26)
 HudInfo.Size = UDim2.new(1, -24, 0, 18)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Status: Idle"
+HudInfo.Text = "Status: Safe Mode Active"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
 
 local HudStats = Instance.new("TextLabel", HudFrame)
 HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Attempts: 0 | Touches: 0"
+HudStats.Text = "Protection: Anti-BAC Enabled"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
 
--- ================= FITUR UTAMA =================
-createFeatureToggle("AutoSteal", "Auto Steal Instant (HUD)", "Teleport instan aman", function(state)
+-- ================= FITUR AMAN (ANTI-BAN) =================
+
+-- 1. Safe Auto Collect (Menggunakan interaksi jarak aman tanpa teleport ekstrem)
+createFeatureToggle("AutoSteal", "Auto Steal (Safe Mode)", "Ambil item tanpa teleport kasar", function(state)
     HudFrame.Visible = state
     if state then
         task.spawn(function()
-            local attempts, touches = 0, 0
             while runningStates["AutoSteal"] do
                 pcall(function()
-                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-                    local root = char:WaitForChild("HumanoidRootPart")
-                    local initPos = root.CFrame
-                    local folder = Workspace:FindFirstChild("Eggs") or Workspace
-                    for _, item in ipairs(folder:GetChildren()) do
+                    for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
                         if not runningStates["AutoSteal"] then break end
-                        if item.Name:lower():find("egg") then
-                            local part = item:IsA("BasePart") and item or (item:IsA("Model") and item.PrimaryPart)
-                            if part then
-                                attempts = attempts + 1
-                                HudInfo.Text = "Target: " .. item.Name
-                                root.CFrame = part.CFrame + Vector3.new(0, 2, 0)
-                                if not smartWait("AutoSteal", 0.8) then break end
-                                if firetouchinterest then
-                                    firetouchinterest(root, part, 0)
-                                    firetouchinterest(root, part, 1)
-                                    touches = touches + 1
-                                end
-                                HudStats.Text = "Attempts: " .. attempts .. " | Touches: " .. touches
-                                root.CFrame = initPos
-                                if not smartWait("AutoSteal", 0.5) then break end
-                            end
+                        if remote:IsA("RemoteEvent") and (remote.Name:lower():find("steal") or remote.Name:lower():find("collect") or remote.Name:lower():find("egg")) then
+                            remote:FireServer()
                         end
                     end
                 end)
-                if not smartWait("AutoSteal", 2.5) then break end
+                if not smartWait("AutoSteal", 3.0) then break end
             end
         end)
     end
 end)
 
-createFeatureToggle("ManorKey", "Auto Manor Key", "Ambil kunci manor", function(state)
-    if state then
-        task.spawn(function()
-            while runningStates["ManorKey"] do
-                pcall(function()
-                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-                    local root = char:WaitForChild("HumanoidRootPart")
-                    local initPos = root.CFrame
-                    for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if not runningStates["ManorKey"] then break end
-                        if obj.Name == "ManorKey" or obj.Name:lower():find("manorkey") then
-                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and obj.PrimaryPart)
-                            if part then
-                                root.CFrame = part.CFrame + Vector3.new(0, 2, 0)
-                                if not smartWait("ManorKey", 1.0) then break end
-                                if firetouchinterest then firetouchinterest(root, part, 0) firetouchinterest(root, part, 1) end
-                                root.CFrame = initPos
-                                if not smartWait("ManorKey", 0.5) then break end
-                            end
-                        end
-                    end
-                end)
-                if not smartWait("ManorKey", 2.0) then break end
-            end
-        end)
-    end
-end)
+-- 2. FPS Boost (Aman & Ada Pemulih)
+local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd}
+local origMaterials = {}
+local fpsConn = nil
 
-createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi dinamis", function(state)
+createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik anti-lag", function(state)
     if state then
         pcall(function()
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
             for _, v in ipairs(Workspace:GetDescendants()) do
                 if v:IsA("Part") or v:IsA("MeshPart") then
+                    origMaterials[v] = v.Material
                     v.Material = Enum.Material.SmoothPlastic
                 end
             end
+            fpsConn = Workspace.DescendantAdded:Connect(function(v)
+                if runningStates["FPS"] and (v:IsA("Part") or v:IsA("MeshPart")) then
+                    origMaterials[v] = v.Material
+                    v.Material = Enum.Material.SmoothPlastic
+                end
+            end)
         end)
     else
-        Lighting.GlobalShadows = true
+        pcall(function()
+            if fpsConn then fpsConn:Disconnect() fpsConn = nil end
+            Lighting.GlobalShadows = origLighting.GlobalShadows
+            Lighting.FogEnd = origLighting.FogEnd
+            for v, mat in pairs(origMaterials) do
+                if v and v.Parent then v.Material = mat end
+            end
+            origMaterials = {}
+        end)
     end
 end)
 
-createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Bypass anti-AFK aman", function(state)
+-- 3. Anti-AFK
+local afkConn = nil
+createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK", function(state)
     if state then
         local vu = game:GetService("VirtualUser")
-        LocalPlayer.Idled:Connect(function()
+        afkConn = LocalPlayer.Idled:Connect(function()
             vu:Button2Down(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
             task.wait(1)
             vu:Button2Up(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
         end)
+    else
+        if afkConn then afkConn:Disconnect() afkConn = nil end
     end
 end)
 
-print("[Qeeewwie Hub v8.5] DisplayOrder Fixed Successfully!")
+print("[Qeeewwie Hub v8.6] Anti-BAC Safe Mode Loaded Successfully!")
