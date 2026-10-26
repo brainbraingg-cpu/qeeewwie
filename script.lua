@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FUSION-SCAN & PET RIDE DELIVERY [SC]
+-- QEEEWWIE HUB: EXACT PRIORITY & SPEED-WALK FUSION [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -69,7 +69,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Fusion-Scan & Pet Walk [⚡]"
+SubTitle.Text = "Exact Priority Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -145,7 +145,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "FUSION-SCAN FARM: OFF"
+AutoFarmBtn.Text = "EXACT PRIORITY FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -178,7 +178,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Steal -> TP ke Fusion -> Scan Base -> Jalan pakai pet ke base."
+InfoLabel.Text = "Status: TP Egg -> Diam 1 detik -> Steal 0.1ms -> TP Fusion -> Scan Base -> Jalan pake Speed Boost."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -233,7 +233,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "FUSION-SCAN FARM: ON" or "FUSION-SCAN FARM: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "EXACT PRIORITY FARM: ON" or "EXACT PRIORITY FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -309,6 +309,29 @@ local function safeAutoRide()
 end
 
 -- =========================================================
+-- PENCARIAN TEMPAT FUSION TERDEKAT
+-- =========================================================
+local function findNearestFusion(currentPos)
+    local nearestPos = currentPos + Vector3.new(0, 75, 0) -- Default aman jika tidak ketemu
+    local shortestDist = math.huge
+    pcall(function()
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                local name = string.lower(obj.Name)
+                if name:find("fusion") or name:find("fuse") or name:find("upgrade") then
+                    local dist = (obj.Position - currentPos).Magnitude
+                    if dist < shortestDist then
+                        shortestDist = dist
+                        nearestPos = obj.Position + Vector3.new(0, 10, 0)
+                    end
+                end
+            end
+        end
+    end)
+    return nearestPos
+end
+
+-- =========================================================
 -- VALIDASI EGG
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
@@ -349,7 +372,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA SESUAI URUTAN PRIORITAS BARU
+-- MESIN UTAMA SESUAI URUTAN MUTLAK
 -- =========================================================
 task.spawn(function()
     while true do
@@ -402,42 +425,48 @@ task.spawn(function()
                         -- 1. TP KE EGG
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
-                        task.wait(0.2)
                         
-                        -- 2. STEAL EGG CEPET
+                        -- 2. DIEM 1 DETIK
+                        task.wait(1.0)
+                        
+                        -- 3. STEAL 0,1 MILIDETIK (0.0001 detik / kilat instan)
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
-                        task.wait(0.4)
+                        task.wait(0.0001)
                         
-                        -- 3. TP KE FUSION (Area Atas)
-                        -- Mencari objek fusion atau naik secara vertikal ke atas
-                        local fusionOffset = Vector3.new(0, 75, 0)
+                        -- 4. KE TEMPAT FUSION TERDEKAT
+                        local fusionPos = findNearestFusion(root.Position)
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = root.CFrame + fusionOffset
+                        root.CFrame = CFrame.new(fusionPos)
                         task.wait(0.3)
                         
-                        -- 4. SCANNING BASE KITA & JALAN PAKE PET KE BASE
+                        -- 5. SCAN BASE KITA & JALAN DENGAN SPEED BOOST
                         if basePosition and autoTpFarmActive then
-                            -- Pindah posisi melayang tepat di atas base hasil scan
-                            local scannedBasePos = basePosition.Position + Vector3.new(0, 30, 0)
-                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = CFrame.new(scannedBasePos)
+                            -- Aktifkan speed boost otomatis saat perjalanan pulang
+                            humanoid.WalkSpeed = customWalkSpeed
                             
+                            -- Pindah ke atas/dekat base hasil scanning sebentar biar mulus jalurnya
+                            local scannedBaseTop = basePosition.Position + Vector3.new(0, 15, 0)
+                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            root.CFrame = CFrame.new(scannedBaseTop)
                             task.wait(0.2)
                             
-                            -- Turun dan berjalan pakai pet menuju titik base persis
+                            -- Jalan kaki pakai pet menuju titik dasar base
                             humanoid:MoveTo(basePosition.Position)
                             
                             local startTime = tick()
                             repeat
                                 task.wait(0.2)
                                 if not autoTpFarmActive then break end
-                            until (root.Position - basePosition.Position).Magnitude < 8 or (tick() - startTime) > 5
+                            until (root.Position - basePosition.Position).Magnitude < 8 or (tick() - startTime) > 4
+                            
+                            -- Kembalikan walkspeed normal setelah sampai base
+                            humanoid.WalkSpeed = 16
                         end
                         
-                        task.wait(0.3)
+                        task.wait(0.4)
                     end
                 else
                     table.clear(collectedEggsMemory)
@@ -450,9 +479,6 @@ task.spawn(function()
         if speedBoostActive and char then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             if humanoid then humanoid.WalkSpeed = customWalkSpeed end
-        elseif char then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if humanoid and humanoid.WalkSpeed == customWalkSpeed then humanoid.WalkSpeed = 16 end
         end
     end
 end)
