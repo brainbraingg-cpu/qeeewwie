@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ULTRA STREAMLINED & ROBUST [SC]
+-- QEEEWWIE HUB: FIXED MOVE-TO & FAST DELIVERY [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -12,7 +12,7 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- 1. KONFIGURASI
+-- 1. KONFIGURASI UTAMA
 local Config = {
     AutoFarmActive = false,
     SpeedBoostActive = false,
@@ -27,7 +27,7 @@ local Config = {
 local startingBaseCFrame = nil
 local collectedEggsMemory = {}
 
--- 2. PEMBUATAN UI
+-- 2. PEMBUATAN UI HUB
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
@@ -73,7 +73,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Streamlined Engine [⚡]"
+SubTitle.Text = "Anti-Stuck MoveTo Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -182,7 +182,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Fast & Reliable Steal Engine"
+InfoLabel.Text = "Status: Failsafe System Ready."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -392,74 +392,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- 6. MESIN UTAMA AUTO FARM (OPTIMIZED DELIVERY)
-task.spawn(function()
-    while true do
-        task.wait(0.2)
-        if Config.AutoFarmActive then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if not char then return end
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if not root or not humanoid then return end
-                
-                if not startingBaseCFrame then startingBaseCFrame = root.CFrame end
-                
-                safeAutoRide()
-                
-                local availableEggs = {}
-                for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not Config.AutoFarmActive then break end
-                    if prompt:IsA("ProximityPrompt") then
-                        local parentPart = prompt.Parent
-                        if parentPart and parentPart:IsA("BasePart") then
-                            local valid, isRare = isValidEgg(prompt, parentPart)
-                            if valid then
-                                table.insert(availableEggs, {prompt = prompt, part = parentPart, isRare = isRare})
-                            end
-                        end
-                    end
-                end
-                
-                if #availableEggs > 0 then
-                    table.sort(availableEggs, function(a, b)
-                        if Config.PrioritizeRare then
-                            if a.isRare and not b.isRare then return true end
-                            if not a.isRare and b.isRare then return false end
-                        end
-                        if not a.part or not b.part or not root then return false end
-                        return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
-                    end)
-                    
-                    local target = availableEggs[1]
-                    if target and target.part and target.prompt and Config.AutoFarmActive then
-                        collectedEggsMemory[target.prompt] = true
-                        
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
-                        task.wait(0.3)
-                        
-                        pcall(function()
-                            target.prompt.HoldDuration = 0
-                            if fireproximityprompt then fireproximityprompt(target.prompt) end
-                            if target.prompt.Triggered then
-                                target.prompt:InputHoldBegin()
-                                task.wait(0.05)
-                                target.prompt:InputHoldEnd()
-                            end
-                        end)
-                        task.wait(0.15) -- Micro-delay khusus agar delivery ke server 100% sukses
-                        
-                        local fusionPos = findNearestFusion(root.Position)
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(fusionPos)
-                        task.wait(0.2)
-                        
-                        if startingBaseCFrame and Config.AutoFarmActive then
-                            humanoid.WalkSpeed = Config.CustomWalkSpeed
-                            humanoid:MoveTo(starting
-                                        -- 6. MESIN UTAMA AUTO FARM (DENGAN BASE-RETURN FAILSAFE)
+-- 6. MESIN UTAMA AUTO FARM (FAILSAFE MOVE-TO FIX)
 task.spawn(function()
     while true do
         task.wait(0.2)
@@ -508,7 +441,7 @@ task.spawn(function()
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         task.wait(0.3)
                         
-                        -- STEP 2: STEAL / COLLECT
+                        -- STEP 2: STEAL / DELIVER EGG TO SERVER
                         pcall(function()
                             target.prompt.HoldDuration = 0
                             if fireproximityprompt then fireproximityprompt(target.prompt) end
@@ -520,38 +453,10 @@ task.spawn(function()
                         end)
                         task.wait(0.15)
                         
-                        -- STEP 3: TP KE FUSION ATAS
+                        -- STEP 3: TP KE FUSION ATAS MAP
                         local fusionPos = findNearestFusion(root.Position)
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = CFrame.new(fusionPos)
                         task.wait(0.2)
                         
-                        -- STEP 4: PULANG KE BASE (DENGAN PROTEKSI ANTI-NYANGKUT)
-                        if startingBaseCFrame and Config.AutoFarmActive then
-                            humanoid.WalkSpeed = Config.CustomWalkSpeed
-                            humanoid:MoveTo(startingBaseCFrame.Position)
-                            
-                            local startTime = tick()
-                            repeat
-                                task.wait(0.1)
-                                if not Config.AutoFarmActive then break end
-                                -- Jika lebih dari 3 detik gak nyampai-nyampai (nyangkut), langsung TP paksa balik ke base biar gak macet!
-                                if (tick() - startTime) > 3 then
-                                    root.CFrame = startingBaseCFrame
-                                    break
-                                end
-                            until (root.Position - startingBaseCFrame.Position).Magnitude < 8
-                        end
-                        
-                        humanoid.WalkSpeed = Config.NormalWalkSpeed
-                        task.wait(0.2)
-                    end
-                else
-                    table.clear(collectedEggsMemory)
-                    task.wait(0.5)
-                end
-            end)
-        end
-    end
-end)
-                                        
+                        -- STEP 4: PULANG KE BASE (DENGAN PROTEKSI FAILSAFE 
