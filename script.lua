@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: SUPREME CLEAN & MASTER EDITION [SC]
+-- QEEEWWIE HUB: CLEAN & EXACT SEQUENCE [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -23,7 +23,7 @@ local Config = {
     NormalWalkSpeed = 16
 }
 
-local basePosition = nil
+local startingBaseCFrame = nil
 local collectedEggsMemory = {}
 
 -- =========================================================
@@ -76,7 +76,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Master Clean Edition [⚡]"
+SubTitle.Text = "Exact Sequence Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -152,7 +152,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "MASTER FARM: OFF"
+AutoFarmBtn.Text = "EXACT FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -185,7 +185,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal 0.1ms -> TP Fusion -> Scan Base -> Jalan pake Speed Boost."
+InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal 0.1ms -> TP Fusion -> Jalan pulang pake Speed Boost."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -240,14 +240,15 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "MASTER FARM: ON" or "MASTER FARM: OFF"
+    AutoFarmBtn.Text = Config.AutoFarmActive and "EXACT FARM: ON" or "EXACT FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if Config.AutoFarmActive then
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
         if root then
-            basePosition = root.CFrame
+            -- Kunci posisi base awal saat tombol dihidupkan
+            startingBaseCFrame = root.CFrame
         end
     else
         table.clear(collectedEggsMemory)
@@ -273,7 +274,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION SCAN)
+-- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION FINDER)
 -- =========================================================
 local function safeAutoRide()
     if not Config.AutoRideEnabled then return end
@@ -357,7 +358,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- 5. MESIN UTAMA (URUTAN PRIORITAS MUTLAK)
+-- 5. MESIN UTAMA (URUTAN MUTLAK TANPA BUG BASE)
 -- =========================================================
 task.spawn(function()
     while true do
@@ -370,8 +371,8 @@ task.spawn(function()
                 local humanoid = char:FindFirstChildOfClass("Humanoid")
                 if not root or not humanoid then return end
                 
-                if not basePosition then
-                    basePosition = root.CFrame
+                if not startingBaseCFrame then
+                    startingBaseCFrame = root.CFrame
                 end
                 
                 safeAutoRide()
@@ -407,7 +408,7 @@ task.spawn(function()
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- STEP 2: DIAM 1 DETIK DI EGG
+                        -- STEP 2: DIAM PERSIS 1 DETIK DI EGG
                         task.wait(1.0)
                         
                         -- STEP 3: STEAL KILAT 0,1 MILIDETIK
@@ -423,23 +424,20 @@ task.spawn(function()
                         root.CFrame = CFrame.new(fusionPos)
                         task.wait(0.3)
                         
-                        -- STEP 5: SCAN BASE KITA & JALAN PULANG PAKAI SPEED BOOST
-                        if basePosition and Config.AutoFarmActive then
+                        -- STEP 5: JALAN PULANG KE BASE DENGAN SPEED BOOST AKTIF
+                        if startingBaseCFrame and Config.AutoFarmActive then
                             humanoid.WalkSpeed = Config.CustomWalkSpeed
                             
-                            local scannedBaseTop = basePosition.Position + Vector3.new(0, 15, 0)
-                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = CFrame.new(scannedBaseTop)
-                            task.wait(0.2)
-                            
-                            humanoid:MoveTo(basePosition.Position)
+                            -- Berjalan menuju koordinat awal base lo
+                            humanoid:MoveTo(startingBaseCFrame.Position)
                             
                             local startTime = tick()
                             repeat
                                 task.wait(0.2)
                                 if not Config.AutoFarmActive then break end
-                            until (root.Position - basePosition.Position).Magnitude < 8 or (tick() - startTime) > 4
+                            until (root.Position - startingBaseCFrame.Position).Magnitude < 6 or (tick() - startTime) > 5
                             
+                            -- Kembalikan kecepatan normal
                             humanoid.WalkSpeed = Config.NormalWalkSpeed
                         end
                         
