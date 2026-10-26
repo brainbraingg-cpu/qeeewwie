@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: BASE-PROTECTED & PURE WILD EGG SWEEP [SC]
+-- QEEEWWIE HUB: AUTO TP + INSTANT STEAL & RETURN BASE [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
--- Variabel Status & Konfigurasi Supreme
+-- Variabel Status & Konfigurasi
 local autoTpFarmActive = false
 local speedBoostActive = false
 local lowRarityOnly = false
@@ -72,7 +72,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Base-Protected Sweep [⚡]"
+SubTitle.Text = "TP + Instant Steal [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -146,15 +146,15 @@ PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
--- Tombol Fitur Auto Farm TP + Instant Grab
+-- Tombol Fitur Auto TP + Instant Steal + Return Base
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "FULL AUTO SWEEP: OFF"
+AutoFarmBtn.Text = "AUTO TP & INSTANT STEAL: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoFarmBtn.TextSize = 11
+AutoFarmBtn.TextSize = 10
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
@@ -175,7 +175,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Telur di Base/Base Orang DIBLOKIR.\nMurni memburu telur liar di hutan + Return Base."
+InfoLabel.Text = "Status: TP ke Telur -> Instant Steal Paksa -> Balik Base.\nAnti-Base & Anti-Jalur Aktif."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -231,7 +231,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "FULL AUTO SWEEP: ON" or "FULL AUTO SWEEP: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "AUTO TP & INSTANT STEAL: ON" or "AUTO TP & INSTANT STEAL: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -265,7 +265,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FILTER VALIDASI TELUR (ANTI-BASE, ANTI-JALUR, SMART MEMORY)
+-- FILTER VALIDASI TELUR (ANTI-BASE, ANTI-JALUR)
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
     if collectedEggsMemory[prompt] then
@@ -284,12 +284,12 @@ local function isValidEgg(prompt, parentPart)
     
     local fullStr = partName .. " " .. parentName .. " " .. grandName .. " " .. greatName .. " " .. promptText
     
-    -- BLACKLIST MUTLAK AREA JALUR, DISPLAY, TOKO, NPC
+    -- Blacklist area Jalur, Display, Toko, NPC
     if fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk") or fullStr:find("board") then
         return false
     end
     
-    -- BLACKLIST MUTLAK AREA BASE / CLAIMED / TYCOON (Biar gak ngambil telur yang udah ditaroh)
+    -- Blacklist area Base / Claimed / Tycoon
     if fullStr:find("base") or fullStr:find("plot") or fullStr:find("claim") or fullStr:find("tycoon") or fullStr:find("pedestal") or fullStr:find("stand") or fullStr:find("placed") or fullStr:find("mybase") then
         return false
     end
@@ -301,7 +301,6 @@ local function isValidEgg(prompt, parentPart)
         return false
     end
     
-    -- Filter Rarity Rendah (Common Only)
     if lowRarityOnly then
         local isHighRarity = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary")
         if isHighRarity then
@@ -313,7 +312,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA SUPREME (FULL AUTO SWEEP & RETURN BASE)
+-- MESIN UTAMA: AUTO TP + INSTANT STEAL + RETURN BASE
 -- =========================================================
 task.spawn(function()
     while true do
@@ -349,22 +348,23 @@ task.spawn(function()
                     
                     local target = availableEggs[1]
                     if target and autoTpFarmActive then
-                        -- Simpan ke memori agar telur ini tidak diteleport ulang
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 1. Auto Teleport murni ke telur liar di hutan
+                        -- 1. Teleport ke Telur Liar
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- 2. Auto Instant Grab
+                        -- 2. AUTO INSTANT STEAL (Picu interaksi paksa berulang biar langsung masuk inventory)
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
+                            task.wait(0.05)
+                            fireproximityprompt(target.prompt) -- Eksekusi dua kali biar steal tembus
                         end
                         
-                        task.wait(0.12)
+                        task.wait(0.15)
                         
-                        -- 3. Auto Return Teleport Balik ke Base
+                        -- 3. Auto Return Teleport Pulang ke Base
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
