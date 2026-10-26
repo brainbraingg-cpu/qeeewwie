@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: CLEAN & EXACT SEQUENCE [SC]
+-- QEEEWWIE HUB: NO-FUSION DIRECT PATH [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -76,7 +76,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Exact Sequence Edition [⚡]"
+SubTitle.Text = "No-Fusion Direct Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -152,7 +152,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "EXACT FARM: OFF"
+AutoFarmBtn.Text = "DIRECT FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -185,7 +185,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal 0.1ms -> TP Fusion -> Jalan pulang pake Speed Boost."
+InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Toko -> Jalan pulang ke base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -240,14 +240,13 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "EXACT FARM: ON" or "EXACT FARM: OFF"
+    AutoFarmBtn.Text = Config.AutoFarmActive and "DIRECT FARM: ON" or "DIRECT FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if Config.AutoFarmActive then
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
         if root then
-            -- Kunci posisi base awal saat tombol dihidupkan
             startingBaseCFrame = root.CFrame
         end
     else
@@ -274,7 +273,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION FINDER)
+-- 4. FUNGSI PENDUKUNG (SAFE RIDE & SHOP FINDER)
 -- =========================================================
 local function safeAutoRide()
     if not Config.AutoRideEnabled then return end
@@ -304,18 +303,18 @@ local function safeAutoRide()
     end)
 end
 
-local function findNearestFusion(currentPos)
-    local nearestPos = currentPos + Vector3.new(0, 75, 0)
+local function findNearestShop(currentPos)
+    local nearestPos = currentPos + Vector3.new(0, 5, 0)
     local shortestDist = math.huge
     pcall(function()
         for _, obj in pairs(Workspace:GetDescendants()) do
             if obj:IsA("BasePart") then
                 local name = string.lower(obj.Name)
-                if name:find("fusion") or name:find("fuse") or name:find("upgrade") then
+                if name:find("shop") or name:find("toko") or name:find("store") then
                     local dist = (obj.Position - currentPos).Magnitude
                     if dist < shortestDist then
                         shortestDist = dist
-                        nearestPos = obj.Position + Vector3.new(0, 10, 0)
+                        nearestPos = obj.Position + Vector3.new(0, 3, 0)
                     end
                 end
             end
@@ -358,7 +357,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- 5. MESIN UTAMA (URUTAN MUTLAK TANPA BUG BASE)
+-- 5. MESIN UTAMA (TANPA FUSION, LANGSUNG KE TOKO LALU PULANG)
 -- =========================================================
 task.spawn(function()
     while true do
@@ -418,17 +417,16 @@ task.spawn(function()
                         end
                         task.wait(0.0001)
                         
-                        -- STEP 4: TP KE TEMPAT FUSION TERDEKAT
-                        local fusionPos = findNearestFusion(root.Position)
+                        -- STEP 4: TP KE TENGAH-TENGAH TOKO (SHOP)
+                        local shopPos = findNearestShop(root.Position)
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(fusionPos)
+                        root.CFrame = CFrame.new(shopPos)
                         task.wait(0.3)
                         
-                        -- STEP 5: JALAN PULANG KE BASE DENGAN SPEED BOOST AKTIF
+                        -- STEP 5: JALAN PULANG KE BASE AWAL DENGAN SPEED BOOST AKTIF
                         if startingBaseCFrame and Config.AutoFarmActive then
                             humanoid.WalkSpeed = Config.CustomWalkSpeed
                             
-                            -- Berjalan menuju koordinat awal base lo
                             humanoid:MoveTo(startingBaseCFrame.Position)
                             
                             local startTime = tick()
@@ -437,7 +435,6 @@ task.spawn(function()
                                 if not Config.AutoFarmActive then break end
                             until (root.Position - startingBaseCFrame.Position).Magnitude < 6 or (tick() - startTime) > 5
                             
-                            -- Kembalikan kecepatan normal
                             humanoid.WalkSpeed = Config.NormalWalkSpeed
                         end
                         
