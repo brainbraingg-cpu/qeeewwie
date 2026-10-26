@@ -1,0 +1,60 @@
+-- Script: Auto Steal Egg (Safe Delay Method)
+-- Cocok dijalankan via Arceus X
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+-- Konfigurasi Pengaturan
+local _G_Config = {
+    AutoSteal = true,
+    DelayTime = 1.0, -- Jeda 1 detik sesuai permintaan
+}
+
+-- Simpan posisi awal karakter (posisi aman/diam)
+local function getRootPart()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    return character:WaitForChild("HumanoidRootPart")
+end
+
+local safePosition = getRootPart().Position
+
+print("[Archeus Script] Berhasil diaktifkan! Karakter tetap diam, mengambil telur dengan jeda 1 detik.")
+
+-- Fungsi utama untuk mengambil telur
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G_Config.AutoSteal then
+            -- Cari folder atau tempat penyimpanan telur di map game (sesuaikan path game jika perlu)
+            local eggsFolder = Workspace:FindFirstChild("Eggs") or Workspace:FindFirstChild("Map") and Workspace.Map:FindFirstChild("Eggs")
+            
+            if eggsFolder then
+                for _, egg in ipairs(eggsFolder:GetChildren()) do
+                    -- Cek apakah objek valid dan memiliki Handle/PrimaryPart
+                    local targetPart = egg:FindFirstChild("Handle") or egg:FindFirstChild("PrimaryPart") or egg:IsA("BasePart") and egg
+                    
+                    if targetPart and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        local rootPart = LocalPlayer.Character.HumanoidRootPart
+                        local currentPos = rootPart.Position
+                        
+                        -- 1. Teleport instan ke posisi telur
+                        rootPart.CFrame = targetPart.CFrame
+                        
+                        -- 2. Berhenti/diam selama 1 detik di dekat telur (menghindari deteksi cepat)
+                        task.wait(_G_Config.DelayTime)
+                        
+                        -- (Opsional) Trigger interaksi sentuh jika game menggunakan sistem sentuh
+                        firetouchinterest(rootPart, targetPart, 0)
+                        firetouchinterest(rootPart, targetPart, 1)
+                        
+                        -- 3. Kembali ke posisi aman/diam semula agar terlihat diam
+                        rootPart.CFrame = CFrame.new(safePosition)
+                        
+                        -- Jeda antar pengambilan telur berikutnya
+                        task.wait(1) 
+                    end
+                end
+            end
+        end
+    end
+end)
