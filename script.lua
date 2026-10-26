@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: ANTI-DELIVERY FAILED & SYNCED [SC]
+-- QEEEWWIE HUB: RIDING-SYNC & ANTI-FAIL [SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -68,7 +68,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Synced Delivery Fix [⚡]"
+SubTitle.Text = "Riding-Sync Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -144,7 +144,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "SYNCED STEAL FARM: OFF"
+AutoFarmBtn.Text = "RIDING-SYNC FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -166,7 +166,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Fix Error AT-xxxx (Delivery Failed).\nJeda server disesuaikan agar telur sukses diklaim."
+InfoLabel.Text = "Status: Pastikan sedang naik hewan (riding).\nFix Delivery Failed & Sinkronisasi Server."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -218,7 +218,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "SYNCED STEAL FARM: ON" or "SYNCED STEAL FARM: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "RIDING-SYNC FARM: ON" or "RIDING-SYNC FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -294,11 +294,11 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: SYNCED TP + STABLE SERVER STEAL & RETURN
+-- MESIN UTAMA: RIDING-SYNC TP & STABLE SERVER CLAIM
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.4)
+        task.wait(0.5) -- Jeda lebih longgar agar server mencatat status riding & klaim dengan sempurna
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -336,19 +336,19 @@ task.spawn(function()
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- Jeda sinkronisasi server agar posisi TP valid
+                        -- Jeda sinkronisasi agar sistem game mengenali posisi saat naik hewan
                         task.wait(1)
                         
-                        -- 2. Eksekusi Ambil/Steal Telur
+                        -- 2. Eksekusi klaim/steal telur
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
                         
-                        -- Jeda penting agar server game selesai memproses pengiriman telur ke inventaris
+                        -- Jeda penting agar server sukses memproses pengiriman telur tanpa "Delivery Failed"
                         task.wait(1)
                         
-                        -- 3. Teleport Pulang ke Base setelah sukses diterima server
+                        -- 3. Teleport kembali ke Base setelah sukses
                         if basePosition and autoTpFarmActive then
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                             root.CFrame = basePosition
