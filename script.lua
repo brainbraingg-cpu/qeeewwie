@@ -1,375 +1,210 @@
--- =========================================================
--- QEEEWWIE HUB: MASSIVE OVERHAUL + AUTO RIDE PET [SC EDITION]
--- =========================================================
+-- ==========================================
+-- Qeeewwie Hub v7 (Inspired by Sena Hub Style)
+-- Game: Steal an Egg
+-- Executor: Arceus X / Delta / Mobile
+-- ==========================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Bersihkan UI lama
-pcall(function()
-    if PlayerGui:FindFirstChild("QeeewwieHubUI") then PlayerGui.QeeewwieHubUI:Destroy() end
-    if CoreGui:FindFirstChild("QeeewwieHubUI") then CoreGui.QeeewwieHubUI:Destroy() end
-end)
+-- Hapus UI lama jika ada agar tidak numpuk
+if CoreGui:FindFirstChild("QeeewwieHubV7") then
+    CoreGui.QeeewwieHubV7:Destroy()
+end
 
-local Config = {
-    AutoFarmActive = false,
-    StealMode = "Instant", -- "Instant" atau "Fly"
-    MoveMode = "TP",       -- "TP" atau "Walk"
-    EggEspActive = false,
-    PetAntiClip = true,
-    AutoRideEnabled = true, -- Fitur Auto Ride Pet
-    HalloweenEvent = true,
-    YinYangEvent = true,
-    MultiSpeed = 50,
-    NormalWalkSpeed = 16
-}
-
-local startingBaseCFrame = nil
-local collectedEggsMemory = {}
-local espFolder = Instance.new("Folder", Workspace)
-espFolder.Name = "QeeewwieESP_Container"
-
--- UI Container Setup
-local ParentTarget = PlayerGui
-pcall(function()
-    if gethui then ParentTarget = gethui()
-    elseif CoreGui then ParentTarget = CoreGui end
-end)
-
+-- Membuat ScreenGui Utama
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "QeeewwieHubUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999999
-ScreenGui.Parent = ParentTarget
+ScreenGui.Name = "QeeewwieHubV7"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Floating Button
-local FloatingBtn = Instance.new("TextButton", ScreenGui)
-FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
-FloatingBtn.Size = UDim2.new(0, 50, 0, 50)
-FloatingBtn.Font = Enum.Font.GothamBold
-FloatingBtn.Text = "SC"
-FloatingBtn.TextColor3 = Color3.fromRGB(255, 100, 185)
-FloatingBtn.TextSize = 20
-FloatingBtn.Visible = false
-FloatingBtn.Active = true
-FloatingBtn.Draggable = true
-Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
+-- Tombol Mengambang (Floating Logo) untuk Buka/Tutup Menu di HP
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+ToggleBtn.Position = UDim2.new(0, 20, 0, 100)
+ToggleBtn.Size = UDim2.new(0, 110, 0, 40)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "Qeeewwie v7"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 150)
+ToggleBtn.TextSize = 13
+ToggleBtn.Active = true
+ToggleBtn.Draggable = true -- Bisa digeser pakai jempol
 
--- Main Frame (Diperbesar untuk menampung tombol tambahan)
-local MainFrame = Instance.new("Frame", ScreenGui)
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.Parent = ToggleBtn
+
+-- Main Window (Menu Utama ala Hub Premium)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-MainFrame.Position = UDim2.new(0.5, -140, 0.18, 0)
-MainFrame.Size = UDim2.new(0, 280, 0, 470)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
+MainFrame.Size = UDim2.new(0, 350, 0, 260)
+MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
-local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Color = Color3.fromRGB(255, 100, 185)
-MainStroke.Thickness = 2
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
 
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Text = "QEEEWWIE HUB [FULL UPDATE]"
-Title.TextColor3 = Color3.fromRGB(255, 100, 185)
-Title.Position = UDim2.new(0.05, 0, 0.02, 0)
-Title.Size = UDim2.new(0.75, 0, 0, 25)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 14
+-- Top Bar / Header
+local Header = Instance.new("Frame")
+Header.Parent = MainFrame
+Header.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+Header.Size = UDim2.new(1, 0, 0, 35)
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 10)
+HeaderCorner.Parent = Header
+
+local Title = Instance.new("TextLabel")
+Title.Parent = Header
 Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(0, 250, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Qeeewwie Hub v7 | Steal an Egg"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 13
 
-local CloseBtn = Instance.new("TextButton", MainFrame)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseBtn.Position = UDim2.new(0.82, 0, 0.02, 0)
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 14
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
+-- Tombol Close (X)
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = Header
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseButton.Position = UDim2.new(1, -30, 0, 7)
+CloseButton.Size = UDim2.new(0, 21, 0, 21)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 11
 
--- Tombol-Tombol Fitur Utama
-local function createButton(name, posY, color)
-    local btn = Instance.new("TextButton", MainFrame)
-    btn.BackgroundColor3 = color
-    btn.Position = UDim2.new(0.08, 0, posY, 0)
-    btn.Size = UDim2.new(0.84, 0, 0, 34)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 11
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    return btn
-end
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseButton
 
-local AutoFarmBtn = createButton("AUTO STEAL FARM: OFF", 0.10, Color3.fromRGB(180, 40, 100))
-local StealModeBtn = createButton("STEAL MODE: INSTANT", 0.19, Color3.fromRGB(50, 100, 200))
-local MoveModeBtn = createButton("MOVE MODE: TP", 0.28, Color3.fromRGB(100, 50, 200))
-local RidePetBtn = createButton("AUTO RIDE PET: ON", 0.37, Color3.fromRGB(50, 150, 100))
-local EspBtn = createButton("EGG ESP: OFF", 0.46, Color3.fromRGB(50, 150, 150))
-local AntiClipBtn = createButton("PET ANTI-CLIP: ON", 0.55, Color3.fromRGB(150, 100, 50))
-local HalloweenBtn = createButton("EVENT HALLOWEEN: ON", 0.64, Color3.fromRGB(200, 100, 0))
-local YinYangBtn = createButton("EVENT YIN-YANG STONE: ON", 0.73, Color3.fromRGB(80, 80, 80))
+-- Container Menu (Isi Fitur)
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundTransparency = 1
+Container.Position = UDim2.new(0, 10, 0, 45)
+Container.Size = UDim2.new(1, -20, 1, -55)
+Container.CanvasSize = UDim2.new(0, 0, 0, 300)
+Container.ScrollBarThickness = 4
 
--- UI Event Handlers
-CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() espFolder:Destroy() end)
-FloatingBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatingBtn.Visible = false end)
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
 
-AutoFarmBtn.MouseButton1Click:Connect(function()
-    Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "AUTO STEAL FARM: ON" or "AUTO STEAL FARM: OFF"
-    AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
-    if Config.AutoFarmActive then
-        local char = LocalPlayer.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if root then startingBaseCFrame = root.CFrame end
-    else
-        table.clear(collectedEggsMemory)
-    end
+-- Fungsi Toggle Buka Tutup Menu
+ToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
 end)
 
-StealModeBtn.MouseButton1Click:Connect(function()
-    if Config.StealMode == "Instant" then
-        Config.StealMode = "Fly"
-        StealModeBtn.Text = "STEAL MODE: FLY"
-    else
-        Config.StealMode = "Instant"
-        StealModeBtn.Text = "STEAL MODE: INSTANT"
-    end
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
 end)
 
-MoveModeBtn.MouseButton1Click:Connect(function()
-    if Config.MoveMode == "TP" then
-        Config.MoveMode = "Walk"
-        MoveModeBtn.Text = "MOVE MODE: MULTI SPEED"
-    else
-        Config.MoveMode = "TP"
-        MoveModeBtn.Text = "MOVE MODE: TP"
-    end
-end)
-
-RidePetBtn.MouseButton1Click:Connect(function()
-    Config.AutoRideEnabled = not Config.AutoRideEnabled
-    RidePetBtn.Text = Config.AutoRideEnabled and "AUTO RIDE PET: ON" or "AUTO RIDE PET: OFF"
-    RidePetBtn.BackgroundColor3 = Config.AutoRideEnabled and Color3.fromRGB(50, 150, 100) or Color3.fromRGB(150, 50, 50)
-end)
-
-EspBtn.MouseButton1Click:Connect(function()
-    Config.EggEspActive = not Config.EggEspActive
-    EspBtn.Text = Config.EggEspActive and "EGG ESP: ON" or "EGG ESP: OFF"
-    EspBtn.BackgroundColor3 = Config.EggEspActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 150, 150)
-    if not Config.EggEspActive then espFolder:ClearAllChildren() end
-end)
-
-AntiClipBtn.MouseButton1Click:Connect(function()
-    Config.PetAntiClip = not Config.PetAntiClip
-    AntiClipBtn.Text = Config.PetAntiClip and "PET ANTI-CLIP: ON" or "PET ANTI-CLIP: OFF"
-    AntiClipBtn.BackgroundColor3 = Config.PetAntiClip and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(150, 100, 50)
-end)
-
-HalloweenBtn.MouseButton1Click:Connect(function()
-    Config.HalloweenEvent = not Config.HalloweenEvent
-    HalloweenBtn.Text = Config.HalloweenEvent and "EVENT HALLOWEEN: ON" or "EVENT HALLOWEEN: OFF"
-end)
-
-YinYangBtn.MouseButton1Click:Connect(function()
-    Config.YinYangEvent = not Config.YinYangEvent
-    YinYangBtn.Text = Config.YinYangEvent and "EVENT YIN-YANG STONE: ON" or "EVENT YIN-YANG STONE: OFF"
-end)
-
--- Utility Functions
-local function safeAutoRide()
-    if not Config.AutoRideEnabled then return end
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char then return end
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        if humanoid and humanoid.SeatPart then return end
-
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("ProximityPrompt") then
-                local parent = obj.Parent
-                if parent then
-                    local nameStr = string.lower(parent.Name .. " " .. (obj.ActionText or "") .. " " .. (obj.ObjectText or ""))
-                    if nameStr:find("ride") or nameStr:find("naik") or nameStr:find("mount") or nameStr:find("pet") then
-                        obj.HoldDuration = 0
-                        if fireproximityprompt then fireproximityprompt(obj) task.wait(0.05) break end
-                    end
-                end
-            end
+---------------------------------------------------------
+-- FUNGSI PEMBUAT TOMBOL FITUR (UI Components)
+---------------------------------------------------------
+local function createToggle(name, callback)
+    D_Btn = Instance.new("TextButton")
+    D_Btn.Parent = Container
+    D_Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
+    D_Btn.Size = UDim2.new(1, 0, 0, 40)
+    D_Btn.Font = Enum.Font.GothamBold
+    D_Btn.Text = name .. ": OFF"
+    D_Btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+    D_Btn.TextSize = 13
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = D_Btn
+    
+    local toggled = false
+    D_Btn.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        if toggled then
+            D_Btn.Text = name .. ": ON"
+            D_Btn.TextColor3 = Color3.fromRGB(0, 255, 128)
+            D_Btn.BackgroundColor3 = Color3.fromRGB(20, 60, 40)
+        else
+            D_Btn.Text = name .. ": OFF"
+            D_Btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+            D_Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
         end
+        callback(toggled)
     end)
 end
 
-local function findNearestFusion(currentPos)
-    local nearestPos = currentPos + Vector3.new(0, 75, 0)
-    local shortestDist = math.huge
-    pcall(function()
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and (string.lower(obj.Name):find("fusion") or string.lower(obj.Name):find("fuse")) then
-                local dist = (obj.Position - currentPos).Magnitude
-                if dist < shortestDist then
-                    shortestDist = dist
-                    nearestPos = obj.Position + Vector3.new(0, 10, 0)
-                end
-            end
-        end
-    end)
-    return nearestPos
-end
+---------------------------------------------------------
+-- FITUR-FITUR UTAMA (STEAL AN EGG)
+---------------------------------------------------------
 
-local function isValidTarget(prompt, parentPart)
-    if collectedEggsMemory[prompt] then return false end
-    local nameStr = string.lower(parentPart.Name .. " " .. (prompt.ActionText or "") .. " " .. (prompt.ObjectText or ""))
-    
-    local isEgg = nameStr:find("egg") or nameStr:find("telur")
-    local isHalloween = Config.HalloweenEvent and (nameStr:find("halloween") or nameStr:find("pumpkin") or nameStr:find("hallow"))
-    local isYinYang = Config.YinYangEvent and (nameStr:find("yin") or nameStr:find("yang") or nameStr:find("batu") or nameStr:find("stone"))
-    
-    if isEgg or isHalloween or isYinYang then
-        if not nameStr:find("robux") and not nameStr:find("shop") and not nameStr:find("toko") then
-            return true
-        end
-    end
-    return false
-end
+local autoStealActive = false
+local instantCollectActive = false
 
--- ESP & ANTI-CLIP RUNSERVICE
-RunService.RenderStepped:Connect(function()
-    if Config.EggEspActive then
-        pcall(function()
-            for _, child in pairs(espFolder:GetChildren()) do child:Destroy() end
-            for _, prompt in pairs(Workspace:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") and prompt.Parent and prompt.Parent:IsA("BasePart") then
-                    if isValidTarget(prompt, prompt.Parent) then
-                        local part = prompt.Parent
-                        local bill = Instance.new("BillboardGui", espFolder)
-                        bill.Size = UDim2.new(0, 50, 0, 25)
-                        bill.AlwaysOnTop = true
-                        bill.Adornee = part
-                        
-                        local txt = Instance.new("TextLabel", bill)
-                        txt.Size = UDim2.new(1, 0, 1, 0)
-                        txt.BackgroundTransparency = 1
-                        txt.Text = "🎯 TARGET"
-                        txt.TextColor3 = Color3.fromRGB(255, 255, 0)
-                        txt.TextSize = 12
-                        txt.Font = Enum.Font.GothamBold
-                    end
-                end
-            end
-        end)
-    end
+-- 1. Fitur Auto Steal (Metode Diam + Delay 1 Detik Sesuai Permintaanmu)
+createToggle("Auto Steal (Safe Delay)", function(state)
+    autoStealActive = state
     
-    if Config.PetAntiClip then
-        pcall(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, obj in pairs(char:GetDescendants()) do
-                    if obj:IsA("BasePart") and obj.Name ~= "HumanoidRootPart" then
-                        obj.CanCollide = false
+    if autoStealActive then
+        task.spawn(function()
+            while autoStealActive do
+                task.wait(1)
+                pcall(function()
+                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local rootPart = char:WaitForChild("HumanoidRootPart")
+                    local initialPos = rootPart.CFrame
+                    
+                    local eggsFolder = Workspace:FindFirstChild("Eggs")
+                    if eggsFolder then
+                        for _, egg in ipairs(eggsFolder:GetChildren()) do
+                            if not autoStealActive then break end
+                            
+                            local targetPart = egg:IsA("BasePart") and egg or (egg:IsA("Model") and (egg.PrimaryPart or egg:FindFirstChildWhichIsA("BasePart")))
+                            
+                            if targetPart then
+                                -- Teleport ke telur
+                                rootPart.CFrame = targetPart.CFrame
+                                -- Diam selama 1 detik biar nggak ke-detect anti-cheat
+                                task.wait(1.0)
+                                
+                                if firetouchinterest then
+                                    firetouchinterest(rootPart, targetPart, 0)
+                                    firetouchinterest(rootPart, targetPart, 1)
+                                end
+                                
+                                -- Balik ke posisi aman semula
+                                rootPart.CFrame = initialPos
+                                task.wait(0.5)
+                            end
+                        end
                     end
-                end
+                end)
             end
         end)
     end
 end)
 
--- MESIN UTAMA AUTO STEAL & FARM
-task.spawn(function()
-    while true do
-        task.wait(0.2)
-        if Config.AutoFarmActive then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if not char then return end
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                local humanoid = char:FindFirstChildOfClass("Humanoid")
-                if not root or not humanoid then return end
-                
-                if not startingBaseCFrame then startingBaseCFrame = root.CFrame end
-                
-                -- Jalankan pengecekan auto ride pet
-                safeAutoRide()
-                
-                local targets = {}
-                for _, prompt in pairs(Workspace:GetDescendants()) do
-                    if not Config.AutoFarmActive then break end
-                    if prompt:IsA("ProximityPrompt") then
-                        local parentPart = prompt.Parent
-                        if parentPart and parentPart:IsA("BasePart") then
-                            if isValidTarget(prompt, parentPart) then
-                                table.insert(targets, {prompt = prompt, part = parentPart})
-                            end
-                        end
-                    end
-                end
-                
-                if #targets > 0 then
-                    local target = targets[1]
-                    if target and target.part and target.prompt and Config.AutoFarmActive then
-                        collectedEggsMemory[target.prompt] = true
-                        
-                        -- STEAL MODE: FLY vs INSTANT
-                        if Config.StealMode == "Fly" then
-                            local steps = 10
-                            local currentPos = root.CFrame
-                            for i = 1, steps do
-                                if not Config.AutoFarmActive then break end
-                                root.CFrame = currentPos:Lerp(target.part.CFrame + Vector3.new(0, 3.5, 0), i / steps)
-                                task.wait(0.02)
-                            end
-                        else
-                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
-                            task.wait(0.2)
-                        end
-                        
-                        -- Eksekusi Pengambilan (Steal)
-                        pcall(function()
-                            target.prompt.HoldDuration = 0
-                            if fireproximityprompt then fireproximityprompt(target.prompt) end
-                            target.prompt:InputHoldBegin()
-                            task.wait(0.05)
-                            target.prompt:InputHoldEnd()
-                        end)
-                        task.wait(0.15)
-                        
-                        -- Pindah ke Fusion Atas
-                        local fusionPos = findNearestFusion(root.Position)
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(fusionPos)
-                        task.wait(0.2)
-                        
-                        -- MOVE MODE: TP vs MULTI SPEED
-                        if startingBaseCFrame and Config.AutoFarmActive then
-                            if Config.MoveMode == "TP" then
-                                root.CFrame = startingBaseCFrame
-                            else
-                                humanoid.WalkSpeed = Config.MultiSpeed
-                                humanoid:MoveTo(startingBaseCFrame.Position)
-                                local startTime = tick()
-                                repeat
-                                    task.wait(0.1)
-                                    if not Config.AutoFarmActive then break end
-                                    if (tick() - startTime) > 2.5 then
-                                        root.CFrame = startingBaseCFrame
-                                        break
-                                    end
-                                until (root.Position - startingBaseCFrame.Position).Magnitude < 6
-                            end
-                        end
-                        humanoid.WalkSpeed = Config.NormalWalkSpeed
-                    end
-                else
-                    table.clear(collectedEggsMemory)
-                    task.wait(0.5)
-                end
-            end)
-        end
+-- 2. Fitur Tambahan (Contoh: Anti AFK Biar Bisa Ditinggal Treo/Farm)
+createToggle("Anti-AFK Bypass", function(state)
+    if state then
+        local vu = game:GetService("VirtualUser")
+        LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        end)
+        print("[Qeeewwie v7] Anti-AFK Aktif!")
     end
 end)
+
+print("[Qeeewwie Hub v7] Berhasil dimuat dengan gaya Sena Hub!")
