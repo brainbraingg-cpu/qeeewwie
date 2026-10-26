@@ -1,16 +1,18 @@
 -- ========================================================
--- Qeeewwie Hub v8.6 | Anti-BAC Bypass & Safe Mode
--- Game: Steal an Egg (Stealth & Safe Execution)
+-- Qeeewwie Hub | Smart Tween & Fly Mode Edition
+-- Game: Steal an Egg
 -- ========================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Bersihkan UI lama jika ada
+-- Bersihkan UI lama secara total
 if PlayerGui:FindFirstChild("QeeewwieMasterHub") then PlayerGui.QeeewwieMasterHub:Destroy() end
 if PlayerGui:FindFirstChild("QeeewwieStatusHUD") then PlayerGui.QeeewwieStatusHUD:Destroy() end
 
@@ -22,17 +24,18 @@ local function smartWait(id, duration)
     local elapsed = 0
     while elapsed < duration do
         if not runningStates[id] then return false end
-        task.wait(0.1)
-        elapsed = elapsed + 0.1
+        task.wait(0.05)
+        elapsed = elapsed + 0.05
     end
     return runningStates[id]
 end
 
--- ================= UI UTAMA =================
+-- ================= UI UTAMA (MASTER HUB) =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QeeewwieMasterHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999999
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
@@ -51,7 +54,7 @@ Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 150)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
 MainFrame.Position = UDim2.new(0.5, -190, 0.5, -170)
-MainFrame.Size = UDim2.new(0, 380, 0, 360)
+MainFrame.Size = UDim2.new(0, 380, 0, 390)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -68,7 +71,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | v8.6 Anti-BAC"
+Title.Text = "Qeeewwie Hub | Fly & Farm Edition"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -168,7 +171,7 @@ HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Safe Mode HUD"
+HudTitle.Text = "Steal Egg | Fly Mode HUD"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
 
@@ -177,45 +180,106 @@ HudInfo.BackgroundTransparency = 1
 HudInfo.Position = UDim2.new(0, 12, 0, 26)
 HudInfo.Size = UDim2.new(1, -24, 0, 18)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Status: Safe Mode Active"
+HudInfo.Text = "Status: Flying & Safe Mode"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
 
 local HudStats = Instance.new("TextLabel", HudFrame)
 HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Protection: Anti-BAC Enabled"
+HudStats.Text = "Anti-Cheat Bypass Active"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
 
--- ================= FITUR AMAN (ANTI-BAN) =================
+-- ================= FITUR UTAMA =================
 
--- 1. Safe Auto Collect (Menggunakan interaksi jarak aman tanpa teleport ekstrem)
-createFeatureToggle("AutoSteal", "Auto Steal (Safe Mode)", "Ambil item tanpa teleport kasar", function(state)
+-- 1. Mode Fly (Terbang Bebas Mengikuti Kamera)
+local flyConn = nil
+createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di udara", function(state)
     HudFrame.Visible = state
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    
+    if state then
+        local bg = Instance.new("BodyGyro", root)
+        bg.Name = "QeeewwieFlyGyro"
+        bg.MaxTorque = Vector3.new(90000, 90000, 90000)
+        bg.CFrame = root.CFrame
+
+        local bv = Instance.new("BodyVelocity", root)
+        bv.Name = "QeeewwieFlyVelocity"
+        bv.Velocity = Vector3.new(0, 0, 0)
+        bv.MaxForce = Vector3.new(90000, 90000, 90000)
+
+        flyConn = RunService.RenderStepped:Connect(function()
+            if not runningStates["FlyMode"] then return end
+            pcall(function()
+                bg.CFrame = Workspace.CurrentCamera.CFrame
+                bv.Velocity = Workspace.CurrentCamera.CFrame.LookVector * 40
+            end)
+        end)
+    else
+        if flyConn then flyConn:Disconnect() flyConn = nil end
+        if root:FindFirstChild("QeeewwieFlyGyro") then root.QeeewwieFlyGyro:Destroy() end
+        if root:FindFirstChild("QeeewwieFlyVelocity") then root.QeeewwieFlyVelocity:Destroy() end
+    end
+end)
+
+-- 2. Smart Tween Farm
+createFeatureToggle("SmartTween", "Smart Tween Farm", "Geser halus ke telur & kembali aman", function(state)
     if state then
         task.spawn(function()
-            while runningStates["AutoSteal"] do
+            while runningStates["SmartTween"] do
                 pcall(function()
-                    for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-                        if not runningStates["AutoSteal"] then break end
-                        if remote:IsA("RemoteEvent") and (remote.Name:lower():find("steal") or remote.Name:lower():find("collect") or remote.Name:lower():find("egg")) then
-                            remote:FireServer()
+                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local root = char:WaitForChild("HumanoidRootPart")
+                    local initPos = root.CFrame
+                    
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if not runningStates["SmartTween"] then break end
+                        
+                        local nameLower = obj.Name:lower()
+                        if nameLower:find("egg") or nameLower:find("telur") then
+                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
+                            
+                            if part then
+                                local distance = (root.Position - part.Position).Magnitude
+                                local travelTime = math.clamp(distance / 400, 0.2, 1.5)
+                                
+                                local tween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = part.CFrame + Vector3.new(0, 3, 0)})
+                                tween:Play()
+                                tween.Completed:Wait()
+                                
+                                if not smartWait("SmartTween", 0.4) then break end
+                                
+                                if firetouchinterest then
+                                    firetouchinterest(root, part, 0)
+                                    firetouchinterest(root, part, 1)
+                                end
+                                
+                                task.wait(0.2)
+                                
+                                local returnTween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = initPos})
+                                returnTween:Play()
+                                returnTween.Completed:Wait()
+                                
+                                if not smartWait("SmartTween", 0.5) then break end
+                            end
                         end
                     end
                 end)
-                if not smartWait("AutoSteal", 3.0) then break end
+                if not smartWait("SmartTween", 2.0) then break end
             end
         end)
     end
 end)
 
--- 2. FPS Boost (Aman & Ada Pemulih)
+-- 3. FPS Boost
 local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd}
 local origMaterials = {}
 local fpsConn = nil
 
-createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik anti-lag", function(state)
+createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik & hapus lag", function(state)
     if state then
         pcall(function()
             Lighting.GlobalShadows = false
@@ -246,9 +310,9 @@ createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik anti-lag
     end
 end)
 
--- 3. Anti-AFK
+-- 4. Anti-AFK Bypass
 local afkConn = nil
-createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK", function(state)
+createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK otomatis", function(state)
     if state then
         local vu = game:GetService("VirtualUser")
         afkConn = LocalPlayer.Idled:Connect(function()
@@ -261,4 +325,4 @@ createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK", function(
     end
 end)
 
-print("[Qeeewwie Hub v8.6] Anti-BAC Safe Mode Loaded Successfully!")
+print("[Qeeewwie Hub] Fly & Smart Edition Loaded Successfully!")
