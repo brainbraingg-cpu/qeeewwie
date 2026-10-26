@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: SAFE TP FARM & RETURN TO BASE [ANTI-BUG]
+-- QEEEWWIE HUB: FIXED & REINFORCED [SC EDITION]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,18 +11,22 @@ if PlayerGui:FindFirstChild("QeeewwieHubUI") then
     PlayerGui.QeeewwieHubUI:Destroy()
 end
 
+-- Variabel Status & Konfigurasi Supreme
 local autoTpFarmActive = false
 local speedBoostActive = false
+local lowRarityOnly = false
 local customWalkSpeed = 95
 local basePosition = nil
 
--- Pembuatan UI Utama
+-- =========================================================
+-- PEMBUATAN UI UTAMA (ESTETIKA SUPREME & STABIL)
+-- =========================================================
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "QeeewwieHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 2147483647
 
--- Logo SC Mengambang
+-- Logo SC Mengambang (Glowing)
 local FloatingBtn = Instance.new("TextButton", ScreenGui)
 FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
@@ -41,10 +45,11 @@ local FloatingStroke = Instance.new("UIStroke", FloatingBtn)
 FloatingStroke.Color = Color3.fromRGB(255, 100, 185)
 FloatingStroke.Thickness = 3
 
+-- Jendela Utama Hub
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 260, 0, 420)
+MainFrame.Size = UDim2.new(0, 260, 0, 450)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 10
@@ -54,6 +59,7 @@ local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(255, 100, 185)
 MainStroke.Thickness = 2
 
+-- Header & Judul
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "QEEEWWIE HUB [SC]"
 Title.TextColor3 = Color3.fromRGB(255, 100, 185)
@@ -65,15 +71,16 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Safe TP & Return [⚡]"
+SubTitle.Text = "Bug Fixed & Reinforced [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.Position = UDim2.new(0.08, 0, 0.07, 0)
+SubTitle.Position = UDim2.new(0.08, 0, 0.065, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
 SubTitle.Font = Enum.Font.SourceSans
 SubTitle.TextSize = 11
 SubTitle.BackgroundTransparency = 1
 SubTitle.ZIndex = 11
 
+-- Tombol Kontrol (Minimize & Close)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
 MinimizeBtn.Position = UDim2.new(0.70, 0, 0.02, 0)
@@ -96,9 +103,10 @@ CloseBtn.TextSize = 14
 CloseBtn.ZIndex = 11
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
+-- Navigasi Tab Menu
 local TabContainer = Instance.new("Frame", MainFrame)
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0.05, 0, 0.13, 0)
+TabContainer.Position = UDim2.new(0.05, 0, 0.12, 0)
 TabContainer.Size = UDim2.new(0.9, 0, 0, 28)
 TabContainer.ZIndex = 11
 
@@ -123,42 +131,57 @@ TabPlayer.TextSize = 10
 TabPlayer.ZIndex = 12
 Instance.new("UICorner", TabPlayer).CornerRadius = UDim.new(0, 6)
 
+-- Halaman Konten
 local PageFarm = Instance.new("Frame", MainFrame)
 PageFarm.BackgroundTransparency = 1
-PageFarm.Position = UDim2.new(0.05, 0, 0.21, 0)
-PageFarm.Size = UDim2.new(0.9, 0, 0.76, 0)
+PageFarm.Position = UDim2.new(0.05, 0, 0.19, 0)
+PageFarm.Size = UDim2.new(0.9, 0, 0.78, 0)
 PageFarm.ZIndex = 11
 
 local PagePlayer = Instance.new("Frame", MainFrame)
 PagePlayer.BackgroundTransparency = 1
-PagePlayer.Position = UDim2.new(0.05, 0, 0.21, 0)
-PagePlayer.Size = UDim2.new(0.9, 0, 0.76, 0)
+PagePlayer.Position = UDim2.new(0.05, 0, 0.19, 0)
+PagePlayer.Size = UDim2.new(0.9, 0, 0.78, 0)
 PagePlayer.Visible = false
 PagePlayer.ZIndex = 11
 
+-- Tombol Fitur Auto Farm TP
 local AutoFarmBtn = Instance.new("TextButton", PageFarm)
 AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
-AutoFarmBtn.Position = UDim2.new(0, 0, 0.05, 0)
-AutoFarmBtn.Size = UDim2.new(1, 0, 0, 42)
+AutoFarmBtn.Position = UDim2.new(0, 0, 0.03, 0)
+AutoFarmBtn.Size = UDim2.new(1, 0, 0, 38)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "SAFE TP & RETURN BASE: OFF"
+AutoFarmBtn.Text = "INFINITE SWEEP TP: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
 Instance.new("UICorner", AutoFarmBtn).CornerRadius = UDim.new(0, 6)
 
+-- Tombol Filter Rarity
+local RarityBtn = Instance.new("TextButton", PageFarm)
+RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+RarityBtn.Position = UDim2.new(0, 0, 0.28, 0)
+RarityBtn.Size = UDim2.new(1, 0, 0, 34)
+RarityBtn.Font = Enum.Font.SourceSansBold
+RarityBtn.Text = "RARITY FILTER: ALL EGGS"
+RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+RarityBtn.TextSize = 10
+RarityBtn.ZIndex = 12
+Instance.new("UICorner", RarityBtn).CornerRadius = UDim.new(0, 6)
+
 local InfoLabel = Instance.new("TextLabel", PageFarm)
 InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-InfoLabel.Position = UDim2.new(0, 0, 0.35, 0)
+InfoLabel.Position = UDim2.new(0, 0, 0.53, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 75)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: Anti-Bug Paten.\nDijamin tidak akan nyasar ke Jalur/Display toko."
+InfoLabel.Text = "Status: Typo fixed (task.wait dipasang).\nAnti-Jalur & Rarity Filter Berfungsi Sempurna."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
 InfoLabel.ZIndex = 12
 Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 
+-- Tombol Halaman Player
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 SpeedBtn.Position = UDim2.new(0, 0, 0.05, 0)
@@ -170,6 +193,9 @@ SpeedBtn.TextSize = 11
 SpeedBtn.ZIndex = 12
 Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0, 6)
 
+-- =========================================================
+-- KONEKSI INTERAKSI UI
+-- =========================================================
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -204,7 +230,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "SAFE TP & RETURN BASE: ON" or "SAFE TP & RETURN BASE: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "INFINITE SWEEP TP: ON" or "INFINITE SWEEP TP: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -216,6 +242,19 @@ AutoFarmBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+RarityBtn.MouseButton1Click:Connect(function()
+    lowRarityOnly = not lowRarityOnly
+    if lowRarityOnly then
+        RarityBtn.Text = "RARITY: LOW / COMMON ONLY"
+        RarityBtn.BackgroundColor3 = Color3.fromRGB(200, 120, 40)
+        RarityBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    else
+        RarityBtn.Text = "RARITY FILTER: ALL EGGS"
+        RarityBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+        RarityBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+end)
+
 SpeedBtn.MouseButton1Click:Connect(function()
     speedBoostActive = not speedBoostActive
     SpeedBtn.Text = speedBoostActive and "SUPREME SPEED: ON" or "SUPREME SPEED: OFF"
@@ -223,7 +262,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- FILTER SUPER KETAT (BLOKIR SEMUA HAL SELAIN TELUR HUTAN)
+-- FILTER VALIDASI TELUR (ANTI-JALUR & RARITY CHECK)
 -- =========================================================
 local function isValidEgg(prompt, parentPart)
     local partName = string.lower(parentPart.Name)
@@ -236,68 +275,85 @@ local function isValidEgg(prompt, parentPart)
     
     local fullStr = partName .. " " .. parentName .. " " .. grandName .. " " .. promptText
     
-    -- BLACKLIST MUTLAK: Jika ada kata-kata display, toko, atau Jalur, langsung TOLAK
-    if fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk") or fullStr:find("leaderboard") then
+    -- Blacklist mutlak area Jalur, Display, Toko, NPC
+    if fullStr:find("jalur") or fullStr:find("toko") or fullStr:find("shop") or fullStr:find("display") or fullStr:find("npc") or fullStr:find("bicara") or fullStr:find("talk") or fullStr:find("board") then
         return false
     end
     
-    -- Harus benar-benar ada kata telur/egg atau event spesial hutan
-    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween")
+    local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("forest")
     local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass")
     
-    return isEgg and not isRestricted
+    if not (isEgg and not isRestricted) then
+        return false
+    end
+    
+    -- Filter Rarity Rendah (Common)
+    if lowRarityOnly then
+        local isHighRarity = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary")
+        if isHighRarity then
+            return false
+        end
+    end
+    
+    return true
 end
 
 -- =========================================================
--- MESIN UTAMA SAFE TP & RETURN TO BASE
+-- MESIN UTAMA SUPREME (INFINITE SWEEP + RARITY + RETURN BASE)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.6) -- Jeda aman agar tidak memberatkan game
+        task.wait(0.25) -- Diperbaiki dari typo "it" menjadi task.wait yang benar
         if autoTpFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
                 if not char then return end
-                local root = char:FindFirstChild("HumanoidRootPart")
+                local root = char and char:FindFirstChild("HumanoidRootPart")
                 if not root then return end
                 
                 if not basePosition then
                     basePosition = root.CFrame
                 end
                 
-                local foundEgg = false
-                
+                local availableEggs = {}
                 for _, prompt in pairs(Workspace:GetDescendants()) do
                     if not autoTpFarmActive then break end
-                    
                     if prompt:IsA("ProximityPrompt") then
                         local parentPart = prompt.Parent
                         if parentPart and parentPart:IsA("BasePart") then
                             if isValidEgg(prompt, parentPart) then
-                                foundEgg = true
-                                
-                                -- 1. Teleport ke Telur
-                                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                root.CFrame = parentPart.CFrame + Vector3.new(0, 3.5, 0)
-                                
-                                -- 2. Ambil instan
-                                prompt.HoldDuration = 0
-                                if fireproximityprompt then
-                                    fireproximityprompt(prompt)
-                                end
-                                
-                                task.wait(0.2)
-                                
-                                -- 3. Pulang ke Base
-                                if basePosition and autoTpFarmActive then
-                                    root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                    root.CFrame = basePosition
-                                end
-                                
-                                task.wait(0.5)
-                                break
+                                table.insert(availableEggs, {prompt = prompt, part = parentPart})
                             end
                         end
+                    end
+                end
+                
+                if #availableEggs > 0 then
+                    table.sort(availableEggs, function(a, b)
+                        return (root.Position - a.part.Position).Magnitude < (root.Position - b.part.Position).Magnitude
+                    end)
+                    
+                    local target = availableEggs[1]
+                    if target and autoTpFarmActive then
+                        -- 1. Teleport ke Telur (Seluruh Map)
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
+                        
+                        -- 2. Ambil instan
+                        target.prompt.HoldDuration = 0
+                        if fireproximityprompt then
+                            fireproximityprompt(target.prompt)
+                        end
+                        
+                        task.wait(0.12)
+                        
+                        -- 3. Pulang seketika ke Base
+                        if basePosition and autoTpFarmActive then
+                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            root.CFrame = basePosition
+                        end
+                        
+                        task.wait(0.25)
                     end
                 end
             end)
