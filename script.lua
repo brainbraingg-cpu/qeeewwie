@@ -385,5 +385,102 @@ local function isValidEgg(prompt, parentPart)
     end
     
     local isEgg = fullStr:find("egg") or fullStr:find("telur") or fullStr:find("hatch") or fullStr:find("halloween") or fullStr:find("event") or fullStr:find("forest")
-    local isRestricted = fullStr:find
+    local isRestricted = fullStr:find("robux") or fullStr:find("buy") or fullStr:find("purchase") or fullStr:find("pass")
     
+    if not (isEgg and not isRestricted) then return false end
+    
+    local isRare = fullStr:find("divine") or fullStr:find("cherub") or fullStr:find("ethereal") or fullStr:find("solaris") or fullStr:find("seraph") or fullStr:find("blackhole") or fullStr:find("mythic") or fullStr:find("legendary") or fullStr:find("halloween") or fullStr:find("lubang hitam")
+    
+    return true, isRare
+end
+
+-- =========================================================
+-- 5. LOOP UTAMA PLAYER MODS (SPEED, ANTICLIP, INVISIBLE)
+-- =========================================================
+RunService.Stepped:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        if Config.SpeedBoostActive then
+            humanoid.WalkSpeed = Config.CustomWalkSpeed
+        end
+    end
+    
+    -- Anti Clip (Noclip) Handler
+    if Config.AntiClipActive then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+    
+    -- Invisible Handler
+    if Config.InvisibleActive then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("MeshPart") then
+                part.Transparency = 1
+            elseif part:IsA("Decal") or part:IsA("Texture") then
+                part.Transparency = 1
+            end
+        end
+    else
+        for _, part in pairs(char:GetDescendants()) do
+            if part.Name == "HumanoidRootPart" then
+                part.Transparency = 1
+            elseif part:IsA("BasePart") and part.Transparency == 1 and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = 0
+            end
+        end
+    end
+end)
+
+-- =========================================================
+-- 6. MESIN UTAMA AUTO FARM (FUSION-DIRECT)
+-- =========================================================
+task.spawn(function()
+    while true do
+        task.wait(0.4)
+        if Config.AutoFarmActive then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char then return end
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+                if not root or not humanoid then return end
+                
+                if not startingBaseCFrame then
+                    startingBaseCFrame = root.CFrame
+                end
+                
+                safeAutoRide()
+                
+                local availableEggs = {}
+                for _, prompt in pairs(Workspace:GetDescendants()) do
+                    if not Config.AutoFarmActive then break end
+                    if prompt:IsA("ProximityPrompt") then
+                        local parentPart = prompt.Parent
+                        if parentPart and parentPart:IsA("BasePart") then
+                            local valid, isRare = isValidEgg(prompt, parentPart)
+                            if valid then
+                                table.insert(availableEggs, {prompt = prompt, part = parentPart, isRare = isRare})
+                            end
+                        end
+                    end
+                end
+                
+                if #availableEggs > 0 then
+                    table.sort(availableEggs, function(a, b)
+                        if Config.PrioritizeRare then
+                            if a.isRare and not b.isRare then return true end
+                            if not a.isRare and b.isRare then return false end
+                        end
+                        if not a.part or not b.part or not root then return false end
+                        return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
+                    end)
+                    
+                    local target = availableEggs[1]
+                    if target and target.part and target.prompt and Config.AutoFarmActive then
+                        collectedEggsMemory[target.prom
