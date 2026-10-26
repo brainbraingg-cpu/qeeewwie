@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: NO-FUSION DIRECT PATH [SC]
+-- QEEEWWIE HUB: STRICT TP-TO-SHOP SEQUENCE [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -76,7 +76,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "No-Fusion Direct Edition [⚡]"
+SubTitle.Text = "Strict TP-Shop Edition [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -152,7 +152,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "DIRECT FARM: OFF"
+AutoFarmBtn.Text = "STRICT FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -185,7 +185,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Toko -> Jalan pulang ke base."
+InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Toko Dulu -> Baru Jalan ke Base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -240,7 +240,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "DIRECT FARM: ON" or "DIRECT FARM: OFF"
+    AutoFarmBtn.Text = Config.AutoFarmActive and "STRICT FARM: ON" or "STRICT FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if Config.AutoFarmActive then
@@ -273,7 +273,7 @@ SpeedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- 4. FUNGSI PENDUKUNG (SAFE RIDE & SHOP FINDER)
+-- 4. FUNGSI PENDUKUNG (SAFE RIDE & VALID SHOP FINDER)
 -- =========================================================
 local function safeAutoRide()
     if not Config.AutoRideEnabled then return end
@@ -303,24 +303,35 @@ local function safeAutoRide()
     end)
 end
 
-local function findNearestShop(currentPos)
-    local nearestPos = currentPos + Vector3.new(0, 5, 0)
-    local shortestDist = math.huge
+local function findValidShop()
+    local targetPos = nil
     pcall(function()
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("BasePart") then
+            if obj:IsA("Model") or obj:IsA("Folder") then
                 local name = string.lower(obj.Name)
-                if name:find("shop") or name:find("toko") or name:find("store") then
-                    local dist = (obj.Position - currentPos).Magnitude
-                    if dist < shortestDist then
-                        shortestDist = dist
-                        nearestPos = obj.Position + Vector3.new(0, 3, 0)
+                if (name:find("shop") or name:find("toko") or name:find("store")) and not name:find("rock") and not name:find("stone") and not name:find("batu") then
+                    local primaryPart = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                    if primaryPart then
+                        targetPos = primaryPart.CFrame + Vector3.new(0, 4, 0)
+                        break
+                    end
+                end
+            end
+        end
+        
+        if not targetPos then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if obj:IsA("BasePart") then
+                    local name = string.lower(obj.Name)
+                    if (name:find("shop") or name:find("toko")) and not name:find("rock") and not name:find("stone") then
+                        targetPos = obj.CFrame + Vector3.new(0, 4, 0)
+                        break
                     end
                 end
             end
         end
     end)
-    return nearestPos
+    return targetPos
 end
 
 local function isValidEgg(prompt, parentPart)
@@ -357,7 +368,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- 5. MESIN UTAMA (TANPA FUSION, LANGSUNG KE TOKO LALU PULANG)
+-- 5. MESIN UTAMA (URUTAN MUTLAK: TP EGG -> STEAL -> TP TOKO -> JALAN KE BASE)
 -- =========================================================
 task.spawn(function()
     while true do
@@ -396,18 +407,19 @@ task.spawn(function()
                             if a.isRare and not b.isRare then return true end
                             if not a.isRare and b.isRare then return false end
                         end
+                        if not a.part or not b.part or not root then return false end
                         return (root.Position - a.part.Position).Magnitude > (root.Position - b.part.Position).Magnitude
                     end)
                     
                     local target = availableEggs[1]
-                    if target and Config.AutoFarmActive then
+                    if target and target.part and target.prompt and Config.AutoFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
                         -- STEP 1: TP KE EGG
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        -- STEP 2: DIAM PERSIS 1 DETIK DI EGG
+                        -- STEP 2: DIAM 1 DETIK DI EGG
                         task.wait(1.0)
                         
                         -- STEP 3: STEAL KILAT 0,1 MILIDETIK
@@ -417,16 +429,18 @@ task.spawn(function()
                         end
                         task.wait(0.0001)
                         
-                        -- STEP 4: TP KE TENGAH-TENGAH TOKO (SHOP)
-                        local shopPos = findNearestShop(root.Position)
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(shopPos)
-                        task.wait(0.3)
+                        -- STEP 4: LANGSUNG TP KE TOKO (DIJAMIN TANPA JALAN DULU)
+                        local shopCFrame = findValidShop()
+                        if shopCFrame then
+                            humanoid.WalkSpeed = 0
+                            root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            root.CFrame = shopCFrame
+                            task.wait(0.3)
+                        end
                         
-                        -- STEP 5: JALAN PULANG KE BASE AWAL DENGAN SPEED BOOST AKTIF
+                        -- STEP 5: JALAN PULANG KE BASE DENGAN SPEED BOOST AKTIF
                         if startingBaseCFrame and Config.AutoFarmActive then
                             humanoid.WalkSpeed = Config.CustomWalkSpeed
-                            
                             humanoid:MoveTo(startingBaseCFrame.Position)
                             
                             local startTime = tick()
@@ -434,10 +448,9 @@ task.spawn(function()
                                 task.wait(0.2)
                                 if not Config.AutoFarmActive then break end
                             until (root.Position - startingBaseCFrame.Position).Magnitude < 6 or (tick() - startTime) > 5
-                            
-                            humanoid.WalkSpeed = Config.NormalWalkSpeed
                         end
                         
+                        humanoid.WalkSpeed = Config.NormalWalkSpeed
                         task.wait(0.4)
                     end
                 else
