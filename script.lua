@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FUSION-DIRECT + ANTICLIP & INVISIBLE [SC]
+-- QEEEWWIE HUB: MASTER FULL SCRIPT [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -79,7 +79,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Master Edition + Bypass [⚡]"
+SubTitle.Text = "Master Full Version [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -155,7 +155,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "FUSION FARM: OFF"
+AutoFarmBtn.Text = "MASTER FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -188,14 +188,13 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP Egg -> Diam 1s -> Steal -> TP Fusion Atas -> Jalan pulang ke base."
+InfoLabel.Text = "Status: Engine Ready."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
 InfoLabel.ZIndex = 12
 Instance.new("UICorner", InfoLabel).CornerRadius = UDim.new(0, 6)
 
--- TOMBOL PLAYER MODS (SPEED, ANTICLIP, INVISIBLE)
 local SpeedBtn = Instance.new("TextButton", PagePlayer)
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 SpeedBtn.Position = UDim2.new(0, 0, 0.02, 0)
@@ -266,7 +265,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     Config.AutoFarmActive = not Config.AutoFarmActive
-    AutoFarmBtn.Text = Config.AutoFarmActive and "FUSION FARM: ON" or "FUSION FARM: OFF"
+    AutoFarmBtn.Text = Config.AutoFarmActive and "MASTER FARM: ON" or "MASTER FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = Config.AutoFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if Config.AutoFarmActive then
@@ -311,7 +310,7 @@ InvisibleBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =========================================================
--- 4. FUNGSI PENDUKUNG (SAFE RIDE & FUSION FINDER)
+-- 4. FUNGSI UTILITAS PENDUKUNG
 -- =========================================================
 local function safeAutoRide()
     if not Config.AutoRideEnabled then return end
@@ -319,7 +318,6 @@ local function safeAutoRide()
         local char = LocalPlayer.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
-        
         if humanoid and humanoid.SeatPart then return end
 
         for _, obj in pairs(Workspace:GetDescendants()) do
@@ -395,20 +393,17 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- 5. LOOP UTAMA PLAYER MODS (SPEED, ANTICLIP, INVISIBLE)
+-- 5. LOOP UTAMA PLAYER MODS
 -- =========================================================
 RunService.Stepped:Connect(function()
     local char = LocalPlayer.Character
     if not char then return end
     
     local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        if Config.SpeedBoostActive then
-            humanoid.WalkSpeed = Config.CustomWalkSpeed
-        end
+    if humanoid and Config.SpeedBoostActive then
+        humanoid.WalkSpeed = Config.CustomWalkSpeed
     end
     
-    -- Anti Clip (Noclip) Handler
     if Config.AntiClipActive then
         for _, part in pairs(char:GetDescendants()) do
             if part:IsA("BasePart") then
@@ -417,7 +412,6 @@ RunService.Stepped:Connect(function()
         end
     end
     
-    -- Invisible Handler
     if Config.InvisibleActive then
         for _, part in pairs(char:GetDescendants()) do
             if part:IsA("BasePart") or part:IsA("MeshPart") then
@@ -438,11 +432,11 @@ RunService.Stepped:Connect(function()
 end)
 
 -- =========================================================
--- 6. MESIN UTAMA AUTO FARM (FUSION-DIRECT)
+-- 6. MESIN UTAMA AUTO FARM (LENGKAP & ANTI NYANGKUT)
 -- =========================================================
 task.spawn(function()
     while true do
-        task.wait(0.4)
+        task.wait(0.3)
         if Config.AutoFarmActive then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -483,4 +477,50 @@ task.spawn(function()
                     
                     local target = availableEggs[1]
                     if target and target.part and target.prompt and Config.AutoFarmActive then
-                        collectedEggsMemory[target.prom
+                        collectedEggsMemory[target.prompt] = true
+                        
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
+                        
+                        task.wait(1.0)
+                 
+                        pcall(function()
+                            target.prompt.HoldDuration = 0
+                            if fireproximityprompt then
+                                fireproximityprompt(target.prompt)
+                            end
+                            if target.prompt.Triggered then
+                                target.prompt:InputHoldBegin()
+                                task.wait(0.05)
+                                target.prompt:InputHoldEnd()
+                            end
+                        end)
+                        task.wait(0.05)
+                        
+                        local fusionPos = findNearestFusion(root.Position)
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.CFrame = CFrame.new(fusionPos)
+                        task.wait(0.3)
+                        
+                        if startingBaseCFrame and Config.AutoFarmActive then
+                            humanoid.WalkSpeed = Config.CustomWalkSpeed
+                            humanoid:MoveTo(startingBaseCFrame.Position)
+                            
+                            local startTime = tick()
+                            repeat
+                                task.wait(0.2)
+                                if not Config.AutoFarmActive then break end
+                            until (root.Position - startingBaseCFrame.Position).Magnitude < 6 or (tick() - startTime) > 5
+                        end
+                        
+                        humanoid.WalkSpeed = Config.NormalWalkSpeed
+                        task.wait(0.3)
+                    end
+                else
+                    table.clear(collectedEggsMemory)
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+end)
