@@ -337,7 +337,7 @@ task.spawn(function()
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
                         -- Jeda sinkronisasi server agar posisi TP valid
-                        task.wait(0.2)
+                        task.wait(1)
                         
                         -- 2. Eksekusi Ambil/Steal Telur
                         target.prompt.HoldDuration = 0
@@ -346,7 +346,7 @@ task.spawn(function()
                         end
                         
                         -- Jeda penting agar server game selesai memproses pengiriman telur ke inventaris
-                        task.wait(0.35)
+                        task.wait(1)
                         
                         -- 3. Teleport Pulang ke Base setelah sukses diterima server
                         if basePosition and autoTpFarmActive then
@@ -354,7 +354,7 @@ task.spawn(function()
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(0.4)
+                        task.wait(1)
                     end
                 else
                     table.clear(collectedEggsMemory)
