@@ -403,7 +403,7 @@ task.spawn(function()
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
                         
-                        task.wait(0.25)
+                        task.wait(1)
                         
                         -- Steal / Ambil Telur
                         target.prompt.HoldDuration = 0
@@ -411,7 +411,7 @@ task.spawn(function()
                             fireproximityprompt(target.prompt)
                         end
                         
-                        task.wait(0.4)
+                        task.wait(1)
                         
                         -- Return to Base
                         if basePosition and autoTpFarmActive then
@@ -419,7 +419,7 @@ task.spawn(function()
                             root.CFrame = basePosition
                         end
                         
-                        task.wait(0.4)
+                        task.wait(1)
                     end
                 else
                     table.clear(collectedEggsMemory)
