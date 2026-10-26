@@ -1,5 +1,5 @@
 -- =========================================================
--- QEEEWWIE HUB: FLY-OVER DELIVERY & FUSION SAFE [SC]
+-- QEEEWWIE HUB: FUSION-SCAN & PET RIDE DELIVERY [SC]
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -69,7 +69,7 @@ Title.BackgroundTransparency = 1
 Title.ZIndex = 11
 
 local SubTitle = Instance.new("TextLabel", MainFrame)
-SubTitle.Text = "Fly-Over Fusion Delivery [⚡]"
+SubTitle.Text = "Fusion-Scan & Pet Walk [⚡]"
 SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
 SubTitle.Position = UDim2.new(0.08, 0, 0.06, 0)
 SubTitle.Size = UDim2.new(0.70, 0, 0, 18)
@@ -145,7 +145,7 @@ AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 100)
 AutoFarmBtn.Position = UDim2.new(0, 0, 0.02, 0)
 AutoFarmBtn.Size = UDim2.new(1, 0, 0, 36)
 AutoFarmBtn.Font = Enum.Font.SourceSansBold
-AutoFarmBtn.Text = "FLY-OVER FARM: OFF"
+AutoFarmBtn.Text = "FUSION-SCAN FARM: OFF"
 AutoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoFarmBtn.TextSize = 11
 AutoFarmBtn.ZIndex = 12
@@ -178,7 +178,7 @@ InfoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.62, 0)
 InfoLabel.Size = UDim2.new(1, 0, 0, 65)
 InfoLabel.Font = Enum.Font.SourceSans
-InfoLabel.Text = "Status: TP ke Telur -> Steal -> Terbang ke Atas Fusion -> Melayang ke Base -> Landing."
+InfoLabel.Text = "Status: TP Egg -> Steal -> TP ke Fusion -> Scan Base -> Jalan pakai pet ke base."
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
 InfoLabel.TextSize = 10
 InfoLabel.TextWrapped = true
@@ -233,7 +233,7 @@ end)
 
 AutoFarmBtn.MouseButton1Click:Connect(function()
     autoTpFarmActive = not autoTpFarmActive
-    AutoFarmBtn.Text = autoTpFarmActive and "FLY-OVER FARM: ON" or "FLY-OVER FARM: OFF"
+    AutoFarmBtn.Text = autoTpFarmActive and "FUSION-SCAN FARM: ON" or "FUSION-SCAN FARM: OFF"
     AutoFarmBtn.BackgroundColor3 = autoTpFarmActive and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(180, 40, 100)
     
     if autoTpFarmActive then
@@ -349,7 +349,7 @@ local function isValidEgg(prompt, parentPart)
 end
 
 -- =========================================================
--- MESIN UTAMA: TP -> STEAL -> TERBANG KE ATAS FUSION -> BASE -> LANDING
+-- MESIN UTAMA SESUAI URUTAN PRIORITAS BARU
 -- =========================================================
 task.spawn(function()
     while true do
@@ -359,13 +359,14 @@ task.spawn(function()
                 local char = LocalPlayer.Character
                 if not char then return end
                 local root = char and char:FindFirstChild("HumanoidRootPart")
-                if not root then return end
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+                if not root or not humanoid then return end
                 
                 if not basePosition then
                     basePosition = root.CFrame
                 end
                 
-                -- 1. Pastikan naik pet
+                -- Pastikan naik pet
                 safeAutoRide()
                 
                 local availableEggs = {}
@@ -398,47 +399,45 @@ task.spawn(function()
                     if target and autoTpFarmActive then
                         collectedEggsMemory[target.prompt] = true
                         
-                        -- 2. Teleport ke Telur Target di Hutan
+                        -- 1. TP KE EGG
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         root.CFrame = target.part.CFrame + Vector3.new(0, 3.5, 0)
-                        
                         task.wait(0.2)
                         
-                        -- 3. Instant Steal Telur
+                        -- 2. STEAL EGG CEPET
                         target.prompt.HoldDuration = 0
                         if fireproximityprompt then
                             fireproximityprompt(target.prompt)
                         end
+                        task.wait(0.4)
                         
-                        task.wait(0.4) -- Jeda sukses klaim server
-                        
-                        -- 4. METODE BARU: TP ke Atas (Area Fusion) -> Terbang Melayang ke Base -> Landing
-                        local fusionHeightOffset = Vector3.new(0, 80, 0) -- Ketinggian area atas/fusion
-                        local targetPos = basePosition.Position
-                        
-                        -- Pindah ke atas (area fusion) secara instan membawa telur
+                        -- 3. TP KE FUSION (Area Atas)
+                        -- Mencari objek fusion atau naik secara vertikal ke atas
+                        local fusionOffset = Vector3.new(0, 75, 0)
                         root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(targetPos + fusionHeightOffset)
-                        
+                        root.CFrame = root.CFrame + fusionOffset
                         task.wait(0.3)
                         
-                        -- Terbang melayang perlahan menuju tepat di atas base
-                        local steps = 15
-                        local startPos = root.Position
-                        local endPos = targetPos + Vector3.new(0, 45, 0) -- Melayang di atas base
-                        
-                        for i = 1, steps do
-                            if not autoTpFarmActive then break end
+                        -- 4. SCANNING BASE KITA & JALAN PAKE PET KE BASE
+                        if basePosition and autoTpFarmActive then
+                            -- Pindah posisi melayang tepat di atas base hasil scan
+                            local scannedBasePos = basePosition.Position + Vector3.new(0, 30, 0)
                             root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            root.CFrame = CFrame.new(startPos:Lerp(endPos, i / steps))
-                            task.wait(0.04)
+                            root.CFrame = CFrame.new(scannedBasePos)
+                            
+                            task.wait(0.2)
+                            
+                            -- Turun dan berjalan pakai pet menuju titik base persis
+                            humanoid:MoveTo(basePosition.Position)
+                            
+                            local startTime = tick()
+                            repeat
+                                task.wait(0.2)
+                                if not autoTpFarmActive then break end
+                            until (root.Position - basePosition.Position).Magnitude < 8 or (tick() - startTime) > 5
                         end
                         
-                        -- 5. Jatuh / Landing mulus ke dalam Base
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
-                        
-                        task.wait(0.4)
+                        task.wait(0.3)
                     end
                 else
                     table.clear(collectedEggsMemory)
