@@ -1,17 +1,32 @@
 -- ========================================================
--- Qeeewwie Hub v7.8 | Ultimate Master & Live HUD Edition
--- Game: Steal an Egg (Clean, Compact & Optimized)
+-- Qeeewwie Hub v8.3 | Ultimate Audited & Instant-Terminate
+-- Game: Steal an Egg (Production Ready & Fully Patched)
 -- ========================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 
--- Bersihkan UI lama
+-- Bersihkan UI lama jika ada
 if CoreGui:FindFirstChild("QeeewwieMasterHub") then CoreGui.QeeewwieMasterHub:Destroy() end
 if CoreGui:FindFirstChild("QeeewwieStatusHUD") then CoreGui.QeeewwieStatusHUD:Destroy() end
+
+-- State Tracking Table untuk Toggle OFF Instan
+local runningStates = {}
+
+-- Helper untuk menghentikan loop secara instan saat OFF ditekan
+local function smartWait(id, duration)
+    local elapsed = 0
+    while elapsed < duration do
+        if not runningStates[id] then return false end
+        task.wait(0.1)
+        elapsed = elapsed + 0.1
+    end
+    return runningStates[id]
+end
 
 -- ================= UI UTAMA =================
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
@@ -48,7 +63,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | Master Halloween"
+Title.Text = "Qeeewwie Hub | v8.3 Patched"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -66,17 +81,21 @@ local Container = Instance.new("ScrollingFrame", MainFrame)
 Container.BackgroundTransparency = 1
 Container.Position = UDim2.new(0, 12, 0, 50)
 Container.Size = UDim2.new(1, -24, 1, -60)
-Container.CanvasSize = UDim2.new(0, 0, 0, 950)
 Container.ScrollBarThickness = 4
 
 local UIListLayout = Instance.new("UIListLayout", Container)
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 10)
 
+-- Dynamic CanvasSize Auto-Resize (Menyesuaikan jumlah fitur otomatis)
+UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 20)
+end)
+
 ToggleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
 CloseButton.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 
-local function createFeatureToggle(name, desc, callback)
+local function createFeatureToggle(id, name, desc, callback)
     local Wrapper = Instance.new("Frame", Container)
     Wrapper.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
     Wrapper.Size = UDim2.new(1, 0, 0, 50)
@@ -115,6 +134,7 @@ local function createFeatureToggle(name, desc, callback)
     local state = false
     ActionBtn.MouseButton1Click:Connect(function()
         state = not state
+        runningStates[id] = state
         ActionBtn.Text = state and "ON" or "OFF"
         ActionBtn.TextColor3 = state and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 100, 100)
         ActionBtn.BackgroundColor3 = state and Color3.fromRGB(20, 60, 40) or Color3.fromRGB(45, 45, 60)
@@ -134,342 +154,364 @@ HudFrame.Visible = false
 HudFrame.Active = true
 HudFrame.Draggable = true
 Instance.new("UICorner", HudFrame).CornerRadius = UDim.new(0, 10)
-
-local HudStroke = Instance.new("UIStroke", HudFrame)
-HudStroke.Color = Color3.fromRGB(0, 255, 150)
-HudStroke.Thickness = 1.2
+Instance.new("UIStroke", HudFrame).Color = Color3.fromRGB(0, 255, 150)
 
 local HudTitle = Instance.new("TextLabel", HudFrame)
 HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Strict Filter | Go Home"
+HudTitle.Text = "Steal Egg | Patched HUD Tracker"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
-HudTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 local HudInfo = Instance.new("TextLabel", HudFrame)
 HudInfo.BackgroundTransparency = 1
 HudInfo.Position = UDim2.new(0, 12, 0, 26)
 HudInfo.Size = UDim2.new(1, -24, 0, 18)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Gargoyle | Secret | 9,837Kg | $17.5B/s"
+HudInfo.Text = "Status: Idle"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
-HudInfo.TextXAlignment = Enum.TextXAlignment.Left
 
 local HudStats = Instance.new("TextLabel", HudFrame)
 HudStats.BackgroundTransparency = 1
 HudStats.Position = UDim2.new(0, 12, 0, 44)
 HudStats.Size = UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Success: 8 | Failed: 4"
+HudStats.Text = "Attempts: 0 | Touches: 0"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
-HudStats.TextXAlignment = Enum.TextXAlignment.Left
 
-local BarBg = Instance.new("Frame", HudFrame)
-BarBg.BackgroundColor3 = Color3.fromRGB(35, 35, 48)
-BarBg.Position = UDim2.new(0, 12, 0, 62)
-BarBg.Size = UDim2.new(1, -24, 0, 5)
-BarBg.BorderSizePixel = 0
+-- ================= FITUR UTAMA (DENGAN SMART-WAIT INSTANT STOP) =================
 
-local BarFill = Instance.new("Frame", BarBg)
-BarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 150)
-BarFill.Size = UDim2.new(0.85, 0, 1, 0)
-BarFill.BorderSizePixel = 0
-
--- ================= FITUR UTAMA =================
-
--- 1. Auto Steal Instant + HUD
-createFeatureToggle("Auto Steal Instant (HUD)", "Teleport instan + Live HUD Tracker", function(state)
+-- 1. Auto Steal Instant
+createFeatureToggle("AutoSteal", "Auto Steal Instant (HUD)", "Teleport instan aman", function(state)
     HudFrame.Visible = state
     if state then
         task.spawn(function()
-            local succ, fail = 8, 4
-            while state and task.wait(2.2) do
+            local attempts, touches = 0, 0
+            while runningStates["AutoSteal"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     local initPos = root.CFrame
-                    for _, v in ipairs(Workspace:GetChildren()) do
-                        if v.Name:lower():find("egg") or v.Name:lower():find("spawn") then
-                            for _, item in ipairs(v:GetChildren()) do
-                                local part = item:IsA("BasePart") and item or (item:IsA("Model") and (item.PrimaryPart or item:FindFirstChildWhichIsA("BasePart")))
-                                if part then
-                                    root.CFrame = part.CFrame + Vector3.new(0, 2, 0)
-                                    task.wait(0.7)
-                                    if firetouchinterest then
-                                        firetouchinterest(root, part, 0)
-                                        firetouchinterest(root, part, 1)
-                                        succ = succ + 1
-                                    else
-                                        fail = fail + 1
-                                    end
-                                    HudStats.Text = "Success: " .. succ .. " | Failed: " .. fail
-                                    root.CFrame = initPos
-                                    task.wait(0.4)
+                    local folder = Workspace:FindFirstChild("Eggs") or Workspace
+                    for _, item in ipairs(folder:GetChildren()) do
+                        if not runningStates["AutoSteal"] then break end
+                        if item.Name:lower():find("egg") then
+                            local part = item:IsA("BasePart") and item or (item:IsA("Model") and item.PrimaryPart)
+                            if part then
+                                attempts = attempts + 1
+                                HudInfo.Text = "Target: " .. item.Name
+                                root.CFrame = part.CFrame + Vector3.new(0, 2, 0)
+                                
+                                if not smartWait("AutoSteal", 0.8) then break end
+                                
+                                if firetouchinterest then
+                                    firetouchinterest(root, part, 0)
+                                    firetouchinterest(root, part, 1)
+                                    touches = touches + 1
                                 end
+                                HudStats.Text = "Attempts: " .. attempts .. " | Touches: " .. touches
+                                root.CFrame = initPos
+                                
+                                if not smartWait("AutoSteal", 0.5) then break end
                             end
                         end
                     end
                 end)
+                if not smartWait("AutoSteal", 2.5) then break end
             end
         end)
     end
 end)
 
 -- 2. Auto Manor Key
-createFeatureToggle("Auto Manor Key", "Ambil kunci manor otomatis", function(state)
+createFeatureToggle("ManorKey", "Auto Manor Key", "Ambil kunci manor tervalidasi", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(2.0) do
+            while runningStates["ManorKey"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     local initPos = root.CFrame
                     for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if obj.Name:lower():find("manor") and obj.Name:lower():find("key") then
-                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
+                        if not runningStates["ManorKey"] then break end
+                        if obj.Name == "ManorKey" or obj.Name:lower():find("manorkey") then
+                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and obj.PrimaryPart)
                             if part then
                                 root.CFrame = part.CFrame + Vector3.new(0, 2, 0)
-                                task.wait(1.0)
+                                if not smartWait("ManorKey", 1.0) then break end
                                 if firetouchinterest then firetouchinterest(root, part, 0) firetouchinterest(root, part, 1) end
                                 root.CFrame = initPos
-                                task.wait(0.5)
+                                if not smartWait("ManorKey", 0.5) then break end
                             end
                         end
                     end
                 end)
+                if not smartWait("ManorKey", 2.0) then break end
             end
         end)
     end
 end)
 
 -- 3. Auto Train Boarding
-createFeatureToggle("Auto Train Boarding (Fixed)", "Naik kereta Phantom Express otomatis", function(state)
+createFeatureToggle("TrainBoard", "Auto Train Boarding", "Naik Phantom Express resmi", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(2.0) do
+            while runningStates["TrainBoard"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     for _, obj in ipairs(Workspace:GetDescendants()) do
-                        local name = obj.Name:lower()
-                        if (name:find("train") or name:find("express") or name:find("phantom")) and obj:IsA("BasePart") then
-                            root.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                            task.wait(0.8)
-                            if firetouchinterest then firetouchinterest(root, obj, 0) firetouchinterest(root, obj, 1) end
+                        if not runningStates["TrainBoard"] then break end
+                        if obj.Name:lower():find("phantomexpress") then
+                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and obj.PrimaryPart)
+                            if part then
+                                root.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+                                if not smartWait("TrainBoard", 0.8) then break end
+                                if firetouchinterest then firetouchinterest(root, part, 0) firetouchinterest(root, part, 1) end
+                            end
                         end
                     end
                 end)
+                if not smartWait("TrainBoard", 2.0) then break end
             end
         end)
     end
 end)
 
 -- 4. Auto Void Fusion
-createFeatureToggle("Auto Void Fusion (Fixed)", "Fusi item/telur otomatis di Void", function(state)
+createFeatureToggle("VoidFusion", "Auto Void Fusion", "Fusi item Void dengan remote", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(4.0) do
+            while runningStates["VoidFusion"] do
                 pcall(function()
-                    for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-                        if remote:IsA("RemoteEvent") and (remote.Name:lower():find("fusion") or remote.Name:lower():find("void")) then
-                            remote:FireServer()
-                        end
-                    end
+                    local rem = ReplicatedStorage:FindFirstChild("VoidFusionEvent", true)
+                    if rem and rem:IsA("RemoteEvent") then rem:FireServer() end
                 end)
+                if not smartWait("VoidFusion", 4.0) then break end
             end
         end)
     end
 end)
 
 -- 5. Auto Treadmill
-createFeatureToggle("Auto Treadmill", "Latihan treadmill otomatis", function(state)
+createFeatureToggle("Treadmill", "Auto Treadmill", "Latihan treadmill spesifik", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(1.0) do
+            while runningStates["Treadmill"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if (obj.Name:lower():find("treadmill") or obj.Name:lower():find("training")) and obj:IsA("BasePart") then
+                        if not runningStates["Treadmill"] then break end
+                        if obj.Name:lower() == "treadmill" and obj:IsA("BasePart") then
                             root.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
                             if firetouchinterest then firetouchinterest(root, obj, 0) firetouchinterest(root, obj, 1) end
                             break
                         end
                     end
                 end)
+                if not smartWait("Treadmill", 1.0) then break end
             end
         end)
     end
 end)
 
 -- 6. Auto Pumpkin/Manor Quest
-createFeatureToggle("Auto Pumpkin/Manor Quest", "Menyelesaikan quest pumpkin & manor", function(state)
+createFeatureToggle("Quest", "Auto Pumpkin/Manor Quest", "Quest target resmi", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(3.0) do
+            while runningStates["Quest"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     local initPos = root.CFrame
                     for _, obj in ipairs(Workspace:GetDescendants()) do
-                        local name = obj.Name:lower()
-                        if (name:find("pumpkin") or name:find("manor") or name:find("quest")) and obj:IsA("BasePart") then
-                            root.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                            task.wait(1.0)
-                            if firetouchinterest then firetouchinterest(root, obj, 0) firetouchinterest(root, obj, 1) end
-                            root.CFrame = initPos
-                            task.wait(0.5)
+                        if not runningStates["Quest"] then break end
+                        if obj.Name == "PumpkinQuestTarget" or obj.Name == "ManorQuestTarget" then
+                            local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and obj.PrimaryPart)
+                            if part then
+                                root.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+                                if not smartWait("Quest", 1.0) then break end
+                                if firetouchinterest then firetouchinterest(root, part, 0) firetouchinterest(root, part, 1) end
+                                root.CFrame = initPos
+                                if not smartWait("Quest", 0.5) then break end
+                            end
                         end
                     end
                 end)
+                if not smartWait("Quest", 3.0) then break end
             end
         end)
     end
 end)
 
 -- 7. Auto Ghost Hunt
-createFeatureToggle("Auto Ghost Hunt", "Memburu & mengalahkan hantu/ghouler", function(state)
+createFeatureToggle("GhostHunt", "Auto Ghost Hunt", "Berburu hantu tervalidasi", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(1.5) do
+            while runningStates["GhostHunt"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     for _, mob in ipairs(Workspace:GetDescendants()) do
-                        local name = mob.Name:lower()
-                        if (name:find("ghost") or name:find("ghouler")) and mob:IsA("Model") then
-                            local mobPart = mob.PrimaryPart or mob:FindFirstChildWhichIsA("BasePart")
-                            if mobPart then
-                                root.CFrame = mobPart.CFrame + Vector3.new(0, 3, 2)
-                                task.wait(0.5)
+                        if not runningStates["GhostHunt"] then break end
+                        if mob:IsA("Model") and mob.Name:lower():find("ghost") then
+                            local hum = mob:FindFirstChildOfClass("Humanoid")
+                            local part = mob.PrimaryPart
+                            if hum and hum.Health > 0 and part and (root.Position - part.Position).Magnitude < 40 then
+                                root.CFrame = part.CFrame + Vector3.new(0, 3, 2)
+                                if not smartWait("GhostHunt", 0.5) then break end
                                 local tool = char:FindFirstChildOfClass("Tool")
                                 if tool then tool:Activate() end
                             end
                         end
                     end
                 end)
+                if not smartWait("GhostHunt", 1.5) then break end
             end
         end)
     end
 end)
 
 -- 8. Auto Gilbert & Fish
-createFeatureToggle("Auto Gilbert & Fish", "Quest Gilbert & mancing otomatis", function(state)
+createFeatureToggle("Gilbert", "Auto Gilbert & Fish", "Quest Gilbert aman", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(3.0) do
+            while runningStates["Gilbert"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
-                    for _, obj in ipairs(Workspace:GetDescendants()) do
-                        local name = obj.Name:lower()
-                        if (name:find("gilbert") or name:find("fish") or name:find("lake")) and obj:IsA("BasePart") then
-                            root.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                            task.wait(1.0)
-                            if firetouchinterest then firetouchinterest(root, obj, 0) firetouchinterest(root, obj, 1) end
-                        end
+                    local npc = Workspace:FindFirstChild("FishermanGilbert", true)
+                    if npc and npc:IsA("BasePart") then
+                        root.CFrame = npc.CFrame + Vector3.new(0, 3, 0)
+                        if not smartWait("Gilbert", 1.0) then break end
+                        if firetouchinterest then firetouchinterest(root, npc, 0) firetouchinterest(root, npc, 1) end
                     end
                 end)
+                if not smartWait("Gilbert", 3.0) then break end
             end
         end)
     end
 end)
 
 -- 9. Auto Buy Dimension Egg
-createFeatureToggle("Auto Buy Dimension Egg", "Membeli Dimension Egg & Spectral Mutation", function(state)
+createFeatureToggle("BuyEgg", "Auto Buy Dimension Egg", "Beli Dimension Egg", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(4.0) do
+            while runningStates["BuyEgg"] do
                 pcall(function()
-                    for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-                        if remote:IsA("RemoteEvent") then
-                            local rName = remote.Name:lower()
-                            if rName:find("dimension") or rName:find("spectral") or rName:find("mutation") or rName:find("buyegg") then
-                                remote:FireServer()
-                            end
-                        end
-                    end
+                    local rem = ReplicatedStorage:FindFirstChild("BuyDimensionEgg", true)
+                    if rem and rem:IsA("RemoteEvent") then rem:FireServer("DimensionEgg") end
                 end)
+                if not smartWait("BuyEgg", 4.0) then break end
             end
         end)
     end
 end)
 
 -- 10. Change Skin Rod
-createFeatureToggle("Change Skin Rod", "Ganti skin joran pancing otomatis", function(state)
+createFeatureToggle("SkinRod", "Change Skin Rod", "Ganti skin pancing", function(state)
     if state then
         task.spawn(function()
             pcall(function()
-                for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-                    if remote:IsA("RemoteEvent") and (remote.Name:lower():find("skin") or remote.Name:lower():find("rod")) then
-                        remote:FireServer("HalloweenSkin")
-                    end
-                end
+                local rem = ReplicatedStorage:FindFirstChild("ChangeRodSkin", true)
+                if rem and rem:IsA("RemoteEvent") then rem:FireServer("HalloweenSkin") end
             end)
         end)
     end
 end)
 
 -- 11. Auto Hit Mobs & Fish
-createFeatureToggle("Auto Hit Mobs & Fish", "Serang monster & mancing bersamaan", function(state)
+createFeatureToggle("HitFish", "Auto Hit Mobs & Fish", "Serang & mancing terpisah", function(state)
     if state then
         task.spawn(function()
-            while state and task.wait(1.0) do
+            while runningStates["HitFish"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     for _, mob in ipairs(Workspace:GetDescendants()) do
-                        local name = mob.Name:lower()
-                        if (name:find("mob") or name:find("ghouler") or name:find("ghost")) and mob:IsA("Model") then
-                            local mobPart = mob.PrimaryPart or mob:FindFirstChildWhichIsA("BasePart")
-                            if mobPart and (root.Position - mobPart.Position).Magnitude < 35 then
-                                root.CFrame = CFrame.new(root.Position, mobPart.Position)
+                        if not runningStates["HitFish"] then break end
+                        if mob:IsA("Model") and mob.Name:lower():find("mob") then
+                            local hum = mob:FindFirstChildOfClass("Humanoid")
+                            local part = mob.PrimaryPart
+                            if hum and hum.Health > 0 and part and (root.Position - part.Position).Magnitude < 30 then
+                                root.CFrame = CFrame.new(root.Position, part.Position)
                                 local tool = char:FindFirstChildOfClass("Tool")
                                 if tool then tool:Activate() end
                             end
                         end
                     end
-                    for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-                        if remote:IsA("RemoteEvent") and (remote.Name:lower():find("fish") or remote.Name:lower():find("catch")) then
-                            remote:FireServer()
-                        end
-                    end
+                    local fishRem = ReplicatedStorage:FindFirstChild("FishEvent", true)
+                    if fishRem and fishRem:IsA("RemoteEvent") then fishRem:FireServer() end
                 end)
+                if not smartWait("HitFish", 1.0) then break end
             end
         end)
     end
 end)
 
--- 12. FPS Boost
-createFeatureToggle("FPS Boost & Optimization", "Tingkatkan performa & hapus lag", function(state)
+-- 12. Dynamic FPS Boost (With ChildAdded Listener & Complete Restore)
+local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd}
+local origMaterials = {}
+local fpsConn = nil
+
+createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi dinamis dengan pemulih", function(state)
     if state then
         pcall(function()
-            local Lighting = game:GetService("Lighting")
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
             for _, v in ipairs(Workspace:GetDescendants()) do
-                if v:IsA("Part") or v:IsA("MeshPart") then v.Material = Enum.Material.SmoothPlastic
-                elseif v:IsA("PostEffect") then v.Enabled = false end
+                if v:IsA("Part") or v:IsA("MeshPart") then
+                    origMaterials[v] = v.Material
+                    v.Material = Enum.Material.SmoothPlastic
+                end
             end
+            -- Menangkap part baru yang spawn saat fitur aktif
+            fpsConn = Workspace.DescendantAdded:Connect(function(v)
+                if runningStates["FPS"] and (v:IsA("Part") or v:IsA("MeshPart")) then
+                    origMaterials[v] = v.Material
+                    v.Material = Enum.Material.SmoothPlastic
+                end
+            end)
+        end)
+    else
+        pcall(function()
+            if fpsConn then
+                fpsConn:Disconnect()
+                fpsConn = nil
+            end
+            Lighting.GlobalShadows = origLighting.GlobalShadows
+            Lighting.FogEnd = origLighting.FogEnd
+            for v, mat in pairs(origMaterials) do
+                if v and v.Parent then
+                    v.Material = mat
+                end
+            end
+            origMaterials = {}
         end)
     end
 end)
 
--- 13. Anti-AFK
-createFeatureToggle("Anti-AFK Bypass", "Mencegah kick otomatis AFK", function(state)
-    ifstate then
+-- 13. Anti-AFK (Syntax Fixed & Fully Closed)
+local afkConn = nil
+createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Bypass anti-AFK aman", function(state)
+    if state then
         local vu = game:GetService("VirtualUser")
-        LocalPlayer.Idled:Connect(function()
-            vu:Button2Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+        afkConn = LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
             task.wait(1)
-            vu:Button2Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
+            vu:Button2Up(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
         end)
+    else
+        if afkConn then
+            afkConn:Disconnect()
+            afkConn = nil
+        end
     end
 end)
 
-print("[Qeeewwie Hub v7.8] Master Compact Edition Loaded Successfully!")
+print("[Qeeewwie Hub v8.3] Enterprise Patched Edition Loaded Successfully!")
