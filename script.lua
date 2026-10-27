@@ -1,5 +1,5 @@
 -- ========================================================
--- Qeeewwie Hub | Sena Exclusive Style Edition
+-- Qeeewwie Hub | Ultimate Sena Exclusive Edition (FPS Boosted)
 -- Game: Steal an Egg
 -- ========================================================
 
@@ -20,8 +20,7 @@ task.wait(0.5)
 
 local runningStates = {}
 local config = {
-    TweenSpeed = 350, -- Kecepatan geser agar aman dari anti-cheat
-    EggFilter = "All" -- Filter jenis telur
+    TweenSpeed = 450,
 }
 
 local function smartWait(id, duration)
@@ -75,7 +74,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | Exclusive Mode"
+Title.Text = "Qeeewwie Hub | Ultimate FPS Mode"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -175,41 +174,41 @@ HudTitle.BackgroundTransparency = 1
 HudTitle.Position = UDim2.new(0, 12, 0, 6)
 HudTitle.Size = UDim2.new(1, -24, 0, 20)
 HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Exclusive Mode Active"
+HudTitle.Text = "Steal Egg | Ultimate FPS Active"
 HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HudTitle.TextSize = 11
 
 local HudInfo = Instance.new("TextLabel", HudFrame)
 HudInfo.BackgroundTransparency = 1
 HudInfo.Position = UDim2.new(0, 12, 0, 26)
-HudInfo.Size = UDim2.new(1, -24, 0, 18)
+HudInfo.Size = Instance.new("UDim2", 1, -24, 0, 18)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Status: Smooth Tween & Safe Delivery"
+HudInfo.Text = "Status: Ultra Boost & Smooth Tween"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
 HudInfo.TextSize = 10
 
 local HudStats = Instance.new("TextLabel", HudFrame)
 HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Anti-Kick Bypass: Enabled"
+HudStats.Text = "Framerate: Unlocked & Optimized"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
 
 -- ================= FITUR UTAMA =================
 
--- 1. Exclusive Auto Steal (Smooth Tween + Safe Return ala Sena)
-createFeatureToggle("ExclusiveSteal", "Exclusive Auto Steal", "Ambil telur mulus & anti jatuh", function(state)
+-- 1. Ultimate Auto Steal
+createFeatureToggle("UltimateSteal", "Ultimate Auto Steal", "Curi telur cepat & aman dari kick", function(state)
     HudFrame.Visible = state
     if state then
         task.spawn(function()
-            while runningStates["ExclusiveSteal"] do
+            while runningStates["UltimateSteal"] do
                 pcall(function()
                     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
                     local root = char:WaitForChild("HumanoidRootPart")
                     local initPos = root.CFrame
                     
                     for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if not runningStates["ExclusiveSteal"] then break end
+                        if not runningStates["UltimateSteal"] then break end
                         
                         local nameLower = obj.Name:lower()
                         if nameLower:find("egg") or nameLower:find("telur") then
@@ -217,33 +216,31 @@ createFeatureToggle("ExclusiveSteal", "Exclusive Auto Steal", "Ambil telur mulus
                             
                             if part then
                                 local distance = (root.Position - part.Position).Magnitude
-                                local travelTime = math.clamp(distance / config.TweenSpeed, 0.3, 1.8)
+                                local travelTime = math.clamp(distance / config.TweenSpeed, 0.2, 1.2)
                                 
-                                -- Tween halus ke posisi telur
-                                local tween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = part.CFrame + Vector3.new(0, 3, 0)})
+                                local tween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = part.CFrame + Vector3.new(0, 2.5, 0)})
                                 tween:Play()
                                 tween.Completed:Wait()
                                 
-                                if not smartWait("ExclusiveSteal", 0.3) then break end
+                                if not smartWait("UltimateSteal", 0.2) then break end
                                 
                                 if firetouchinterest then
                                     firetouchinterest(root, part, 0)
                                     firetouchinterest(root, part, 1)
                                 end
                                 
-                                task.wait(0.2)
+                                task.wait(0.15)
                                 
-                                -- Kembali ke pangkalan/posisi awal secara aman
                                 local returnTween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = initPos})
                                 returnTween:Play()
                                 returnTween.Completed:Wait()
                                 
-                                if not smartWait("ExclusiveSteal", 0.5) then break end
+                                if not smartWait("UltimateSteal", 0.3) then break end
                             end
                         end
                     end
                 end)
-                if not smartWait("ExclusiveSteal", 2.0) then break end
+                if not smartWait("UltimateSteal", 1.5) then break end
             end
         end)
     end
@@ -270,7 +267,7 @@ createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di 
             if not runningStates["FlyMode"] then return end
             pcall(function()
                 bg.CFrame = Workspace.CurrentCamera.CFrame
-                bv.Velocity = Workspace.CurrentCamera.CFrame.LookVector * 40
+                bv.Velocity = Workspace.CurrentCamera.CFrame.LookVector * 50
             end)
         end)
     else
@@ -280,26 +277,43 @@ createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di 
     end
 end)
 
--- 3. FPS Boost
-local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd}
+-- 3. Ultra FPS Boost & Optimization (Ala Sena Exclusive)
+local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd, Brightness = Lighting.Brightness}
 local origMaterials = {}
 local fpsConn = nil
 
-createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik & hapus lag", function(state)
+createFeatureToggle("FPS", "Sena-Style Ultra FPS Boost", "Anti-lag maksimal & mulus total", function(state)
     if state then
         pcall(function()
+            -- Optimasi Lighting
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
+            Lighting.Brightness = 2
+            
+            -- Matikan efek berat di Terrain & Workspace
+            if Workspace:FindFirstChildOfClass("Terrain") then
+                Workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
+                Workspace:FindFirstChildOfClass("Terrain").WaterTransparency = 0
+            end
+            
             for _, v in ipairs(Workspace:GetDescendants()) do
                 if v:IsA("Part") or v:IsA("MeshPart") then
                     origMaterials[v] = v.Material
                     v.Material = Enum.Material.SmoothPlastic
+                    v.Reflectance = 0
+                elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") or v:IsA("Smoke") then
+                    v.Enabled = false
                 end
             end
+            
             fpsConn = Workspace.DescendantAdded:Connect(function(v)
-                if runningStates["FPS"] and (v:IsA("Part") or v:IsA("MeshPart")) then
-                    origMaterials[v] = v.Material
-                    v.Material = Enum.Material.SmoothPlastic
+                if runningStates["FPS"] then
+                    if v:IsA("Part") or v:IsA("MeshPart") then
+                        origMaterials[v] = v.Material
+                        v.Material = Enum.Material.SmoothPlastic
+                    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                        v.Enabled = false
+                    end
                 end
             end)
         end)
@@ -308,6 +322,7 @@ createFeatureToggle("FPS", "FPS Boost & Optimization", "Optimasi grafik & hapus 
             if fpsConn then fpsConn:Disconnect() fpsConn = nil end
             Lighting.GlobalShadows = origLighting.GlobalShadows
             Lighting.FogEnd = origLighting.FogEnd
+            Lighting.Brightness = origLighting.Brightness
             for v, mat in pairs(origMaterials) do
                 if v and v.Parent then v.Material = mat end
             end
@@ -331,4 +346,4 @@ createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK otomatis", 
     end
 end)
 
-print("[Qeeewwie Hub] Exclusive Edition Loaded Successfully!")
+print("[Qeeewwie Hub] Ultimate FPS Edition Loaded Successfully!")
