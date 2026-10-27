@@ -1,11 +1,10 @@
 -- ========================================================
--- Qeeewwie Hub | Ultimate Sena Exclusive Edition (FPS Boosted)
+-- Qeeewwie Hub | Fixed UI & Ultimate Edition
 -- Game: Steal an Egg
 -- ========================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -16,22 +15,10 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("QeeewwieMasterHub") then PlayerGui.QeeewwieMasterHub:Destroy() end
 if PlayerGui:FindFirstChild("QeeewwieStatusHUD") then PlayerGui.QeeewwieStatusHUD:Destroy() end
 
-task.wait(0.5)
+task.wait(0.3)
 
 local runningStates = {}
-local config = {
-    TweenSpeed = 450,
-}
-
-local function smartWait(id, duration)
-    local elapsed = 0
-    while elapsed < duration do
-        if not runningStates[id] then return false end
-        task.wait(0.05)
-        elapsed = elapsed + 0.05
-    end
-    return runningStates[id]
-end
+local config = { TweenSpeed = 450 }
 
 -- ================= UI UTAMA (MASTER HUB) =================
 local ScreenGui = Instance.new("ScreenGui")
@@ -56,9 +43,9 @@ Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 150)
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
-MainFrame.Position = UDim2.new(0.5, -190, 0.5, -185)
-MainFrame.Size = UDim2.new(0, 380, 0, 410)
-MainFrame.Visible = false
+MainFrame.Position = UDim2.new(0.5, -190, 0.5, -190)
+MainFrame.Size = UDim2.new(0, 380, 0, 380)
+MainFrame.Visible = true -- Langsung munculkan agar tidak kosong
 MainFrame.Active = true
 MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -74,7 +61,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 300, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Qeeewwie Hub | Ultimate FPS Mode"
+Title.Text = "Qeeewwie Hub | Fixed Edition"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 12
 
@@ -88,19 +75,15 @@ CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.TextSize = 11
 Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 6)
 
-local Container = Instance.new("ScrollingFrame", MainFrame)
+-- Menggunakan Frame biasa dengan UIListLayout agar aman di semua executor mobile (tanpa ScrollingFrame bug)
+local Container = Instance.new("Frame", MainFrame)
 Container.BackgroundTransparency = 1
 Container.Position = UDim2.new(0, 12, 0, 50)
 Container.Size = UDim2.new(1, -24, 1, -60)
-Container.ScrollBarThickness = 4
 
 local UIListLayout = Instance.new("UIListLayout", Container)
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 10)
-
-UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 20)
-end)
+UIListLayout.Padding = UDim.new(0, 8)
 
 ToggleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
 CloseButton.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
@@ -108,12 +91,12 @@ CloseButton.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 local function createFeatureToggle(id, name, desc, callback)
     local Wrapper = Instance.new("Frame", Container)
     Wrapper.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
-    Wrapper.Size = UDim2.new(1, 0, 0, 50)
+    Wrapper.Size = UDim2.new(1, 0, 0, 60)
     Instance.new("UICorner", Wrapper).CornerRadius = UDim.new(0, 8)
     
     local Label = Instance.new("TextLabel", Wrapper)
     Label.BackgroundTransparency = 1
-    Label.Position = UDim2.new(0, 12, 0, 5)
+    Label.Position = UDim2.new(0, 12, 0, 8)
     Label.Size = UDim2.new(0, 220, 0, 20)
     Label.Font = Enum.Font.GothamBold
     Label.Text = name
@@ -123,7 +106,7 @@ local function createFeatureToggle(id, name, desc, callback)
 
     local DescLabel = Instance.new("TextLabel", Wrapper)
     DescLabel.BackgroundTransparency = 1
-    DescLabel.Position = UDim2.new(0, 12, 0, 25)
+    DescLabel.Position = UDim2.new(0, 12, 0, 30)
     DescLabel.Size = UDim2.new(0, 220, 0, 18)
     DescLabel.Font = Enum.Font.Gotham
     DescLabel.Text = desc
@@ -133,7 +116,7 @@ local function createFeatureToggle(id, name, desc, callback)
 
     local ActionBtn = Instance.new("TextButton", Wrapper)
     ActionBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-    ActionBtn.Position = UDim2.new(1, -95, 0, 10)
+    ActionBtn.Position = UDim2.new(1, -95, 0, 15)
     ActionBtn.Size = UDim2.new(0, 85, 0, 30)
     ActionBtn.Font = Enum.Font.GothamBold
     ActionBtn.Text = "OFF"
@@ -162,35 +145,28 @@ StatusGui.Parent = PlayerGui
 local HudFrame = Instance.new("Frame", StatusGui)
 HudFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
 HudFrame.Position = UDim2.new(0.5, -170, 0, 15)
-HudFrame.Size = UDim2.new(0, 340, 0, 75)
+HudFrame.Size = UDim2.new(0, 340, 0, 60)
 HudFrame.Visible = false
 HudFrame.Active = true
 HudFrame.Draggable = true
 Instance.new("UICorner", HudFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", HudFrame).Color = Color3.fromRGB(0, 255, 150)
 
-local HudTitle = Instance.new("TextLabel", HudFrame)
-HudTitle.BackgroundTransparency = 1
-HudTitle.Position = UDim2.new(0, 12, 0, 6)
-HudTitle.Size = UDim2.new(1, -24, 0, 20)
-HudTitle.Font = Enum.Font.GothamBold
-HudTitle.Text = "Steal Egg | Ultimate FPS Active"
-HudTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-HudTitle.TextSize = 11
-
 local HudInfo = Instance.new("TextLabel", HudFrame)
 HudInfo.BackgroundTransparency = 1
-HudInfo.Position = UDim2.new(0, 12, 0, 26)
-HudInfo.Size = Instance.new("UDim2", 1, -24, 0, 18)
+HudInfo.Position = UDim2.new(0, 12, 0, 10)
+HudInfo.Size = UDim2.new(1, -24, 0, 20)
 HudInfo.Font = Enum.Font.GothamBold
-HudInfo.Text = "Status: Ultra Boost & Smooth Tween"
+HudInfo.Text = "Status: Qeeewwie Hub Active"
 HudInfo.TextColor3 = Color3.fromRGB(0, 255, 150)
-HudInfo.TextSize = 10
+HudInfo.TextSize = 11
 
 local HudStats = Instance.new("TextLabel", HudFrame)
-HudStats.BackgroundTransparency, HudStats.Position, HudStats.Size = 1, UDim2.new(0, 12, 0, 44), UDim2.new(1, -24, 0, 16)
+HudStats.BackgroundTransparency = 1
+HudStats.Position = UDim2.new(0, 12, 0, 32)
+HudStats.Size = UDim2.new(1, -24, 0, 16)
 HudStats.Font = Enum.Font.Gotham
-HudStats.Text = "Framerate: Unlocked & Optimized"
+HudStats.Text = "Ready to Steal & Boost"
 HudStats.TextColor3 = Color3.fromRGB(180, 180, 200)
 HudStats.TextSize = 10
 
@@ -209,11 +185,9 @@ createFeatureToggle("UltimateSteal", "Ultimate Auto Steal", "Curi telur cepat & 
                     
                     for _, obj in ipairs(Workspace:GetDescendants()) do
                         if not runningStates["UltimateSteal"] then break end
-                        
                         local nameLower = obj.Name:lower()
                         if nameLower:find("egg") or nameLower:find("telur") then
                             local part = obj:IsA("BasePart") and obj or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
-                            
                             if part then
                                 local distance = (root.Position - part.Position).Magnitude
                                 local travelTime = math.clamp(distance / config.TweenSpeed, 0.2, 1.2)
@@ -222,7 +196,8 @@ createFeatureToggle("UltimateSteal", "Ultimate Auto Steal", "Curi telur cepat & 
                                 tween:Play()
                                 tween.Completed:Wait()
                                 
-                                if not smartWait("UltimateSteal", 0.2) then break end
+                                if not runningStates["UltimateSteal"] then break end
+                                task.wait(0.2)
                                 
                                 if firetouchinterest then
                                     firetouchinterest(root, part, 0)
@@ -230,23 +205,23 @@ createFeatureToggle("UltimateSteal", "Ultimate Auto Steal", "Curi telur cepat & 
                                 end
                                 
                                 task.wait(0.15)
-                                
                                 local returnTween = TweenService:Create(root, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {CFrame = initPos})
                                 returnTween:Play()
                                 returnTween.Completed:Wait()
                                 
-                                if not smartWait("UltimateSteal", 0.3) then break end
+                                if not runningStates["UltimateSteal"] then break end
+                                task.wait(0.3)
                             end
                         end
                     end
                 end)
-                if not smartWait("UltimateSteal", 1.5) then break end
+                task.wait(1.5)
             end
         end)
     end
 end)
 
--- 2. Mode Fly (Terbang Bebas)
+-- 2. Mode Fly
 local flyConn = nil
 createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di udara", function(state)
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -277,7 +252,7 @@ createFeatureToggle("FlyMode", "Mode Fly (Terbang)", "Terbang bebas melayang di 
     end
 end)
 
--- 3. Ultra FPS Boost & Optimization (Ala Sena Exclusive)
+-- 3. Ultra FPS Boost
 local origLighting = {GlobalShadows = Lighting.GlobalShadows, FogEnd = Lighting.FogEnd, Brightness = Lighting.Brightness}
 local origMaterials = {}
 local fpsConn = nil
@@ -285,27 +260,17 @@ local fpsConn = nil
 createFeatureToggle("FPS", "Sena-Style Ultra FPS Boost", "Anti-lag maksimal & mulus total", function(state)
     if state then
         pcall(function()
-            -- Optimasi Lighting
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
             Lighting.Brightness = 2
-            
-            -- Matikan efek berat di Terrain & Workspace
-            if Workspace:FindFirstChildOfClass("Terrain") then
-                Workspace:FindFirstChildOfClass("Terrain").WaterWaveSize = 0
-                Workspace:FindFirstChildOfClass("Terrain").WaterTransparency = 0
-            end
-            
             for _, v in ipairs(Workspace:GetDescendants()) do
                 if v:IsA("Part") or v:IsA("MeshPart") then
                     origMaterials[v] = v.Material
                     v.Material = Enum.Material.SmoothPlastic
-                    v.Reflectance = 0
-                elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") or v:IsA("Smoke") then
+                elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
                     v.Enabled = false
                 end
             end
-            
             fpsConn = Workspace.DescendantAdded:Connect(function(v)
                 if runningStates["FPS"] then
                     if v:IsA("Part") or v:IsA("MeshPart") then
@@ -331,7 +296,7 @@ createFeatureToggle("FPS", "Sena-Style Ultra FPS Boost", "Anti-lag maksimal & mu
     end
 end)
 
--- 4. Anti-AFK Bypass
+-- 4. Anti-AFK
 local afkConn = nil
 createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK otomatis", function(state)
     if state then
@@ -346,4 +311,4 @@ createFeatureToggle("AntiAFK", "Anti-AFK Bypass", "Mencegah kick AFK otomatis", 
     end
 end)
 
-print("[Qeeewwie Hub] Ultimate FPS Edition Loaded Successfully!")
+print("[Qeeewwie Hub] Fixed UI Edition Loaded Successfully!")
